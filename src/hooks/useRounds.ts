@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getRounds, getActiveRound, startRound as startRoundService, finishRound as finishRoundService, abandonRound as abandonRoundService } from '../services/rounds'
+import type { NewRoundPlayer } from '../types'
+import {
+  getRounds,
+  getActiveRound,
+  startRound as startRoundService,
+  finishRound as finishRoundService,
+  abandonRound as abandonRoundService,
+} from '../services/rounds'
 
 export function useRounds(userId: string | undefined) {
   const [rounds, setRounds] = useState<any[]>([])
@@ -19,12 +26,14 @@ export function useRounds(userId: string | undefined) {
 
   useEffect(() => {
     if (!userId) { setLoading(false); return }
-    refresh().catch((e) => setError(e.message)).finally(() => setLoading(false))
+    let ignore = false
+    refresh().catch((e) => { if (!ignore) setError(e.message) }).finally(() => { if (!ignore) setLoading(false) })
+    return () => { ignore = true }
   }, [userId, refresh])
 
-  const startRound = useCallback(async (courseId: string) => {
+  const startRound = useCallback(async (courseId: string, players: NewRoundPlayer[]) => {
     if (!userId) return null
-    const round = await startRoundService(courseId, userId)
+    const round = await startRoundService(courseId, userId, players)
     setActiveRound(round)
     return round
   }, [userId])
