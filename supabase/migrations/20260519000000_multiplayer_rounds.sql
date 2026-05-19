@@ -45,11 +45,6 @@ create policy "Round participants can view players" on round_players for select
       where rp2.round_id = round_players.round_id
         and rp2.user_id = auth.uid()
     )
-    or exists (
-      select 1 from rounds r
-      where r.id = round_players.round_id
-        and r.created_by = auth.uid()
-    )
   );
 
 create policy "Round creator can add players" on round_players for insert

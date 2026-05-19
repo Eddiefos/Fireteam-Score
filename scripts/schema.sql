@@ -122,6 +122,14 @@ create policy "Course holes readable with course" on course_holes for select
     where id = course_holes.course_id
     and (is_public = true or created_by = auth.uid())
   ));
+create policy "Course creators can insert holes" on course_holes for insert
+  with check (exists (
+    select 1 from courses where id = course_holes.course_id and created_by = auth.uid()
+  ));
+create policy "Course creators can delete holes" on course_holes for delete
+  using (exists (
+    select 1 from courses where id = course_holes.course_id and created_by = auth.uid()
+  ));
 
 -- ─── rounds ──────────────────────────────────────────────────────────────────
 create table rounds (
