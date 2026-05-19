@@ -7,7 +7,7 @@ import {
 } from '../components/atoms'
 import { useRounds } from '../hooks/useRounds'
 import { useScores } from '../hooks/useScores'
-import { useProfile } from '../hooks/useProfile'
+import { useRoundPlayers } from '../hooks/useRoundPlayers'
 import { useCourses } from '../hooks/useCourses'
 import { playerTotal, playerVsPar, liveTimer } from '../lib/gameLogic'
 
@@ -45,7 +45,7 @@ function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel',
 function LiveScorecardScreen({ go, userId }) {
   const { activeRound, loading: roundsLoading, finishRound } = useRounds(userId)
   const { scores, submitScore } = useScores(activeRound?.id)
-  const { profile, loading: profileLoading } = useProfile(userId)
+  const { players, loading: playersLoading } = useRoundPlayers(activeRound?.id)
   const { courses, loading: coursesLoading } = useCourses(userId)
 
   const isFinishingRef = useRef(false)
@@ -54,20 +54,17 @@ function LiveScorecardScreen({ go, userId }) {
     if (!roundsLoading && !activeRound && !isFinishingRef.current) go('home')
   }, [roundsLoading, activeRound])
 
-  const anyLoading = roundsLoading || profileLoading || coursesLoading
+  const anyLoading = roundsLoading || playersLoading || coursesLoading
   const course = courses.find((c) => c.id === activeRound?.course_id)
   const pars = course?.pars ?? []
 
   const round = useMemo(() => {
-    if (!activeRound || !profile || !pars.length) return null
-    const players = [{ id: userId, name: profile.display_name, color: profile.avatar_color }]
+    if (!activeRound || pars.length === 0 || players.length === 0) return null
     const scoreMap = {}
-    for (const p of players) {
-      scoreMap[p.id] = Array(pars.length).fill(null)
-    }
+    for (const p of players) scoreMap[p.id] = Array(pars.length).fill(null)
     for (const s of scores) {
-      if (scoreMap[s.user_id]) {
-        scoreMap[s.user_id][s.hole_number - 1] = s.strokes
+      if (s.round_player_id && scoreMap[s.round_player_id]) {
+        scoreMap[s.round_player_id][s.hole_number - 1] = s.strokes
       }
     }
     return {
@@ -77,8 +74,9 @@ function LiveScorecardScreen({ go, userId }) {
       pars,
       players,
       scores: scoreMap,
+      createdBy: activeRound.created_by,
     }
-  }, [activeRound, profile, courses, scores, userId])
+  }, [activeRound, players, courses, scores])
 
   if (anyLoading || !round) {
     return (
@@ -103,6 +101,7 @@ function LiveScorecardScreen({ go, userId }) {
       key={activeRound.id}
       go={go}
       round={round}
+      currentUserId={userId}
       onSubmitScore={submitScore}
       onFinish={handleFinish}
       onQuit={handleQuit}
@@ -110,17 +109,20 @@ function LiveScorecardScreen({ go, userId }) {
   )
 }
 
-function LiveScorecardImpl({ go, round: r, onSubmitScore, onFinish, onQuit }) {
+function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinish, onQuit }) {
+  const myPlayer = r.players.find((p) => p.userId === currentUserId) ?? r.players[0]
+  const isCreator = r.createdBy === currentUserId
+
   const [hole, setHole] = useState(() => {
-    const ids = r.players.map((p) => p.id)
     for (let i = 0; i < r.pars.length; i++) {
-      if (!ids.every((pid) => typeof (r.scores[pid] || [])[i] === 'number')) return i
+      if (typeof (r.scores[myPlayer?.id] || [])[i] !== 'number') return i
     }
     return r.pars.length - 1
   })
   const [range, setRange] = useState('low')
   const [showQuit, setShowQuit] = useState(false)
   const [localClears, setLocalClears] = useState(new Set())
+  const [inlinePicker, setInlinePicker] = useState(null) // roundPlayerId with picker open
 
   const [, setTick] = useState(0)
   useEffect(() => {
@@ -141,60 +143,49 @@ function LiveScorecardImpl({ go, round: r, onSubmitScore, onFinish, onQuit }) {
     return copy
   }, [r.scores, localClears])
 
-  const activePlayer = useMemo(() => {
-    for (const p of r.players) {
-      if (typeof (effectiveScores[p.id] || [])[hole] !== 'number') return p
-    }
-    return null
-  }, [effectiveScores, hole, r.players])
+  const myScoreThisHole = myPlayer ? (effectiveScores[myPlayer.id] || [])[hole] : null
+  const myNeedsScore = typeof myScoreThisHole !== 'number'
 
   const setScore = (playerId, holeIdx, value) => {
+    const player = r.players.find((p) => p.id === playerId)
     if (value === null) {
       setLocalClears((prev) => new Set([...prev, `${playerId}:${holeIdx + 1}`]))
     } else {
       setLocalClears((prev) => {
-        const next = new Set(prev)
-        next.delete(`${playerId}:${holeIdx + 1}`)
-        return next
+        const next = new Set(prev); next.delete(`${playerId}:${holeIdx + 1}`); return next
       })
-      onSubmitScore(playerId, holeIdx + 1, value)
+      onSubmitScore(playerId, player?.userId ?? null, holeIdx + 1, value)
     }
+    setInlinePicker(null)
   }
 
   const tapStroke = (n) => {
-    if (!activePlayer) return
-    setScore(activePlayer.id, hole, n)
-    const ids = r.players.map((p) => p.id)
-    const scoresAfter = ids.map((id) => id === activePlayer.id ? n : effectiveScores[id]?.[hole])
-    const allScored = scoresAfter.every((s) => typeof s === 'number')
-    if (allScored) {
-      if (hole < N - 1) {
-        const holeAtTap = hole
-        setTimeout(() => setHole((h) => (h === holeAtTap ? h + 1 : h)), 220)
-      } else {
-        setTimeout(() => onFinish(), 280)
-      }
+    if (!myPlayer || !myNeedsScore) return
+    setScore(myPlayer.id, hole, n)
+    const allMyHolesDone = r.players.every((p) =>
+      p.id === myPlayer.id ? true : typeof effectiveScores[p.id]?.[hole] === 'number'
+    )
+    if (allMyHolesDone && hole < N - 1) {
+      const holeAtTap = hole
+      setTimeout(() => setHole((h) => (h === holeAtTap ? h + 1 : h)), 220)
     }
+  }
+
+  const tapOverride = (roundPlayerId, n) => {
+    setScore(roundPlayerId, hole, n)
   }
 
   const undoLast = () => {
-    const ids = r.players.map((p) => p.id).reverse()
     for (let h = hole; h >= 0; h--) {
-      for (const id of ids) {
-        if (typeof effectiveScores[id][h] === 'number') {
-          setScore(id, h, null)
-          if (h < hole) setHole(h)
-          return
-        }
+      if (myPlayer && typeof effectiveScores[myPlayer.id]?.[h] === 'number') {
+        setScore(myPlayer.id, h, null)
+        if (h < hole) setHole(h)
+        return
       }
     }
   }
 
-  const quit = () => {
-    setShowQuit(false)
-    onQuit()
-  }
-
+  const quit = () => { setShowQuit(false); onQuit() }
   const nums = range === 'low' ? [1, 2, 3, 4, 5, 6] : [7, 8, 9, 10, 11, 12]
 
   return (
@@ -289,42 +280,79 @@ function LiveScorecardImpl({ go, round: r, onSubmitScore, onFinish, onQuit }) {
           {r.players.map((p) => {
             const score = effectiveScores[p.id][hole]
             const hasScore = typeof score === 'number'
-            const active = !hasScore && activePlayer && activePlayer.id === p.id
+            const isMe = p.id === myPlayer?.id
+            const pickerOpen = inlinePicker === p.id
             const rEff = { ...r, scores: effectiveScores }
             const total = playerTotal(rEff, p.id)
             const vs = playerVsPar(rEff, p.id)
             const through = (effectiveScores[p.id] || []).filter((s) => typeof s === 'number').length
             return (
-              <div key={p.id} style={{
-                background: active ? FT.cream : hasScore ? 'rgba(244,239,228,0.08)' : 'rgba(244,239,228,0.04)',
-                color: active ? FT.ink : FT.cream,
-                borderRadius: 18, padding: '12px 14px',
-                border: active ? `2px solid ${FT.orange}` : '2px solid transparent',
-                boxShadow: active ? '0 8px 24px rgba(0,0,0,0.25)' : 'none',
-                display: 'flex', alignItems: 'center', gap: 12,
-                transition: 'all 180ms ease-out',
-              }}>
-                <Avatar name={p.name} color={p.color} size={40} fontSize={13} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontFamily: SFR, fontWeight: 800, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 130 }}>{p.name}</span>
-                    {through > 0 && <ParChip value={vs} size="sm" />}
+              <div key={p.id}>
+                {pickerOpen && isCreator && !isMe && (
+                  <div style={{
+                    background: FT.cream, borderRadius: 16, padding: '10px 12px 12px',
+                    marginBottom: 6, boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+                  }}>
+                    <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginBottom: 6 }}>
+                      {p.displayName.toUpperCase()} — HOLE {hole + 1}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 5 }}>
+                      {[1,2,3,4,5,6,7,8,9].map((n) => {
+                        const tone = n - par
+                        const bg = tone < 0 ? FT.orange : tone === 0 ? FT.forest : tone === 1 ? 'rgba(42,31,23,0.85)' : FT.bark
+                        const fg = tone < 0 ? FT.ink : FT.cream
+                        return (
+                          <button key={n} onClick={() => tapOverride(p.id, n)} style={{
+                            height: 44, borderRadius: 12, border: 'none',
+                            background: bg, color: fg,
+                            fontFamily: SFR, fontWeight: 900, fontSize: 20,
+                          }}>{n}</button>
+                        )
+                      })}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 11, opacity: active ? 0.55 : 0.5, marginTop: 1, fontFamily: MONO, letterSpacing: 0.5 }}>
-                    TOTAL {total} · THRU {through}
-                  </div>
-                </div>
-                {hasScore ? (
-                  <button onClick={() => setScore(p.id, hole, null)} className="flat" title="Edit score" style={{
-                    width: 44, height: 44, borderRadius: 12, border: 'none',
-                    background: score - par <= -1 ? FT.orange : 'rgba(244,239,228,0.12)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: SFR, fontWeight: 900, fontSize: 22,
-                    color: score - par <= -1 ? FT.ink : FT.cream,
-                  }}>{score}</button>
-                ) : (
-                  <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 28, color: active ? FT.orange : 'rgba(244,239,228,0.3)', paddingRight: 4 }}>—</div>
                 )}
+                <div style={{
+                  background: isMe
+                    ? (myNeedsScore ? FT.cream : 'rgba(244,239,228,0.1)')
+                    : (hasScore ? 'rgba(244,239,228,0.08)' : 'rgba(244,239,228,0.04)'),
+                  color: isMe ? (myNeedsScore ? FT.ink : FT.cream) : FT.cream,
+                  borderRadius: 18, padding: '12px 14px',
+                  border: isMe ? `2px solid ${myNeedsScore ? FT.orange : 'rgba(244,239,228,0.2)'}` : '2px solid transparent',
+                  boxShadow: isMe && myNeedsScore ? '0 8px 24px rgba(0,0,0,0.25)' : 'none',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  transition: 'all 180ms ease-out',
+                }}>
+                  <Avatar name={p.displayName} color={p.color} size={40} fontSize={13} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontFamily: SFR, fontWeight: 800, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 130 }}>{p.displayName}</span>
+                      {isMe && <span style={{ fontSize: 9, fontWeight: 800, fontFamily: MONO, letterSpacing: 1, color: FT.orange, background: 'rgba(255,107,31,0.12)', padding: '2px 6px', borderRadius: 5 }}>YOU</span>}
+                      {through > 0 && <ParChip value={vs} size="sm" />}
+                    </div>
+                    <div style={{ fontSize: 11, opacity: 0.5, marginTop: 1, fontFamily: MONO, letterSpacing: 0.5 }}>
+                      TOTAL {total} · THRU {through}
+                    </div>
+                  </div>
+                  {hasScore ? (
+                    <button
+                      onClick={() => {
+                        if (isMe) { setScore(p.id, hole, null) }
+                        else if (isCreator) { setInlinePicker((prev) => prev === p.id ? null : p.id) }
+                      }}
+                      className="flat"
+                      style={{
+                        width: 44, height: 44, borderRadius: 12, border: 'none',
+                        background: score - par <= -1 ? FT.orange : 'rgba(244,239,228,0.12)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: SFR, fontWeight: 900, fontSize: 22,
+                        color: score - par <= -1 ? FT.ink : FT.cream,
+                        cursor: (isMe || isCreator) ? 'pointer' : 'default',
+                      }}>{score}</button>
+                  ) : (
+                    <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 28, color: isMe && myNeedsScore ? FT.orange : 'rgba(244,239,228,0.3)', paddingRight: 4 }}>—</div>
+                  )}
+                </div>
               </div>
             )
           })}
@@ -343,10 +371,10 @@ function LiveScorecardImpl({ go, round: r, onSubmitScore, onFinish, onQuit }) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 6px 8px' }}>
             <div>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>
-                {activePlayer ? `${activePlayer.name} throws` : 'Hole locked in'}
+                {myNeedsScore ? 'Your turn' : 'Hole locked in'}
               </div>
               <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 15 }}>
-                {activePlayer ? 'Tap the strokes' : (hole < N - 1 ? 'Next hole →' : 'Final hole — finish up')}
+                {myNeedsScore ? 'Tap the strokes' : (hole < N - 1 ? 'Next hole →' : 'Final hole — finish up')}
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
@@ -367,7 +395,7 @@ function LiveScorecardImpl({ go, round: r, onSubmitScore, onFinish, onQuit }) {
               const isBirdie = tone < 0
               const bg = isBirdie ? FT.orange : isPar ? FT.forest : tone === 1 ? 'rgba(42,31,23,0.85)' : FT.bark
               const fg = isBirdie ? FT.ink : FT.cream
-              const disabled = !activePlayer
+              const disabled = !myNeedsScore
               return (
                 <button key={n} disabled={disabled} onClick={() => tapStroke(n)} style={{
                   height: 56, borderRadius: 14, border: 'none',
