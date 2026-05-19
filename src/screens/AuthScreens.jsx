@@ -504,40 +504,6 @@ function AccountScreen({ session }) {
 }
 
 // ────────────────────────────────────────────────────────────────────────
-//  Squad screen (stub — Phase 3)
-// ────────────────────────────────────────────────────────────────────────
-function SquadScreen() {
-  return (
-    <ScreenShell label="squad" bg={FT.cream}>
-      <StatusBar />
-      <div className="ft-scroll" style={{ padding: '16px 24px 32px' }}>
-        <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 28, color: FT.ink, marginBottom: 24 }}>
-          Squad
-        </div>
-        <div style={{
-          flex: 1, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          textAlign: 'center', paddingTop: 60,
-        }}>
-          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style={{ marginBottom: 16, opacity: 0.3 }}>
-            <circle cx="20" cy="20" r="9" stroke={FT.ink} strokeWidth="2.5"/>
-            <path d="M4 50c0-8.837 7.163-13 16-13s16 4.163 16 50" stroke={FT.ink} strokeWidth="2.5" strokeLinecap="round"/>
-            <circle cx="40" cy="18" r="7" stroke={FT.ink} strokeWidth="2"/>
-            <path d="M50 46c0-6.627-4.477-10-10-10" stroke={FT.ink} strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-          <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 20, color: FT.ink, marginBottom: 8 }}>
-            Squad coming soon
-          </div>
-          <div style={{ fontFamily: SF, fontSize: 15, color: FT.dim, lineHeight: 1.6, maxWidth: 260 }}>
-            Create a fireteam and invite your friends to track scores together.
-          </div>
-        </div>
-      </div>
-    </ScreenShell>
-  );
-}
-
-// ────────────────────────────────────────────────────────────────────────
 //  Settings (just a name field for now)
 //  Props-based to avoid circular imports with App.jsx
 // ────────────────────────────────────────────────────────────────────────
@@ -593,4 +559,4 @@ function SettingsScreen({ go, user: initialUser, onSave }) {
   );
 }
 
-export { LandingScreen, CreateAccountScreen, LoginScreen, AccountScreen, SettingsScreen, SquadScreen }
+export { LandingScreen, CreateAccountScreen, LoginScreen, AccountScreen, SettingsScreen }

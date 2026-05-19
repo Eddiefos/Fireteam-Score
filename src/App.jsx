@@ -3,7 +3,8 @@ import { useToast } from './components/atoms';
 import { FT, SFR } from './constants/colors';
 import { useAuth } from './hooks/useAuth';
 import { useProfile } from './hooks/useProfile';
-import { LandingScreen, CreateAccountScreen, LoginScreen, AccountScreen, SettingsScreen, SquadScreen } from './screens/AuthScreens';
+import { LandingScreen, CreateAccountScreen, LoginScreen, AccountScreen, SettingsScreen } from './screens/AuthScreens'
+import { SquadScreen } from './screens/SquadScreen'
 import { CoursesScreen, NewCourseScreen } from './screens/CoursesScreen';
 import { StatsScreen } from './screens/StatsScreen';
 import { HomeScreen } from './screens/HomeScreen';
@@ -164,7 +165,7 @@ function App() {
   let body;
   switch (screen) {
     case 'home':       body = <HomeScreen go={go} userId={user?.id} />; break;
-    case 'squad':      body = <SquadScreen go={go} />; break;
+    case 'squad':      body = <SquadScreen go={go} userId={user?.id} />; break;
     case 'stats':      body = <StatsScreen go={go} userId={user?.id} />; break;
     case 'account':    body = <AccountScreen session={{ user }} />; break;
     case 'settings':   body = <SettingsScreen go={go} user={profile?.display_name ?? ''} onSave={() => {}} />; break;
