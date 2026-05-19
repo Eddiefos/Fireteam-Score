@@ -13,6 +13,7 @@ function HomeScreen({ go, userId }) {
   const { profile, loading: profileLoading } = useProfile(userId)
   const { rounds, activeRound, loading: roundsLoading } = useRounds(userId)
   const { courses } = useCourses(userId)
+  const myCourseCount = courses.filter((c) => c.created_by === userId).length
   const { players: activePlayers } = useRoundPlayers(activeRound?.id)
   const { members: fireteamMembers } = useFireteam(userId)
 
@@ -161,7 +162,7 @@ function HomeScreen({ go, userId }) {
           }}>
             <div style={{ fontSize: 22, lineHeight: 1, marginBottom: 8 }}>🌲</div>
             <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 17 }}>Courses</div>
-            <div style={{ fontSize: 12, color: FT.dim, marginTop: 1 }}>{courses.length} saved</div>
+            <div style={{ fontSize: 12, color: FT.dim, marginTop: 1 }}>{myCourseCount} saved</div>
           </button>
         </div>
 
