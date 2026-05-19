@@ -36,6 +36,25 @@ describe('startRound', () => {
     )
     expect(result.id).toBe('r1')
   })
+
+  it('throws when round_players insert fails', async () => {
+    const mockRound = { id: 'r1', course_id: 'c1', status: 'active', started_at: '2026-01-01', finished_at: null, holes_played: 0, created_by: 'u1' }
+    const roundChain = {
+      insert: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: mockRound, error: null }),
+    }
+    const playerChain = {
+      insert: vi.fn().mockResolvedValue({ error: { message: 'insert failed' } }),
+    }
+    vi.mocked(supabase.from)
+      .mockReturnValueOnce(roundChain as any)
+      .mockReturnValueOnce(playerChain as any)
+
+    await expect(startRound('c1', 'u1', [
+      { userId: 'u1', displayName: 'Edvard', initials: 'EF', color: '#FF6B1F', isGuest: false },
+    ])).rejects.toThrow('insert failed')
+  })
 })
 
 describe('finishRound', () => {

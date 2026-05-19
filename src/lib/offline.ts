@@ -39,7 +39,7 @@ export async function flushScoreQueue(
     try {
       await onSubmit(
         entry!.round_id,
-        entry!.round_player_id ?? '',
+        entry!.round_player_id!,
         entry!.user_id,
         entry!.hole_number,
         entry!.strokes,
