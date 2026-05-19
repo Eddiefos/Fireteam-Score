@@ -13,7 +13,7 @@ import { useFireteam } from '../hooks/useFireteam'
 import { totalPar } from '../lib/gameLogic'
 
 function StartRoundScreen({ go, userId }) {
-  const { courses, loading: coursesLoading } = useCourses(userId)
+  const { courses, loading: coursesLoading } = useCourses(userId, true)
   const { startRound } = useRounds(userId)
   const { profile } = useProfile(userId)
   const { friends, loading: friendsLoading } = useFriends(userId)
