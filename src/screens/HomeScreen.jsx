@@ -6,6 +6,7 @@ import { useProfile } from '../hooks/useProfile'
 import { useRounds } from '../hooks/useRounds'
 import { useCourses } from '../hooks/useCourses'
 import { useRoundPlayers } from '../hooks/useRoundPlayers'
+import { useFireteam } from '../hooks/useFireteam'
 import { formatDate } from '../lib/gameLogic'
 
 function HomeScreen({ go, userId }) {
@@ -13,6 +14,7 @@ function HomeScreen({ go, userId }) {
   const { rounds, activeRound, loading: roundsLoading } = useRounds(userId)
   const { courses } = useCourses(userId)
   const { players: activePlayers } = useRoundPlayers(activeRound?.id)
+  const { members: fireteamMembers } = useFireteam(userId)
 
   const loading = profileLoading || roundsLoading
 
@@ -25,11 +27,12 @@ function HomeScreen({ go, userId }) {
   [rounds])
   const recent = completed.slice(0, 4)
 
-  // simplified fireteam bar — just the current user until Fireteams
   const fireteam = useMemo(() => {
+    if (fireteamMembers.length > 0)
+      return fireteamMembers.map((m) => ({ name: m.display_name, color: m.avatar_color }))
     if (!profile) return []
     return [{ name: profile.display_name, color: profile.avatar_color || FT.orange }]
-  }, [profile])
+  }, [fireteamMembers, profile])
 
   const namePrompt = !profile?.display_name
 
