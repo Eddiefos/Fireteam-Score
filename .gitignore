@@ -34,3 +34,6 @@ public/workbox-*.js
 scripts/*.json
 scripts/dist/
 .superpowers/
+
+# Supabase CLI temp files (not migrations — those stay in git)
+supabase/.temp/
