@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { FT, SFR, SF, MONO } from '../constants/colors'
+import { FT, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import {
-  StatusBar, HomeIndicator, ParChip,
+  StatusBar, HomeIndicator,
   IconChevronLeft, IconTrash, IconPlus, EmptyState,
 } from '../components/atoms'
 import { useCourses } from '../hooks/useCourses'
@@ -72,6 +72,17 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
     await deleteCourse(id)
     setConfirmDel(null)
     onToast('Course deleted')
+  }
+
+  if (loading) {
+    return (
+      <ScreenShell label="Courses">
+        <StatusBar />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: FT.orange, opacity: 0.8 }} />
+        </div>
+      </ScreenShell>
+    )
   }
 
   return (
@@ -150,12 +161,24 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
 //  New / Edit Course
 // ────────────────────────────────────────────────────────────────────────
 function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
-  const { courses, createCourse, updateCourse } = useCourses(userId)
-  const editing = params.courseId ? courses.find((c) => c.id === params.courseId) : null
+  const { courses, loading, createCourse, updateCourse } = useCourses(userId)
 
-  const [name, setName] = useState(editing ? editing.name : '')
-  const [holeCount, setHoleCount] = useState(editing ? editing.pars.length : 18)
-  const [pars, setPars] = useState(() => editing ? [...editing.pars] : Array(18).fill(3))
+  // Hooks first (always called)
+  const [name, setName] = useState('')
+  const [holeCount, setHoleCount] = useState(18)
+  const [pars, setPars] = useState(() => Array(18).fill(3))
+
+  // Derive editing after hooks
+  const editing = !loading && params.courseId ? courses.find((c) => c.id === params.courseId) : null
+
+  // Sync name/holeCount/pars to editing once loaded
+  useEffect(() => {
+    if (editing) {
+      setName(editing.name)
+      setHoleCount(editing.pars.length)
+      setPars([...editing.pars])
+    }
+  }, [editing?.id]) // eslint-disable-line
 
   // sync pars when holeCount changes (preserve existing values)
   useEffect(() => {
@@ -166,6 +189,17 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
     });
   }, [holeCount]);
 
+  if (loading) {
+    return (
+      <ScreenShell label="New Course">
+        <StatusBar />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: FT.orange, opacity: 0.8 }} />
+        </div>
+      </ScreenShell>
+    )
+  }
+
   const setPar = (i, v) => {
     v = Math.max(2, Math.min(7, v));
     setPars((prev) => prev.map((p, idx) => idx === i ? v : p));
@@ -175,14 +209,18 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
 
   const save = async () => {
     if (!canSave) return;
-    if (editing) {
-      await updateCourse(editing.id, { name: name.trim(), pars: [...pars] })
-      onToast('Course updated')
-    } else {
-      await createCourse({ name: name.trim(), pars: [...pars] })
-      onToast('Course saved')
+    try {
+      if (editing) {
+        await updateCourse(editing.id, { name: name.trim(), pars: [...pars] })
+        onToast('Course updated')
+      } else {
+        await createCourse({ name: name.trim(), pars: [...pars] })
+        onToast('Course saved')
+      }
+      go('courses')
+    } catch (err) {
+      onToast('Failed to save course')
     }
-    go('courses')
   };
 
   return (
