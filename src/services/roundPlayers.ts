@@ -1,7 +1,18 @@
 import { supabase } from './supabase'
 import type { RoundPlayer, NewRoundPlayer } from '../types'
 
-function toRoundPlayer(row: any): RoundPlayer {
+type RoundPlayerRow = {
+  id: string
+  round_id: string
+  user_id: string | null
+  guest_name: string | null
+  display_name: string
+  initials: string
+  color: string
+  is_guest: boolean
+}
+
+function toRoundPlayer(row: RoundPlayerRow): RoundPlayer {
   return {
     id: row.id,
     roundId: row.round_id,

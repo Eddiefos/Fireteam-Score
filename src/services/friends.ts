@@ -1,6 +1,31 @@
 import { supabase } from './supabase'
 import type { Friend, FriendRequest, Profile } from '../types'
 
+type FriendProfileRow = {
+  id: string
+  display_name: string
+  username: string
+  initials: string
+  avatar_color: string
+}
+
+type FriendRow = {
+  id: string
+  requester_id: string
+  addressee_id: string
+  requester: FriendProfileRow
+  addressee: FriendProfileRow
+}
+
+type FriendRequestRow = {
+  id: string
+  requester_id: string
+  addressee_id: string
+  status: 'pending' | 'accepted' | 'declined'
+  created_at: string
+  profile: FriendProfileRow & { created_at: string }
+}
+
 export async function getFriends(userId: string): Promise<Friend[]> {
   const { data, error } = await supabase
     .from('friends')
@@ -15,7 +40,7 @@ export async function getFriends(userId: string): Promise<Friend[]> {
     .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
   if (error) throw new Error(error.message)
 
-  return (data ?? []).map((row: any) => {
+  return (data ?? []).map((row: FriendRow) => {
     const other = row.requester_id === userId ? row.addressee : row.requester
     return {
       id: row.id,
@@ -41,7 +66,7 @@ export async function getPendingRequests(userId: string): Promise<FriendRequest[
     .eq('status', 'pending')
   if (error) throw new Error(error.message)
 
-  return (data ?? []).map((row: any) => ({
+  return (data ?? []).map((row: FriendRequestRow) => ({
     id: row.id,
     requesterId: row.requester_id,
     addresseeId: row.addressee_id,
@@ -69,7 +94,7 @@ export async function getSentRequests(userId: string): Promise<FriendRequest[]> 
     .eq('status', 'pending')
   if (error) throw new Error(error.message)
 
-  return (data ?? []).map((row: any) => ({
+  return (data ?? []).map((row: FriendRequestRow) => ({
     id: row.id,
     requesterId: row.requester_id,
     addresseeId: row.addressee_id,
