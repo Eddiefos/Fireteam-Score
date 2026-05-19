@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { supabase } from './services/supabase';
 
 
 // ────────────────────────────────────────────────────────────────────────
@@ -1879,20 +1880,219 @@ function hashCode(s) {
 }
 
 // ────────────────────────────────────────────────────────────────────────
+//  Login screen
+// ────────────────────────────────────────────────────────────────────────
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const COOLDOWN_S = 30;
+
+function LoginScreen() {
+  const [email, setEmail]       = useState('');
+  const [status, setStatus]     = useState('idle'); // idle | loading | sent | error
+  const [errMsg, setErrMsg]     = useState('');
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(id);
+  }, [cooldown]);
+
+  const canSubmit = status !== 'loading' && cooldown === 0 && EMAIL_RE.test(email.trim());
+
+  async function handleSend(e) {
+    e.preventDefault();
+    if (!canSubmit) return;
+
+    const trimmed = email.trim().toLowerCase();
+    setStatus('loading');
+    setErrMsg('');
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email: trimmed,
+      options: { shouldCreateUser: true },
+    });
+
+    if (error) {
+      setStatus('error');
+      setErrMsg('Something went wrong. Try again in a moment.');
+      return;
+    }
+
+    setStatus('sent');
+    setCooldown(COOLDOWN_S);
+  }
+
+  const MagicDisc = () => (
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+      <circle cx="26" cy="26" r="23" stroke={FT.orange} strokeWidth="2.5" fill="none"/>
+      <circle cx="26" cy="26" r="15" stroke={FT.orange} strokeWidth="2" fill="none" opacity=".5"/>
+      <circle cx="26" cy="26" r="5" fill={FT.orange}/>
+      <path d="M26 3 A23 23 0 0 1 49 26" stroke={FT.orange} strokeWidth="2.5" strokeLinecap="round"/>
+    </svg>
+  );
+
+  return (
+    <ScreenShell label="login" bg={FT.cream}>
+      {/* Hero */}
+      <div style={{
+        background: FT.forest, position: 'relative', overflow: 'hidden',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'flex-end', padding: '48px 32px 40px', flexShrink: 0,
+      }}>
+        <StatusBar />
+        <TopoBg />
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+          <MagicDisc />
+          <div style={{
+            fontFamily: SFR, fontWeight: 800, fontSize: 32,
+            color: FT.cream, marginTop: 16, letterSpacing: -0.5,
+          }}>Fireteam Score</div>
+          <div style={{
+            fontFamily: SF, fontSize: 15, color: 'rgba(244,239,228,0.65)',
+            marginTop: 6, letterSpacing: 0.1,
+          }}>Disc golf with the squad</div>
+        </div>
+      </div>
+
+      {/* Form */}
+      <div style={{ flex: 1, padding: '36px 28px 40px', display: 'flex', flexDirection: 'column' }}>
+        {status === 'sent' ? (
+          <div style={{
+            flex: 1, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+          }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: 16, background: FT.forest,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20,
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="6" width="18" height="13" rx="2" stroke={FT.cream} strokeWidth="2"/>
+                <path d="M3 8l9 6 9-6" stroke={FT.cream} strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 22, color: FT.ink, marginBottom: 10 }}>
+              Check your email
+            </div>
+            <div style={{ fontFamily: SF, fontSize: 15, color: FT.dim, lineHeight: 1.6, maxWidth: 280 }}>
+              We sent a sign-in link to{' '}
+              <strong style={{ color: FT.ink }}>{email.trim().toLowerCase()}</strong>.
+              Tap the link to sign in.
+            </div>
+            <button
+              onClick={() => { setStatus('idle'); setEmail(''); }}
+              style={{
+                marginTop: 32, background: 'none',
+                border: `1.5px solid ${FT.hair}`, borderRadius: 12,
+                padding: '10px 20px', fontFamily: SFR, fontWeight: 700,
+                fontSize: 14, color: FT.dim, cursor: cooldown > 0 ? 'default' : 'pointer',
+              }}
+            >
+              {cooldown > 0 ? `Resend in ${cooldown}s` : 'Use a different email'}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 22, color: FT.ink, marginBottom: 6 }}>
+              Sign in
+            </div>
+            <div style={{ fontFamily: SF, fontSize: 15, color: FT.dim, marginBottom: 28, lineHeight: 1.5 }}>
+              Enter your email and we'll send you a sign-in link — no password needed.
+            </div>
+
+            <form onSubmit={handleSend} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <label style={{
+                  display: 'block', fontFamily: SFR, fontWeight: 700, fontSize: 12,
+                  color: FT.dim, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 8,
+                }}>
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setStatus('idle'); setErrMsg(''); }}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  inputMode="email"
+                  maxLength={254}
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    padding: '13px 14px', borderRadius: 12,
+                    border: `1.5px solid ${status === 'error' ? '#E5556A' : FT.hair}`,
+                    background: FT.paper, fontFamily: SF, fontSize: 16,
+                    color: FT.ink, outline: 'none', WebkitAppearance: 'none',
+                  }}
+                />
+              </div>
+
+              {status === 'error' && (
+                <div style={{ fontFamily: SF, fontSize: 13, color: '#E5556A' }}>{errMsg}</div>
+              )}
+
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                style={{
+                  marginTop: 4, width: '100%', padding: '15px',
+                  borderRadius: 14, border: 'none',
+                  background: canSubmit ? FT.orange : 'rgba(42,31,23,0.1)',
+                  color: canSubmit ? FT.ink : FT.dim,
+                  fontFamily: SFR, fontWeight: 800, fontSize: 16,
+                  cursor: canSubmit ? 'pointer' : 'default',
+                  transition: 'background 0.15s, color 0.15s',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}
+              >
+                {status === 'loading'
+                  ? <span style={{ opacity: 0.7 }}>Sending…</span>
+                  : cooldown > 0
+                  ? `Resend in ${cooldown}s`
+                  : <>Send magic link <IconArrow size={18} /></>}
+              </button>
+            </form>
+
+            <div style={{
+              marginTop: 'auto', paddingTop: 32, fontFamily: SF,
+              fontSize: 12, color: FT.dim, textAlign: 'center', lineHeight: 1.6,
+            }}>
+              By signing in you agree that scores are sacred<br />and disc golf is the best sport.
+            </div>
+          </>
+        )}
+      </div>
+    </ScreenShell>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
 //  App router
 // ────────────────────────────────────────────────────────────────────────
 function App() {
-  const [screen, setScreen] = useState('home');
-  const [params, setParams] = useState({});
-  const [history, setHistory] = useState([]); // for back nav
+  const [screen, setScreen]   = useState('home');
+  const [params, setParams]   = useState({});
+  const [history, setHistory] = useState([]);
+  // undefined = checking session, null = not logged in, object = logged in
+  const [session, setSession] = useState(undefined);
   const t = useToast();
   _toastFn = t.show;
+
+  // Auth — check session on mount and listen for changes
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const go = useCallback((next, p = {}) => {
     setHistory((h) => [...h, { screen, params }]);
     setScreen(next);
     setParams(p);
-    // scroll to top on screen change
     requestAnimationFrame(() => {
       const sc = document.querySelector('.ft-scroll');
       if (sc) sc.scrollTop = 0;
@@ -1916,6 +2116,30 @@ function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, [screen]);
 
+  // Loading — checking session
+  if (session === undefined) {
+    return (
+      <div className="ft-stage">
+        <div className="ft-phone" style={{ background: FT.forest, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: FT.orange, opacity: 0.8 }} />
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in — show login screen
+  if (!session) {
+    return (
+      <div className="ft-stage">
+        <div className="ft-phone">
+          <LoginScreen />
+        </div>
+        {t.node}
+      </div>
+    );
+  }
+
+  // Logged in — full app
   let body;
   switch (screen) {
     case 'home':       body = <HomeScreen go={go} />; break;
