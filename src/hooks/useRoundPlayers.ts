@@ -8,9 +8,11 @@ export function useRoundPlayers(roundId: string | undefined) {
 
   useEffect(() => {
     if (!roundId) { setLoading(false); return }
+    let ignore = false
     getRoundPlayers(roundId)
-      .then(setPlayers)
-      .finally(() => setLoading(false))
+      .then((data) => { if (!ignore) setPlayers(data) })
+      .finally(() => { if (!ignore) setLoading(false) })
+    return () => { ignore = true }
   }, [roundId])
 
   return { players, loading }

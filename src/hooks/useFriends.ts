@@ -31,7 +31,9 @@ export function useFriends(userId: string | undefined) {
 
   useEffect(() => {
     if (!userId) { setLoading(false); return }
-    refresh().finally(() => setLoading(false))
+    let ignore = false
+    refresh().finally(() => { if (!ignore) setLoading(false) })
+    return () => { ignore = true }
   }, [userId, refresh])
 
   const sendRequest = useCallback(async (addresseeId: string) => {
