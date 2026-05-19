@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { FT, SF, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import {
@@ -48,8 +48,10 @@ function LiveScorecardScreen({ go, userId }) {
   const { profile, loading: profileLoading } = useProfile(userId)
   const { courses, loading: coursesLoading } = useCourses(userId)
 
+  const isFinishingRef = useRef(false)
+
   useEffect(() => {
-    if (!roundsLoading && !activeRound) go('home')
+    if (!roundsLoading && !activeRound && !isFinishingRef.current) go('home')
   }, [roundsLoading, activeRound])
 
   const anyLoading = roundsLoading || profileLoading || coursesLoading
@@ -89,6 +91,7 @@ function LiveScorecardScreen({ go, userId }) {
   }
 
   const handleFinish = async () => {
+    isFinishingRef.current = true
     await finishRound(activeRound.id)
     go('round', { roundId: activeRound.id, justFinished: true })
   }
@@ -166,7 +169,8 @@ function LiveScorecardImpl({ go, round: r, onSubmitScore, onFinish, onQuit }) {
     const allScored = scoresAfter.every((s) => typeof s === 'number')
     if (allScored) {
       if (hole < N - 1) {
-        setTimeout(() => setHole(hole + 1), 220)
+        const holeAtTap = hole
+        setTimeout(() => setHole((h) => (h === holeAtTap ? h + 1 : h)), 220)
       } else {
         setTimeout(() => onFinish(), 280)
       }
@@ -346,7 +350,7 @@ function LiveScorecardImpl({ go, round: r, onSubmitScore, onFinish, onQuit }) {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-              <button onClick={() => setRange((r) => r === 'low' ? 'high' : 'low')} className="flat" style={{
+              <button onClick={() => setRange((prev) => prev === 'low' ? 'high' : 'low')} className="flat" style={{
                 height: 30, padding: '0 10px', borderRadius: 8, border: 'none',
                 background: 'rgba(42,31,23,0.07)', color: FT.ink, fontWeight: 700, fontSize: 12, fontFamily: SF,
               }}>{range === 'low' ? '7-12' : '1-6'}</button>
