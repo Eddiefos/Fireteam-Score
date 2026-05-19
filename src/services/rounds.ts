@@ -65,7 +65,7 @@ export async function getActiveRound(_userId: string): Promise<{
 } | null> {
   const { data, error } = await supabase
     .from('rounds')
-    .select('id, course_id, started_at, holes_played, created_by')
+    .select('id, course_id, started_at, holes_played, created_by, status')
     .eq('status', 'active')
     .order('started_at', { ascending: false })
     .limit(1)

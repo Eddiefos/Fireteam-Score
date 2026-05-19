@@ -1,10 +1,10 @@
 import { supabase } from './supabase'
 import type { Course, CourseHole } from '../types'
 
-export async function getCourses(_userId: string): Promise<Course[]> {
-  const { data: courses, error } = await supabase
-    .from('courses')
-    .select('*')
+export async function getCourses(userId: string, onlyMine = false): Promise<Course[]> {
+  let query = supabase.from('courses').select('*')
+  if (onlyMine) query = query.eq('created_by', userId)
+  const { data: courses, error } = await query
 
   if (error) throw new Error(error.message)
 

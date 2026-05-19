@@ -349,6 +349,17 @@ function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinis
                         color: score - par <= -1 ? FT.ink : FT.cream,
                         cursor: (isMe || isCreator) ? 'pointer' : 'default',
                       }}>{score}</button>
+                  ) : isCreator && !isMe ? (
+                    <button
+                      onClick={() => setInlinePicker((prev) => prev === p.id ? null : p.id)}
+                      className="flat"
+                      style={{
+                        width: 44, height: 44, borderRadius: 12, border: 'none',
+                        background: 'rgba(244,239,228,0.08)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: SFR, fontWeight: 900, fontSize: 28,
+                        color: 'rgba(244,239,228,0.4)', cursor: 'pointer',
+                      }}>—</button>
                   ) : (
                     <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 28, color: isMe && myNeedsScore ? FT.orange : 'rgba(244,239,228,0.3)', paddingRight: 4 }}>—</div>
                   )}

@@ -65,7 +65,7 @@ function TopBar({ onBack, label, right }) {
 //  Courses list — manage saved courses
 // ────────────────────────────────────────────────────────────────────────
 function CoursesScreen({ go, userId, onToast = () => {} }) {
-  const { courses, loading, deleteCourse } = useCourses(userId)
+  const { courses, loading, deleteCourse } = useCourses(userId, true)
   const [confirmDel, setConfirmDel] = useState(null)
 
   const remove = async (id) => {
@@ -166,7 +166,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
 //  New / Edit Course
 // ────────────────────────────────────────────────────────────────────────
 function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
-  const { courses, loading, createCourse, updateCourse } = useCourses(userId)
+  const { courses, loading, createCourse, updateCourse } = useCourses(userId, true)
 
   // Hooks first (always called)
   const [name, setName] = useState('')
