@@ -2296,6 +2296,195 @@ function LoginScreen({ onBack, onSignup }) {
 }
 
 // ────────────────────────────────────────────────────────────────────────
+//  Bottom tab bar
+// ────────────────────────────────────────────────────────────────────────
+const TAB_SCREENS = new Set(['home', 'squad', 'stats', 'account']);
+
+function BottomTabBar({ active, onTab }) {
+  const tabs = [
+    {
+      id: 'home', label: 'Home',
+      icon: (on) => (
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1H14v-5h-4v5H4a1 1 0 01-1-1V9.5z"
+            stroke={on ? FT.forest : FT.dim} strokeWidth="1.8" strokeLinejoin="round" fill={on ? 'rgba(31,61,43,0.1)' : 'none'}/>
+        </svg>
+      ),
+    },
+    {
+      id: 'squad', label: 'Squad',
+      icon: (on) => (
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="8" cy="8" r="3" stroke={on ? FT.forest : FT.dim} strokeWidth="1.8"/>
+          <path d="M2 19c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke={on ? FT.forest : FT.dim} strokeWidth="1.8" strokeLinecap="round"/>
+          <circle cx="16" cy="7" r="2.5" stroke={on ? FT.forest : FT.dim} strokeWidth="1.6"/>
+          <path d="M19.5 18c0-2.485-1.567-4-3.5-4" stroke={on ? FT.forest : FT.dim} strokeWidth="1.6" strokeLinecap="round"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'stats', label: 'Stats',
+      icon: (on) => (
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <rect x="3" y="13" width="4" height="6" rx="1" fill={on ? 'rgba(31,61,43,0.15)' : 'none'} stroke={on ? FT.forest : FT.dim} strokeWidth="1.8"/>
+          <rect x="9" y="9" width="4" height="10" rx="1" fill={on ? 'rgba(31,61,43,0.15)' : 'none'} stroke={on ? FT.forest : FT.dim} strokeWidth="1.8"/>
+          <rect x="15" y="4" width="4" height="15" rx="1" fill={on ? 'rgba(31,61,43,0.15)' : 'none'} stroke={on ? FT.forest : FT.dim} strokeWidth="1.8"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'account', label: 'Account',
+      icon: (on) => (
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="8" r="3.5" stroke={on ? FT.forest : FT.dim} strokeWidth="1.8"/>
+          <path d="M4 19c0-3.866 3.134-6 7-6s7 2.134 7 6" stroke={on ? FT.forest : FT.dim} strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+      ),
+    },
+  ];
+
+  return (
+    <div style={{
+      background: FT.paper, borderTop: `1px solid ${FT.hair}`,
+      display: 'flex', flexShrink: 0,
+      paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+    }}>
+      {tabs.map(({ id, label, icon }) => {
+        const on = active === id;
+        return (
+          <button key={id} onClick={() => onTab(id)} className="flat" style={{
+            flex: 1, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            gap: 3, padding: '9px 0 8px',
+            background: 'none', border: 'none', cursor: 'pointer',
+          }}>
+            {icon(on)}
+            <span style={{
+              fontFamily: SFR, fontWeight: on ? 700 : 500, fontSize: 10,
+              color: on ? FT.forest : FT.dim, letterSpacing: 0.2,
+            }}>{label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
+//  Account screen
+// ────────────────────────────────────────────────────────────────────────
+function AccountScreen({ session }) {
+  const email    = session?.user?.email ?? '';
+  const username = session?.user?.user_metadata?.username || email.split('@')[0];
+  const initials = username.slice(0, 2).toUpperCase();
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    await supabase.auth.signOut();
+  }
+
+  return (
+    <ScreenShell label="account" bg={FT.cream}>
+      <StatusBar />
+      <div className="ft-scroll" style={{ padding: '16px 24px 32px' }}>
+        <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 28, color: FT.ink, marginBottom: 24 }}>
+          Account
+        </div>
+
+        {/* Avatar + info */}
+        <div style={{
+          background: FT.paper, borderRadius: 16, border: `1px solid ${FT.hair}`,
+          padding: '20px', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12,
+        }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 16,
+            background: FT.forest, color: FT.cream,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: SFR, fontWeight: 900, fontSize: 20, flexShrink: 0,
+          }}>{initials}</div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 17, color: FT.ink, marginBottom: 3 }}>
+              {username}
+            </div>
+            <div style={{ fontFamily: SF, fontSize: 13, color: FT.dim, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {email}
+            </div>
+          </div>
+        </div>
+
+        {/* Divider section */}
+        <div style={{
+          background: FT.paper, borderRadius: 16, border: `1px solid ${FT.hair}`,
+          overflow: 'hidden', marginBottom: 24,
+        }}>
+          {[
+            { label: 'Username', value: username },
+            { label: 'Member since', value: new Date(session?.user?.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) },
+          ].map(({ label, value }, i, arr) => (
+            <div key={label} style={{
+              padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              borderBottom: i < arr.length - 1 ? `1px solid ${FT.hair}` : 'none',
+            }}>
+              <span style={{ fontFamily: SF, fontSize: 15, color: FT.ink }}>{label}</span>
+              <span style={{ fontFamily: SF, fontSize: 15, color: FT.dim }}>{value}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Sign out */}
+        <button
+          onClick={handleSignOut}
+          disabled={signingOut}
+          style={{
+            width: '100%', padding: '15px', borderRadius: 14, border: 'none',
+            background: 'rgba(229,85,106,0.1)', color: '#E5556A',
+            fontFamily: SFR, fontWeight: 800, fontSize: 16,
+            cursor: signingOut ? 'default' : 'pointer', opacity: signingOut ? 0.6 : 1,
+          }}
+        >
+          {signingOut ? 'Signing out…' : 'Sign out'}
+        </button>
+      </div>
+    </ScreenShell>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
+//  Squad screen (stub — Phase 3)
+// ────────────────────────────────────────────────────────────────────────
+function SquadScreen() {
+  return (
+    <ScreenShell label="squad" bg={FT.cream}>
+      <StatusBar />
+      <div className="ft-scroll" style={{ padding: '16px 24px 32px' }}>
+        <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 28, color: FT.ink, marginBottom: 24 }}>
+          Squad
+        </div>
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          textAlign: 'center', paddingTop: 60,
+        }}>
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style={{ marginBottom: 16, opacity: 0.3 }}>
+            <circle cx="20" cy="20" r="9" stroke={FT.ink} strokeWidth="2.5"/>
+            <path d="M4 50c0-8.837 7.163-13 16-13s16 4.163 16 50" stroke={FT.ink} strokeWidth="2.5" strokeLinecap="round"/>
+            <circle cx="40" cy="18" r="7" stroke={FT.ink} strokeWidth="2"/>
+            <path d="M50 46c0-6.627-4.477-10-10-10" stroke={FT.ink} strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 20, color: FT.ink, marginBottom: 8 }}>
+            Squad coming soon
+          </div>
+          <div style={{ fontFamily: SF, fontSize: 15, color: FT.dim, lineHeight: 1.6, maxWidth: 260 }}>
+            Create a fireteam and invite your friends to track scores together.
+          </div>
+        </div>
+      </div>
+    </ScreenShell>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────
 //  App router
 // ────────────────────────────────────────────────────────────────────────
 function App() {
@@ -2329,6 +2518,11 @@ function App() {
       if (sc) sc.scrollTop = 0;
     });
   }, [screen, params]);
+
+  const goTab = useCallback((tab) => {
+    setScreen(tab);
+    setParams({});
+  }, []);
 
   // browser back button — go to home, simple model
   useEffect(() => {
@@ -2377,20 +2571,28 @@ function App() {
   let body;
   switch (screen) {
     case 'home':       body = <HomeScreen go={go} />; break;
+    case 'squad':      body = <SquadScreen go={go} />; break;
+    case 'stats':      body = <StatsScreen go={go} />; break;
+    case 'account':    body = <AccountScreen session={session} />; break;
     case 'settings':   body = <SettingsScreen go={go} />; break;
     case 'courses':    body = <CoursesScreen go={go} />; break;
     case 'newCourse':  body = <NewCourseScreen go={go} params={params} />; break;
     case 'start':      body = <StartRoundScreen go={go} />; break;
     case 'live':       body = <LiveScorecardScreen go={go} />; break;
     case 'round':      body = <RoundDetailScreen go={go} params={params} />; break;
-    case 'stats':      body = <StatsScreen go={go} />; break;
     default:           body = <HomeScreen go={go} />;
   }
 
+  const showTabs = TAB_SCREENS.has(screen);
+
   return (
     <div className="ft-stage">
-      <div className="ft-phone" key={screen + (params.roundId || '') + (params.courseId || '')}>
-        {body}
+      <div className="ft-phone" key={screen + (params.roundId || '') + (params.courseId || '')}
+        style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {body}
+        </div>
+        {showTabs && <BottomTabBar active={screen} onTab={goTab} />}
       </div>
       {t.node}
     </div>
