@@ -38,8 +38,8 @@ export function useRounds(userId: string | undefined) {
     return round
   }, [userId])
 
-  const finishRound = useCallback(async (roundId: string) => {
-    await finishRoundService(roundId)
+  const finishRound = useCallback(async (roundId: string, holesPlayed: number) => {
+    await finishRoundService(roundId, holesPlayed)
     setActiveRound(null)
     await refresh()
   }, [refresh])

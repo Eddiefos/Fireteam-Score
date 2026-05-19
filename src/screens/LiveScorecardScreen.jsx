@@ -90,7 +90,7 @@ function LiveScorecardScreen({ go, userId }) {
 
   const handleFinish = async () => {
     isFinishingRef.current = true
-    await finishRound(activeRound.id)
+    await finishRound(activeRound.id, pars.length)
     go('round', { roundId: activeRound.id, justFinished: true })
   }
 
@@ -185,7 +185,14 @@ function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinis
     }
   }
 
+  const allDone = useMemo(() =>
+    r.players.every((p) => (effectiveScores[p.id] || []).every((s) => typeof s === 'number')),
+  [r.players, effectiveScores])
+
+  const [showFinishModal, setShowFinishModal] = useState(false)
+
   const quit = () => { setShowQuit(false); onQuit() }
+  const confirmFinish = () => { setShowFinishModal(false); setShowQuit(false); onFinish() }
   const nums = range === 'low' ? [1, 2, 3, 4, 5, 6] : [7, 8, 9, 10, 11, 12]
 
   return (
@@ -373,62 +380,110 @@ function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinis
         <div style={{ height: 220 }} />
       </div>
 
-      {/* Stepper input for active player */}
+      {/* Stepper input or finish CTA */}
       <div style={{ position: 'absolute', left: 14, right: 14, bottom: 'max(16px, env(safe-area-inset-bottom))', zIndex: 2 }}>
-        <div style={{
-          background: FT.cream, borderRadius: 22, padding: '10px 12px 12px',
-          boxShadow: '0 12px 36px rgba(0,0,0,0.35)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 6px 8px' }}>
-            <div>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>
-                {myNeedsScore ? 'Your turn' : 'Hole locked in'}
+        {allDone && isCreator ? (
+          <button onClick={() => setShowFinishModal(true)} className="flat" style={{
+            width: '100%', height: 64, borderRadius: 22, border: 'none',
+            background: FT.orange, color: FT.ink,
+            fontFamily: SFR, fontWeight: 900, fontSize: 19, letterSpacing: -0.3,
+            boxShadow: '0 12px 36px rgba(0,0,0,0.35), inset 0 -4px 0 rgba(0,0,0,0.18)',
+          }}>Finish Round →</button>
+        ) : (
+          <div style={{
+            background: FT.cream, borderRadius: 22, padding: '10px 12px 12px',
+            boxShadow: '0 12px 36px rgba(0,0,0,0.35)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 6px 8px' }}>
+              <div>
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>
+                  {myNeedsScore ? 'Your turn' : 'Hole locked in'}
+                </div>
+                <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 15 }}>
+                  {myNeedsScore ? 'Tap the strokes' : (hole < N - 1 ? 'Next hole →' : 'Final hole — finish up')}
+                </div>
               </div>
-              <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 15 }}>
-                {myNeedsScore ? 'Tap the strokes' : (hole < N - 1 ? 'Next hole →' : 'Final hole — finish up')}
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button onClick={() => setRange((prev) => prev === 'low' ? 'high' : 'low')} className="flat" style={{
+                  height: 30, padding: '0 10px', borderRadius: 8, border: 'none',
+                  background: 'rgba(42,31,23,0.07)', color: FT.ink, fontWeight: 700, fontSize: 12, fontFamily: SF,
+                }}>{range === 'low' ? '7-12' : '1-6'}</button>
+                <button onClick={undoLast} className="flat" style={{
+                  height: 30, padding: '0 10px', borderRadius: 8, border: 'none',
+                  background: 'rgba(42,31,23,0.07)', color: FT.ink, fontWeight: 700, fontSize: 12, fontFamily: SF,
+                }}>Undo</button>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button onClick={() => setRange((prev) => prev === 'low' ? 'high' : 'low')} className="flat" style={{
-                height: 30, padding: '0 10px', borderRadius: 8, border: 'none',
-                background: 'rgba(42,31,23,0.07)', color: FT.ink, fontWeight: 700, fontSize: 12, fontFamily: SF,
-              }}>{range === 'low' ? '7-12' : '1-6'}</button>
-              <button onClick={undoLast} className="flat" style={{
-                height: 30, padding: '0 10px', borderRadius: 8, border: 'none',
-                background: 'rgba(42,31,23,0.07)', color: FT.ink, fontWeight: 700, fontSize: 12, fontFamily: SF,
-              }}>Undo</button>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6 }}>
+              {nums.map((n) => {
+                const tone = n - par
+                const isPar = tone === 0
+                const isBirdie = tone < 0
+                const bg = isBirdie ? FT.orange : isPar ? FT.forest : tone === 1 ? 'rgba(42,31,23,0.85)' : FT.bark
+                const fg = isBirdie ? FT.ink : FT.cream
+                const disabled = !myNeedsScore
+                return (
+                  <button key={n} disabled={disabled} onClick={() => tapStroke(n)} style={{
+                    height: 56, borderRadius: 14, border: 'none',
+                    background: disabled ? 'rgba(42,31,23,0.1)' : bg,
+                    color: disabled ? FT.dim : fg,
+                    fontFamily: SFR, fontWeight: 900, fontSize: 24, letterSpacing: -0.5,
+                    boxShadow: disabled ? 'none' : 'inset 0 -3px 0 rgba(0,0,0,0.18)',
+                    cursor: disabled ? 'default' : 'pointer',
+                  }}>{n}</button>
+                )
+              })}
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6 }}>
-            {nums.map((n) => {
-              const tone = n - par
-              const isPar = tone === 0
-              const isBirdie = tone < 0
-              const bg = isBirdie ? FT.orange : isPar ? FT.forest : tone === 1 ? 'rgba(42,31,23,0.85)' : FT.bark
-              const fg = isBirdie ? FT.ink : FT.cream
-              const disabled = !myNeedsScore
-              return (
-                <button key={n} disabled={disabled} onClick={() => tapStroke(n)} style={{
-                  height: 56, borderRadius: 14, border: 'none',
-                  background: disabled ? 'rgba(42,31,23,0.1)' : bg,
-                  color: disabled ? FT.dim : fg,
-                  fontFamily: SFR, fontWeight: 900, fontSize: 24, letterSpacing: -0.5,
-                  boxShadow: disabled ? 'none' : 'inset 0 -3px 0 rgba(0,0,0,0.18)',
-                  cursor: disabled ? 'default' : 'pointer',
-                }}>{n}</button>
-              )
-            })}
-          </div>
-        </div>
+        )}
       </div>
 
-      <Modal open={showQuit}
-        title="Leave round?"
-        body="The round will be saved as in-progress and you can resume from Home."
-        cancelLabel="Keep playing"
-        confirmLabel="Save & exit"
-        onCancel={() => setShowQuit(false)}
-        onConfirm={quit} />
+      {/* Quit / leave modal */}
+      {showQuit && (
+        <div onClick={() => setShowQuit(false)} style={{
+          position: 'absolute', inset: 0, background: 'rgba(21,17,13,0.5)',
+          zIndex: 90, display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          padding: '0 0 max(16px,env(safe-area-inset-bottom))',
+        }}>
+          <div onClick={(e) => e.stopPropagation()} style={{
+            background: FT.cream, borderRadius: 20, padding: 18, width: '100%', margin: '0 14px',
+            display: 'flex', flexDirection: 'column', gap: 8,
+          }}>
+            <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 18, letterSpacing: -0.3 }}>Leave round?</div>
+            <div style={{ fontSize: 13, color: FT.dim, lineHeight: 1.45, marginBottom: 4 }}>
+              The round stays active — you can resume from Home.
+            </div>
+            <button onClick={quit} style={{
+              height: 52, borderRadius: 14, border: 'none',
+              background: FT.forest, color: FT.cream,
+              fontFamily: SFR, fontWeight: 800, fontSize: 16,
+            }}>Save &amp; exit</button>
+            {isCreator && (
+              <button onClick={() => { setShowQuit(false); setShowFinishModal(true) }} style={{
+                height: 52, borderRadius: 14, border: 'none',
+                background: 'rgba(42,31,23,0.08)', color: FT.ink,
+                fontFamily: SFR, fontWeight: 800, fontSize: 16,
+              }}>Finish round early…</button>
+            )}
+            <button onClick={() => setShowQuit(false)} style={{
+              height: 44, borderRadius: 14, border: 'none', background: 'none',
+              color: FT.dim, fontFamily: SFR, fontWeight: 700, fontSize: 15,
+            }}>Keep playing</button>
+          </div>
+        </div>
+      )}
+
+      {/* Finish confirmation modal */}
+      <Modal open={showFinishModal}
+        title={allDone ? 'Finish the round?' : 'Not all scores entered'}
+        body={allDone
+          ? 'This will lock the scorecard and save the final result.'
+          : `Some holes are missing scores. Finish the round anyway?`}
+        cancelLabel="Go back"
+        confirmLabel="Finish round"
+        danger={!allDone}
+        onCancel={() => setShowFinishModal(false)}
+        onConfirm={confirmFinish} />
 
       <HomeIndicator dark />
     </ScreenShell>
