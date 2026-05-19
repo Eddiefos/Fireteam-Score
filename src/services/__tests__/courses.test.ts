@@ -31,7 +31,8 @@ const mockHoles = [
 describe('getCourses', () => {
   it('fetches courses and hydrates pars from holes', async () => {
     const courseChain = {
-      select: vi.fn().mockResolvedValue({ data: [mockCourse], error: null }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: [mockCourse], error: null }),
     }
     const holeChain = {
       select: vi.fn().mockReturnThis(),
@@ -42,7 +43,7 @@ describe('getCourses', () => {
       .mockReturnValueOnce(courseChain as any)
       .mockReturnValueOnce(holeChain as any)
 
-    const result = await getCourses()
+    const result = await getCourses('u1')
     expect(result[0].pars).toEqual([3, 3])
     expect(result[0].name).toBe('Bear Creek')
   })
@@ -50,7 +51,8 @@ describe('getCourses', () => {
   it('uses default pars if no holes found', async () => {
     const course = { ...mockCourse, holes: 9 }
     const courseChain = {
-      select: vi.fn().mockResolvedValue({ data: [course], error: null }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: [course], error: null }),
     }
     const holeChain = {
       select: vi.fn().mockReturnThis(),
@@ -61,17 +63,18 @@ describe('getCourses', () => {
       .mockReturnValueOnce(courseChain as any)
       .mockReturnValueOnce(holeChain as any)
 
-    const result = await getCourses()
+    const result = await getCourses('u1')
     expect(result[0].pars).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3])
   })
 
   it('throws if fetch fails', async () => {
     const courseChain = {
-      select: vi.fn().mockResolvedValue({ data: null, error: { message: 'fetch error' } }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: null, error: { message: 'fetch error' } }),
     }
     vi.mocked(supabase.from).mockReturnValue(courseChain as any)
 
-    await expect(getCourses()).rejects.toThrow('fetch error')
+    await expect(getCourses('u1')).rejects.toThrow('fetch error')
   })
 })
 
