@@ -18,13 +18,24 @@ create policy "Users can update own profile" on profiles for update using (auth.
 -- Auto-create profile on signup
 create or replace function handle_new_user()
 returns trigger as $$
+declare
+  _username text;
+  _display  text;
 begin
+  _username := coalesce(
+    new.raw_user_meta_data->>'username',
+    split_part(new.email, '@', 1)
+  );
+  _display := coalesce(
+    new.raw_user_meta_data->>'display_name',
+    _username
+  );
   insert into public.profiles (id, username, display_name, initials)
   values (
     new.id,
-    split_part(new.email, '@', 1),
-    split_part(new.email, '@', 1),
-    upper(left(split_part(new.email, '@', 1), 2))
+    _username,
+    _display,
+    upper(left(_username, 2))
   );
   return new;
 end;
