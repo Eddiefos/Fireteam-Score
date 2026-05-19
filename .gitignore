@@ -33,3 +33,4 @@ public/workbox-*.js
 # Scripts — local-only artefacts
 scripts/*.json
 scripts/dist/
+.superpowers/
