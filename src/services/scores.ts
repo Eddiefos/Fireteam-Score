@@ -3,15 +3,16 @@ import type { Score } from '../types'
 
 export async function submitScore(
   roundId: string,
-  userId: string,
+  roundPlayerId: string,
+  userId: string | null,
   holeNumber: number,
   strokes: number,
 ): Promise<void> {
   const { error } = await supabase
     .from('scores')
     .upsert(
-      { round_id: roundId, user_id: userId, hole_number: holeNumber, strokes },
-      { onConflict: 'round_id,user_id,hole_number' },
+      { round_id: roundId, round_player_id: roundPlayerId, user_id: userId, hole_number: holeNumber, strokes },
+      { onConflict: 'round_id,round_player_id,hole_number' },
     )
   if (error) throw new Error(error.message)
 }
