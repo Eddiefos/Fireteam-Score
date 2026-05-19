@@ -17,6 +17,8 @@ export type Course = {
   id: string
   name: string
   location: string | null
+  lat: number | null
+  lng: number | null
   holes: number
   par_total: number | null
   pars: number[]
@@ -61,4 +63,24 @@ export type PendingScore = {
   hole_number: number
   strokes: number
   timestamp: number
+}
+
+export type Fireteam = {
+  id: string
+  name: string
+  created_by: string | null
+  invite_code: string
+  created_at: string
+}
+
+export type FireteamMember = {
+  fireteam_id: string
+  user_id: string
+  joined_at: string
+}
+
+export type SavedCourse = {
+  user_id: string
+  course_id: string
+  saved_at: string
 }
