@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { supabase } from '../services/supabase'
 import type { Score } from '../types'
 import { submitScore as submitScoreService, getScores } from '../services/scores'
@@ -23,10 +24,11 @@ export function useScores(roundId: string | undefined) {
     if (!roundId) return
     const channel = supabase
       .channel(`scores:${roundId}`)
-      .on(
+      .on<Score>(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'scores', filter: `round_id=eq.${roundId}` },
-        (payload: { new: Score }) => {
+        (payload: RealtimePostgresChangesPayload<Score>) => {
+          if (payload.eventType === 'DELETE') return
           const incoming = payload.new
           setScores((prev) => {
             const idx = prev.findIndex(

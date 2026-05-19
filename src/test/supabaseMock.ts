@@ -12,7 +12,7 @@ export function makeSupabaseMock(result: MockResult = { data: null, error: null 
   }
   chain['single'] = terminal
   // Make the chain itself thenable (for queries that don't call .single())
-  chain['then'] = (resolve: (v: MockResult) => void) => Promise.resolve(result).then(resolve)
+  ;(chain as Record<string, unknown>)['then'] = (resolve: (v: MockResult) => void) => Promise.resolve(result).then(resolve)
 
   const from = vi.fn().mockReturnValue(chain)
   return { from, chain, terminal }

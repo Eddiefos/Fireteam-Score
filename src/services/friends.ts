@@ -40,7 +40,7 @@ export async function getFriends(userId: string): Promise<Friend[]> {
     .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`)
   if (error) throw new Error(error.message)
 
-  return (data ?? []).map((row: FriendRow) => {
+  return ((data ?? []) as unknown as FriendRow[]).map((row) => {
     const other = row.requester_id === userId ? row.addressee : row.requester
     return {
       id: row.id,
@@ -66,7 +66,7 @@ export async function getPendingRequests(userId: string): Promise<FriendRequest[
     .eq('status', 'pending')
   if (error) throw new Error(error.message)
 
-  return (data ?? []).map((row: FriendRequestRow) => ({
+  return ((data ?? []) as unknown as FriendRequestRow[]).map((row) => ({
     id: row.id,
     requesterId: row.requester_id,
     addresseeId: row.addressee_id,
@@ -94,7 +94,7 @@ export async function getSentRequests(userId: string): Promise<FriendRequest[]> 
     .eq('status', 'pending')
   if (error) throw new Error(error.message)
 
-  return (data ?? []).map((row: FriendRequestRow) => ({
+  return ((data ?? []) as unknown as FriendRequestRow[]).map((row) => ({
     id: row.id,
     requesterId: row.requester_id,
     addresseeId: row.addressee_id,
