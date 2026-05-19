@@ -5,12 +5,14 @@ import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconArrow, EmptyStat
 import { useProfile } from '../hooks/useProfile'
 import { useRounds } from '../hooks/useRounds'
 import { useCourses } from '../hooks/useCourses'
+import { useRoundPlayers } from '../hooks/useRoundPlayers'
 import { formatDate } from '../lib/gameLogic'
 
 function HomeScreen({ go, userId }) {
   const { profile, loading: profileLoading } = useProfile(userId)
   const { rounds, activeRound, loading: roundsLoading } = useRounds(userId)
   const { courses } = useCourses(userId)
+  const { players: activePlayers } = useRoundPlayers(activeRound?.id)
 
   const loading = profileLoading || roundsLoading
 
@@ -98,6 +100,18 @@ function HomeScreen({ go, userId }) {
                 <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 16, marginTop: 2 }}>
                   Hole {Math.min(activeCourse?.holes || 18, (activeRound.holes_played || 0) + 1)} of {activeCourse?.holes || '?'}
                 </div>
+                {activePlayers.length > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
+                    {activePlayers.slice(0, 4).map((p, i) => (
+                      <div key={p.id} style={{ marginLeft: i ? -6 : 0 }}>
+                        <Avatar name={p.displayName} color={p.color} size={20} fontSize={7} border={`1.5px solid ${FT.bark}`} />
+                      </div>
+                    ))}
+                    {activePlayers.length > 4 && (
+                      <div style={{ marginLeft: 4, fontSize: 10, color: 'rgba(244,239,228,0.5)', fontFamily: MONO }}>+{activePlayers.length - 4}</div>
+                    )}
+                  </div>
+                )}
               </div>
             </button>
           </div>
