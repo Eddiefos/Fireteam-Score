@@ -115,6 +115,8 @@ create policy "Users can create courses" on courses for insert
   with check (auth.uid() = created_by);
 create policy "Creators can update courses" on courses for update
   using (auth.uid() = created_by);
+create policy "Creators can delete courses" on courses for delete
+  using (auth.uid() = created_by);
 
 create policy "Course holes readable with course" on course_holes for select
   using (exists (
