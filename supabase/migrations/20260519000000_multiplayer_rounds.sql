@@ -73,6 +73,7 @@ alter table scores add constraint scores_round_player_hole_unique
 
 -- Updated RLS for scores
 drop policy if exists "Players write own scores" on scores;
+drop policy if exists "Players update own scores" on scores;
 drop policy if exists "Fireteam members can read scores" on scores;
 
 create policy "Players write own scores" on scores for insert
