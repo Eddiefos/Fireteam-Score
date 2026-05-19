@@ -9,7 +9,7 @@ export function useCourses(userId: string | undefined) {
 
   useEffect(() => {
     if (!userId) { setLoading(false); return }
-    getCourses()
+    getCourses(userId)
       .then(setCourses)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))

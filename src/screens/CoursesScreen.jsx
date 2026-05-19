@@ -69,9 +69,14 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
   const [confirmDel, setConfirmDel] = useState(null)
 
   const remove = async (id) => {
-    await deleteCourse(id)
-    setConfirmDel(null)
-    onToast('Course deleted')
+    try {
+      await deleteCourse(id)
+      setConfirmDel(null)
+      onToast('Course deleted')
+    } catch {
+      setConfirmDel(null)
+      onToast('Failed to delete course')
+    }
   }
 
   if (loading) {

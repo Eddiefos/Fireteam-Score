@@ -1,8 +1,11 @@
 import { supabase } from './supabase'
 import type { Course, CourseHole } from '../types'
 
-export async function getCourses(): Promise<Course[]> {
-  const { data: courses, error } = await supabase.from('courses').select('*')
+export async function getCourses(userId: string): Promise<Course[]> {
+  const { data: courses, error } = await supabase
+    .from('courses')
+    .select('*')
+    .eq('created_by', userId)
 
   if (error) throw new Error(error.message)
 
