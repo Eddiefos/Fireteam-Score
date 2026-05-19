@@ -39,17 +39,19 @@ function StartRoundScreen({ go, userId }) {
 
   const addFriend = useCallback((friend) => {
     if (addedIds.has(friend.userId)) return
-    const color = PLAYER_COLORS[allPlayers.length % PLAYER_COLORS.length]
-    setAddedPlayers((prev) => [...prev, {
-      roundPlayerId: `friend-${friend.userId}`,
-      userId: friend.userId,
-      guestName: null,
-      displayName: friend.displayName,
-      initials: friend.initials,
-      color,
-      isGuest: false,
-    }])
-  }, [addedIds, allPlayers.length])
+    setAddedPlayers((prev) => {
+      const color = PLAYER_COLORS[(prev.length + (myPlayer ? 1 : 0)) % PLAYER_COLORS.length]
+      return [...prev, {
+        roundPlayerId: `friend-${friend.userId}`,
+        userId: friend.userId,
+        guestName: null,
+        displayName: friend.displayName,
+        initials: friend.initials,
+        color,
+        isGuest: false,
+      }]
+    })
+  }, [addedIds, myPlayer])
 
   const removePlayer = useCallback((roundPlayerId) => {
     setAddedPlayers((prev) => prev.filter((p) => p.roundPlayerId !== roundPlayerId))
