@@ -1,12 +1,12 @@
-import { useState, useMemo } from 'react'
-import { FT, SFR, SF, MONO, PLAYER_COLORS } from '../constants/colors'
+import { useState, useMemo, useEffect } from 'react'
+import { FT, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconChevronLeft, IconTrash } from '../components/atoms'
 import { useRounds } from '../hooks/useRounds'
 import { useScores } from '../hooks/useScores'
 import { useProfile } from '../hooks/useProfile'
 import { useCourses } from '../hooks/useCourses'
-import { playerTotal, playerVsPar, winnerOf, formatDate, formatDuration, totalPar, initialsOf } from '../lib/gameLogic'
+import { playerTotal, playerVsPar, formatDuration, totalPar, initialsOf } from '../lib/gameLogic'
 
 function TopBar({ onBack, label, step, right }) {
   return (
@@ -84,7 +84,6 @@ function RoundDetailScreen({ go, params, userId }) {
       id: rawRound.id,
       courseName: course?.name ?? '',
       startedAt: new Date(rawRound.started_at).getTime(),
-      finishedAt: rawRound.finished_at ? new Date(rawRound.finished_at).getTime() : null,
       completedAt: rawRound.finished_at ? new Date(rawRound.finished_at).getTime() : null,
       pars,
       players,
@@ -93,7 +92,11 @@ function RoundDetailScreen({ go, params, userId }) {
     }
   }, [rawRound, profile, courses, scores, userId])
 
-  if (anyLoading) {
+  useEffect(() => {
+    if (!anyLoading && !round) go('home')
+  }, [anyLoading, round])
+
+  if (anyLoading || !round) {
     return (
       <ScreenShell>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -101,11 +104,6 @@ function RoundDetailScreen({ go, params, userId }) {
         </div>
       </ScreenShell>
     )
-  }
-
-  if (!round) {
-    go('home')
-    return null
   }
 
   const handleDelete = async () => {
@@ -217,7 +215,7 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
   return (
     <ScreenShell label="Round Detail">
       <StatusBar />
-      <TopBar onBack={() => go(params.justFinished ? 'home' : 'home')}
+      <TopBar onBack={() => go('home')}
         label={isComplete ? 'FINAL' : 'IN PROGRESS'}
         right={
           <button onClick={() => setConfirmDel(true)} className="flat" style={{
