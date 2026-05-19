@@ -28,6 +28,26 @@ export type Course = {
   created_at: string
 }
 
+export type RoundPlayer = {
+  id: string           // round_players.id — used as score key
+  roundId: string
+  userId: string | null
+  guestName: string | null
+  displayName: string
+  initials: string
+  color: string
+  isGuest: boolean
+}
+
+export type NewRoundPlayer = {
+  userId?: string
+  guestName?: string
+  displayName: string
+  initials: string
+  color: string
+  isGuest: boolean
+}
+
 export type Round = {
   id: string
   course_id: string
@@ -42,16 +62,11 @@ export type Round = {
   scores: Record<string, (number | null)[]>
 }
 
-export type RoundPlayer = {
-  id: string
-  name: string
-  color: string
-}
-
 export type Score = {
   id: string
   round_id: string
-  user_id: string
+  round_player_id: string | null
+  user_id: string | null
   hole_number: number
   strokes: number
   created_at: string
@@ -59,10 +74,31 @@ export type Score = {
 
 export type PendingScore = {
   round_id: string
-  user_id: string
+  round_player_id: string | null
+  user_id: string | null
   hole_number: number
   strokes: number
   timestamp: number
+}
+
+export type Friend = {
+  id: string           // friends.id
+  userId: string       // the other person's profile id
+  displayName: string
+  username: string
+  initials: string
+  avatarColor: string
+  roundsTogether: number
+  avgVsPar: number | null
+}
+
+export type FriendRequest = {
+  id: string
+  requesterId: string
+  addresseeId: string
+  status: 'pending' | 'accepted' | 'declined'
+  profile: Profile
+  createdAt: string
 }
 
 export type Fireteam = {

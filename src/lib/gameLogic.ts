@@ -125,7 +125,7 @@ export type PlayerStats = {
 
 export function computePlayerStats(rounds: Round[], playerName: string): PlayerStats {
   const completed = rounds.filter((r) => r.finished_at)
-  const mine = completed.filter((r) => r.players.some((p) => p.name === playerName))
+  const mine = completed.filter((r) => r.players.some((p) => p.displayName === playerName))
   let totalVs = 0
   let totalRounds = 0
   let birdies = 0
@@ -137,7 +137,7 @@ export function computePlayerStats(rounds: Round[], playerName: string): PlayerS
   const h2h: Record<string, { w: number; l: number; t: number; last: string }> = {}
 
   for (const r of mine) {
-    const me = r.players.find((p) => p.name === playerName)
+    const me = r.players.find((p) => p.displayName === playerName)
     if (!me) continue
     const myScore = playerTotal(r, me.id)
     const myVs = playerVsPar(r, me.id)
@@ -165,7 +165,7 @@ export function computePlayerStats(rounds: Round[], playerName: string): PlayerS
 
     for (const p of r.players) {
       if (p.id === me.id) continue
-      const opp = h2h[p.name] || { w: 0, l: 0, t: 0, last: '–' }
+      const opp = h2h[p.displayName] || { w: 0, l: 0, t: 0, last: '–' }
       const oppScore = playerTotal(r, p.id)
       if (myScore < oppScore) {
         opp.w += 1
@@ -177,7 +177,7 @@ export function computePlayerStats(rounds: Round[], playerName: string): PlayerS
         opp.t += 1
         opp.last = 'T'
       }
-      h2h[p.name] = opp
+      h2h[p.displayName] = opp
     }
   }
 

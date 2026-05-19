@@ -16,17 +16,17 @@ const makeRound = (overrides: Partial<Round> = {}): Round => ({
   created_by: 'u1',
   started_at: new Date().toISOString(),
   finished_at: null,
-  players: [{ id: 'u1', name: 'Alice', color: '#FF6B1F' }],
-  scores: { u1: [3, 2, null] },
+  players: [{ id: 'rp1', roundId: 'r1', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false }],
+  scores: { rp1: [3, 2, null] },
   ...overrides,
 })
 
 describe('playerTotal', () => {
   it('sums strokes for scored holes', () => {
-    expect(playerTotal(makeRound(), 'u1')).toBe(5)
+    expect(playerTotal(makeRound(), 'rp1')).toBe(5)
   })
   it('stops at throughHole', () => {
-    expect(playerTotal(makeRound(), 'u1', 1)).toBe(3)
+    expect(playerTotal(makeRound(), 'rp1', 1)).toBe(3)
   })
   it('returns 0 for unknown player', () => {
     expect(playerTotal(makeRound(), 'unknown')).toBe(0)
@@ -36,7 +36,7 @@ describe('playerTotal', () => {
 describe('playerVsPar', () => {
   it('calculates score relative to par', () => {
     // hole1: 3 strokes, par 3 = E; hole2: 2 strokes, par 3 = -1
-    expect(playerVsPar(makeRound(), 'u1')).toBe(-1)
+    expect(playerVsPar(makeRound(), 'rp1')).toBe(-1)
   })
 })
 
@@ -54,7 +54,7 @@ describe('isRoundComplete', () => {
     expect(isRoundComplete(makeRound())).toBe(false)
   })
   it('returns true when all holes are scored', () => {
-    const r = makeRound({ scores: { u1: [3, 3, 4] } })
+    const r = makeRound({ scores: { rp1: [3, 3, 4] } })
     expect(isRoundComplete(r)).toBe(true)
   })
 })
@@ -63,12 +63,12 @@ describe('winnerOf', () => {
   it('returns the player with the lowest total', () => {
     const r = makeRound({
       players: [
-        { id: 'u1', name: 'Alice', color: '#FF6B1F' },
-        { id: 'u2', name: 'Bob', color: '#3A5A40' },
+        { id: 'rp1', roundId: 'r1', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false },
+        { id: 'rp2', roundId: 'r1', userId: 'u2', guestName: null, displayName: 'Bob', initials: 'BO', color: '#3A5A40', isGuest: false },
       ],
-      scores: { u1: [3, 3, 4], u2: [4, 4, 5] },
+      scores: { rp1: [3, 3, 4], rp2: [4, 4, 5] },
     })
-    expect(winnerOf(r)?.name).toBe('Alice')
+    expect(winnerOf(r)?.displayName).toBe('Alice')
   })
 })
 
@@ -152,16 +152,16 @@ describe('computePlayerStats', () => {
         id: 'r1',
         finished_at: new Date().toISOString(),
         players: [
-          { id: 'u1', name: 'Alice', color: '#FF6B1F' },
-          { id: 'u2', name: 'Bob', color: '#3A5A40' },
+          { id: 'rp1', roundId: 'r1', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false },
+          { id: 'rp2', roundId: 'r1', userId: 'u2', guestName: null, displayName: 'Bob', initials: 'BO', color: '#3A5A40', isGuest: false },
         ],
-        scores: { u1: [3, 3, 4], u2: [4, 4, 5] },
+        scores: { rp1: [3, 3, 4], rp2: [4, 4, 5] },
       }),
       makeRound({
         id: 'r2',
         finished_at: null, // active, not completed
-        players: [{ id: 'u1', name: 'Alice', color: '#FF6B1F' }],
-        scores: { u1: [3, null, null] },
+        players: [{ id: 'rp3', roundId: 'r2', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false }],
+        scores: { rp3: [3, null, null] },
       }),
     ]
     const stats = computePlayerStats(rounds, 'Alice')
@@ -177,10 +177,10 @@ describe('computePlayerStats', () => {
         course_name: 'Course 1',
         pars: [3, 3, 4],
         players: [
-          { id: 'u1', name: 'Alice', color: '#FF6B1F' },
-          { id: 'u2', name: 'Bob', color: '#3A5A40' },
+          { id: 'rp1', roundId: 'r1', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false },
+          { id: 'rp2', roundId: 'r1', userId: 'u2', guestName: null, displayName: 'Bob', initials: 'BO', color: '#3A5A40', isGuest: false },
         ],
-        scores: { u1: [3, 3, 4], u2: [4, 4, 5] }, // Alice: E, Bob: +3
+        scores: { rp1: [3, 3, 4], rp2: [4, 4, 5] }, // Alice: E, Bob: +3
       }),
     ]
     const stats = computePlayerStats(rounds, 'Alice')
@@ -196,8 +196,8 @@ describe('computePlayerStats', () => {
         id: 'r1',
         finished_at: new Date().toISOString(),
         pars: [3, 3, 4],
-        players: [{ id: 'u1', name: 'Alice', color: '#FF6B1F' }],
-        scores: { u1: [2, 3, 3] }, // birdie, par, birdie
+        players: [{ id: 'rp1', roundId: 'r1', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false }],
+        scores: { rp1: [2, 3, 3] }, // birdie, par, birdie
       }),
     ]
     const stats = computePlayerStats(rounds, 'Alice')
@@ -212,8 +212,8 @@ describe('computePlayerStats', () => {
         course_id: 'c1',
         course_name: 'Course A',
         pars: [3, 3, 4],
-        players: [{ id: 'u1', name: 'Alice', color: '#FF6B1F' }],
-        scores: { u1: [3, 3, 4] },
+        players: [{ id: 'rp1', roundId: 'r1', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false }],
+        scores: { rp1: [3, 3, 4] },
       }),
       makeRound({
         id: 'r2',
@@ -221,8 +221,8 @@ describe('computePlayerStats', () => {
         course_id: 'c1',
         course_name: 'Course A',
         pars: [3, 3, 4],
-        players: [{ id: 'u1', name: 'Alice', color: '#FF6B1F' }],
-        scores: { u1: [4, 3, 5] },
+        players: [{ id: 'rp2', roundId: 'r2', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false }],
+        scores: { rp2: [4, 3, 5] },
       }),
     ]
     const stats = computePlayerStats(rounds, 'Alice')
@@ -238,10 +238,10 @@ describe('computePlayerStats', () => {
         finished_at: new Date().toISOString(),
         pars: [3, 3, 4],
         players: [
-          { id: 'u1', name: 'Alice', color: '#FF6B1F' },
-          { id: 'u2', name: 'Bob', color: '#3A5A40' },
+          { id: 'rp1', roundId: 'r1', userId: 'u1', guestName: null, displayName: 'Alice', initials: 'AL', color: '#FF6B1F', isGuest: false },
+          { id: 'rp2', roundId: 'r1', userId: 'u2', guestName: null, displayName: 'Bob', initials: 'BO', color: '#3A5A40', isGuest: false },
         ],
-        scores: { u1: [3, 3, 4], u2: [4, 4, 5] }, // Alice wins
+        scores: { rp1: [3, 3, 4], rp2: [4, 4, 5] }, // Alice wins
       }),
     ]
     const stats = computePlayerStats(rounds, 'Alice')
