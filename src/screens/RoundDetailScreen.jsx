@@ -4,7 +4,7 @@ import { ScreenShell } from '../components/layout/ScreenShell'
 import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconChevronLeft, IconTrash } from '../components/atoms'
 import { useRounds } from '../hooks/useRounds'
 import { useScores } from '../hooks/useScores'
-import { useProfile } from '../hooks/useProfile'
+import { useRoundPlayers } from '../hooks/useRoundPlayers'
 import { useCourses } from '../hooks/useCourses'
 import { playerTotal, playerVsPar, formatDuration, totalPar, initialsOf } from '../lib/gameLogic'
 
@@ -58,26 +58,23 @@ function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel',
 function RoundDetailScreen({ go, params, userId }) {
   const { rounds, loading: roundsLoading, abandonRound } = useRounds(userId)
   const { scores, loading: scoresLoading } = useScores(params.roundId)
-  const { profile, loading: profileLoading } = useProfile(userId)
+  const { players, loading: playersLoading } = useRoundPlayers(params?.roundId)
   const { courses, loading: coursesLoading } = useCourses(userId)
 
-  const anyLoading = roundsLoading || scoresLoading || profileLoading || coursesLoading
+  const anyLoading = roundsLoading || scoresLoading || playersLoading || coursesLoading
 
   const rawRound = rounds.find((r) => r.id === params.roundId)
 
   const round = useMemo(() => {
-    if (!rawRound || !profile) return null
+    if (!rawRound || players.length === 0) return null
     const course = courses.find((c) => c.id === rawRound.course_id)
     const pars = course?.pars ?? []
     if (!pars.length) return null
-    const players = [{ id: userId, name: profile.display_name, color: profile.avatar_color }]
     const scoreMap = {}
-    for (const p of players) {
-      scoreMap[p.id] = Array(pars.length).fill(null)
-    }
+    for (const p of players) scoreMap[p.id] = Array(pars.length).fill(null)
     for (const s of scores) {
-      if (scoreMap[s.user_id]) {
-        scoreMap[s.user_id][s.hole_number - 1] = s.strokes
+      if (s.round_player_id && scoreMap[s.round_player_id]) {
+        scoreMap[s.round_player_id][s.hole_number - 1] = s.strokes
       }
     }
     return {
@@ -90,7 +87,7 @@ function RoundDetailScreen({ go, params, userId }) {
       scores: scoreMap,
       status: rawRound.status,
     }
-  }, [rawRound, profile, courses, scores, userId])
+  }, [rawRound, players, courses, scores])
 
   useEffect(() => {
     if (!anyLoading && !round) go('home')
@@ -179,9 +176,9 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
     return (
       <div style={{ display: 'grid', gridTemplateColumns: `64px repeat(${end - start}, 1fr) 44px`, alignItems: 'center', borderBottom: `1px solid ${FT.hair}`, fontFamily: SFR }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 0 8px 8px' }}>
-          <Avatar name={player.name} color={player.color} size={20} fontSize={9} />
+          <Avatar name={player.displayName} color={player.color} size={20} fontSize={9} />
           <span style={{ fontSize: 10, color: FT.dim, fontFamily: MONO, letterSpacing: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {initialsOf(player.name)}
+            {initialsOf(player.displayName)}
           </span>
         </div>
         {scores.map((s, i) => {
@@ -233,7 +230,7 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
           <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 38, letterSpacing: -1.4, lineHeight: 1, marginTop: 6 }}>
             {!isComplete ? "Still going." :
              winnerTie ? 'A tie at the top.' :
-             `${winner.name} takes it.`}
+             `${winner.displayName} takes it.`}
           </div>
           <div style={{ fontSize: 13, color: FT.dim, marginTop: 4 }}>
             {duration} · {N} holes · par {totalPar(round.pars)}
@@ -258,9 +255,9 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
                     <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 22, width: 22, textAlign: 'center', letterSpacing: -1 }}>
                       {p.place}
                     </div>
-                    <Avatar name={p.name} color={p.color} size={34} fontSize={12}
+                    <Avatar name={p.displayName} color={p.color} size={34} fontSize={12}
                       border={isWinner ? `2px solid ${FT.ink}` : 'none'} />
-                    <div style={{ flex: 1, fontFamily: SFR, fontWeight: 800, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
+                    <div style={{ flex: 1, fontFamily: SFR, fontWeight: 800, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.displayName}</div>
                     <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 22, letterSpacing: -0.5 }}>{p.total}</div>
                     <ParChip value={p.vs} size="md" tone={isWinner ? 'par' : undefined} />
                   </div>
