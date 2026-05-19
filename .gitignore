@@ -1,1 +1,35 @@
 .env.local
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.output/
+
+# Environment — NEVER commit secrets
+.env.local
+.env.*.local
+.env
+
+# Vite / TS cache
+.vite/
+*.tsbuildinfo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PWA generated files (Workbox runtime)
+public/sw.js
+public/workbox-*.js
+
+# Scripts — local-only artefacts
+scripts/*.json
+scripts/dist/
