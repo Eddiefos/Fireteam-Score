@@ -95,6 +95,10 @@ export async function updateCourse(
 }
 
 export async function deleteCourse(id: string): Promise<void> {
-  const { error } = await supabase.from('courses').delete().eq('id', id)
+  const { error, count } = await supabase
+    .from('courses')
+    .delete({ count: 'exact' })
+    .eq('id', id)
   if (error) throw new Error(error.message)
+  if (count === 0) throw new Error('Delete blocked — missing RLS policy')
 }
