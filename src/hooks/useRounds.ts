@@ -1,0 +1,44 @@
+import { useState, useEffect, useCallback } from 'react'
+import { getRounds, getActiveRound, startRound as startRoundService, finishRound as finishRoundService, abandonRound as abandonRoundService } from '../services/rounds'
+
+export function useRounds(userId: string | undefined) {
+  const [rounds, setRounds] = useState<any[]>([])
+  const [activeRound, setActiveRound] = useState<any | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const refresh = useCallback(async () => {
+    if (!userId) return
+    const [allRounds, active] = await Promise.all([
+      getRounds(userId),
+      getActiveRound(userId),
+    ])
+    setRounds(allRounds)
+    setActiveRound(active)
+  }, [userId])
+
+  useEffect(() => {
+    if (!userId) { setLoading(false); return }
+    refresh().catch((e) => setError(e.message)).finally(() => setLoading(false))
+  }, [userId, refresh])
+
+  const startRound = useCallback(async (courseId: string) => {
+    if (!userId) return null
+    const round = await startRoundService(courseId, userId)
+    setActiveRound(round)
+    return round
+  }, [userId])
+
+  const finishRound = useCallback(async (roundId: string) => {
+    await finishRoundService(roundId)
+    setActiveRound(null)
+    await refresh()
+  }, [refresh])
+
+  const abandonRound = useCallback(async (roundId: string) => {
+    await abandonRoundService(roundId)
+    setActiveRound(null)
+  }, [])
+
+  return { rounds, activeRound, loading, error, startRound, finishRound, abandonRound, refresh }
+}
