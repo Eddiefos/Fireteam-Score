@@ -5,10 +5,17 @@ export async function startRound(
   courseId: string,
   userId: string,
   players: NewRoundPlayer[],
+  fireteamId?: string,
 ): Promise<{ id: string }> {
   const { data, error } = await supabase
     .from('rounds')
-    .insert({ course_id: courseId, status: 'active', holes_played: 0, created_by: userId })
+    .insert({
+      course_id: courseId,
+      status: 'active',
+      holes_played: 0,
+      created_by: userId,
+      fireteam_id: fireteamId ?? null,
+    })
     .select()
     .single()
   if (error) throw new Error(error.message)

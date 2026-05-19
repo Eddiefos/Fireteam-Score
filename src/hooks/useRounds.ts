@@ -31,9 +31,9 @@ export function useRounds(userId: string | undefined) {
     return () => { ignore = true }
   }, [userId, refresh])
 
-  const startRound = useCallback(async (courseId: string, players: NewRoundPlayer[]) => {
+  const startRound = useCallback(async (courseId: string, players: NewRoundPlayer[], fireteamId?: string) => {
     if (!userId) return null
-    const round = await startRoundService(courseId, userId, players)
+    const round = await startRoundService(courseId, userId, players, fireteamId)
     setActiveRound(round)
     return round
   }, [userId])

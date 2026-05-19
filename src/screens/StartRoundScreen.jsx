@@ -9,6 +9,7 @@ import { useCourses } from '../hooks/useCourses'
 import { useRounds } from '../hooks/useRounds'
 import { useProfile } from '../hooks/useProfile'
 import { useFriends } from '../hooks/useFriends'
+import { useFireteam } from '../hooks/useFireteam'
 import { totalPar } from '../lib/gameLogic'
 
 function StartRoundScreen({ go, userId }) {
@@ -16,6 +17,7 @@ function StartRoundScreen({ go, userId }) {
   const { startRound } = useRounds(userId)
   const { profile } = useProfile(userId)
   const { friends, loading: friendsLoading } = useFriends(userId)
+  const { fireteam } = useFireteam(userId)
 
   const [selectedCourseId, setSelectedCourseId] = useState(null)
   const [starting, setStarting] = useState(false)
@@ -90,7 +92,7 @@ function StartRoundScreen({ go, userId }) {
         color: p.color,
         isGuest: p.isGuest,
       }))
-      await startRound(selectedCourseId, players)
+      await startRound(selectedCourseId, players, fireteam?.id)
       go('live')
     } catch {
       setStarting(false)

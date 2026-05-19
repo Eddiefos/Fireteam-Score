@@ -3,8 +3,10 @@ import { useToast } from './components/atoms';
 import { FT, SFR } from './constants/colors';
 import { useAuth } from './hooks/useAuth';
 import { useProfile } from './hooks/useProfile';
-import { LandingScreen, CreateAccountScreen, LoginScreen, AccountScreen, SettingsScreen } from './screens/AuthScreens'
-import { SquadScreen } from './screens/SquadScreen'
+import { useFireteam } from './hooks/useFireteam';
+import { LandingScreen, CreateAccountScreen, LoginScreen, AccountScreen, SettingsScreen } from './screens/AuthScreens';
+import { SquadScreen } from './screens/SquadScreen';
+import { FireteamScreen } from './screens/FireteamScreen';
 import { CoursesScreen, NewCourseScreen } from './screens/CoursesScreen';
 import { StatsScreen } from './screens/StatsScreen';
 import { HomeScreen } from './screens/HomeScreen';
@@ -19,9 +21,9 @@ const toast = (m) => _toastFn(m);
 // ────────────────────────────────────────────────────────────────────────
 //  Bottom tab bar
 // ────────────────────────────────────────────────────────────────────────
-const TAB_SCREENS = new Set(['home', 'squad', 'stats', 'account']);
+const TAB_SCREENS = new Set(['home', 'friends', 'stats', 'fireteam', 'account']);
 
-function BottomTabBar({ active, onTab }) {
+function BottomTabBar({ active, onTab, inviteBadge }) {
   const tabs = [
     {
       id: 'home', label: 'Home',
@@ -33,7 +35,7 @@ function BottomTabBar({ active, onTab }) {
       ),
     },
     {
-      id: 'squad', label: 'Squad',
+      id: 'friends', label: 'Friends',
       icon: (on) => (
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
           <circle cx="8" cy="8" r="3" stroke={on ? FT.forest : FT.dim} strokeWidth="1.8"/>
@@ -54,6 +56,17 @@ function BottomTabBar({ active, onTab }) {
       ),
     },
     {
+      id: 'fireteam', label: 'Fireteam', badge: inviteBadge,
+      icon: (on) => (
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2L4 5v6c0 4 3 7.4 7 8.5C15 18.4 18 15 18 11V5l-7-3z"
+            stroke={on ? FT.forest : FT.dim} strokeWidth="1.8" strokeLinejoin="round"
+            fill={on ? 'rgba(31,61,43,0.1)' : 'none'}/>
+          <path d="M8 11l2 2 4-4" stroke={on ? FT.forest : FT.dim} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+    },
+    {
       id: 'account', label: 'Account',
       icon: (on) => (
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -70,7 +83,7 @@ function BottomTabBar({ active, onTab }) {
       display: 'flex', flexShrink: 0,
       paddingBottom: 'env(safe-area-inset-bottom, 0px)',
     }}>
-      {tabs.map(({ id, label, icon }) => {
+      {tabs.map(({ id, label, icon, badge }) => {
         const on = active === id;
         return (
           <button key={id} onClick={() => onTab(id)} className="flat" style={{
@@ -78,8 +91,18 @@ function BottomTabBar({ active, onTab }) {
             alignItems: 'center', justifyContent: 'center',
             gap: 3, padding: '9px 0 8px',
             background: 'none', border: 'none', cursor: 'pointer',
+            position: 'relative',
           }}>
-            {icon(on)}
+            <div style={{ position: 'relative' }}>
+              {icon(on)}
+              {badge > 0 && (
+                <div style={{
+                  position: 'absolute', top: -3, right: -4,
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: FT.orange, border: `1.5px solid ${FT.paper}`,
+                }} />
+              )}
+            </div>
             <span style={{
               fontFamily: SFR, fontWeight: on ? 700 : 500, fontSize: 10,
               color: on ? FT.forest : FT.dim, letterSpacing: 0.2,
@@ -103,6 +126,7 @@ function App() {
 
   const { user, loading: authLoading } = useAuth();
   const { profile } = useProfile(user?.id);
+  const { pendingInvites } = useFireteam(user?.id);
 
   const go = useCallback((next, p = {}) => {
     setScreen(next);
@@ -165,8 +189,9 @@ function App() {
   let body;
   switch (screen) {
     case 'home':       body = <HomeScreen go={go} userId={user?.id} />; break;
-    case 'squad':      body = <SquadScreen go={go} userId={user?.id} />; break;
+    case 'friends':    body = <SquadScreen go={go} userId={user?.id} />; break;
     case 'stats':      body = <StatsScreen go={go} userId={user?.id} />; break;
+    case 'fireteam':   body = <FireteamScreen go={go} userId={user?.id} />; break;
     case 'account':    body = <AccountScreen session={{ user }} />; break;
     case 'settings':   body = <SettingsScreen go={go} user={profile?.display_name ?? ''} onSave={() => {}} />; break;
     case 'courses':    body = <CoursesScreen go={go} userId={user?.id} onToast={toast} />; break;
@@ -186,7 +211,7 @@ function App() {
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {body}
         </div>
-        {showTabs && <BottomTabBar active={screen} onTab={goTab} />}
+        {showTabs && <BottomTabBar active={screen} onTab={goTab} inviteBadge={pendingInvites.length} />}
       </div>
       {t.node}
     </div>

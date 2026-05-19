@@ -115,6 +115,31 @@ export type FireteamMember = {
   joined_at: string
 }
 
+export type FireteamInvite = {
+  id: string
+  fireteam_id: string
+  fireteam_name: string
+  inviter_id: string
+  inviter_name: string
+  invitee_id: string
+  status: 'pending' | 'accepted' | 'declined'
+  created_at: string
+}
+
+export type FireteamLeaderboardEntry = {
+  profile: Profile
+  wins: number
+  avgVsPar: number
+  roundsPlayed: number
+}
+
+export type HeadToHead = {
+  wins: number
+  losses: number
+  streak: number
+  streakType: 'win' | 'loss' | null
+}
+
 export type SavedCourse = {
   user_id: string
   course_id: string

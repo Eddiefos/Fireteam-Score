@@ -1,4 +1,4 @@
-import type { Round, RoundPlayer } from '../types'
+import type { Round, RoundPlayer, Profile, FireteamLeaderboardEntry, HeadToHead } from '../types'
 
 export const initialsOf = (name: string): string => {
   if (!name) return '··'
@@ -121,6 +121,73 @@ export type PlayerStats = {
     t: number
     last: string
   }>
+}
+
+export function computeHeadToHead(
+  userId: string,
+  opponentId: string,
+  rounds: Round[],
+): HeadToHead {
+  const relevant = rounds.filter(
+    (r) =>
+      r.status === 'finished' &&
+      r.players.some((p) => p.userId === userId) &&
+      r.players.some((p) => p.userId === opponentId),
+  )
+
+  let wins = 0
+  let losses = 0
+  let streak = 0
+  let streakType: 'win' | 'loss' | null = null
+
+  for (const r of relevant) {
+    const me = r.players.find((p) => p.userId === userId)
+    const opp = r.players.find((p) => p.userId === opponentId)
+    if (!me || !opp) continue
+    const myScore = playerTotal(r, me.id)
+    const oppScore = playerTotal(r, opp.id)
+    if (myScore < oppScore) {
+      wins++
+      if (streakType === 'win') streak++
+      else { streakType = 'win'; streak = 1 }
+    } else if (myScore > oppScore) {
+      losses++
+      if (streakType === 'loss') streak++
+      else { streakType = 'loss'; streak = 1 }
+    }
+  }
+
+  return { wins, losses, streak, streakType }
+}
+
+export function computeFireteamLeaderboard(
+  members: Profile[],
+  rounds: Round[],
+): FireteamLeaderboardEntry[] {
+  const finished = rounds.filter((r) => r.status === 'finished')
+
+  return members
+    .map((profile) => {
+      const myRounds = finished.filter((r) => r.players.some((p) => p.userId === profile.id))
+      let wins = 0
+      let totalVsPar = 0
+
+      for (const r of myRounds) {
+        const me = r.players.find((p) => p.userId === profile.id)
+        if (!me) continue
+        totalVsPar += playerVsPar(r, me.id)
+        const winner = winnerOf(r)
+        if (winner?.userId === profile.id) wins++
+      }
+
+      return {
+        profile,
+        wins,
+        avgVsPar: myRounds.length ? totalVsPar / myRounds.length : 0,
+        roundsPlayed: myRounds.length,
+      }
+    })
+    .sort((a, b) => b.wins - a.wins || a.avgVsPar - b.avgVsPar)
 }
 
 export function computePlayerStats(rounds: Round[], playerName: string): PlayerStats {
