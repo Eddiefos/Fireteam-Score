@@ -2088,6 +2088,8 @@ function CreateAccountScreen({ onBack, onLogin }) {
       setErrMsg(
         error.message.includes('already registered')
           ? 'An account with this email already exists.'
+          : error.message.includes('rate')
+          ? 'Too many attempts. Please wait a moment and try again.'
           : 'Something went wrong. Please try again.'
       );
       return;
