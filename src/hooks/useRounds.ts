@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { NewRoundPlayer } from '../types'
+import { supabase } from '../services/supabase'
 import {
   getRounds,
   getActiveRound,
@@ -29,6 +30,18 @@ export function useRounds(userId: string | undefined) {
     let ignore = false
     refresh().catch((e) => { if (!ignore) setError(e.message) }).finally(() => { if (!ignore) setLoading(false) })
     return () => { ignore = true }
+  }, [userId, refresh])
+
+  // Refresh whenever any round we can see gets updated (e.g. host finishes the round)
+  useEffect(() => {
+    if (!userId) return
+    const channel = supabase
+      .channel(`rounds-updates:${userId}`)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rounds' }, () => {
+        refresh()
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [userId, refresh])
 
   const startRound = useCallback(async (courseId: string, players: NewRoundPlayer[], fireteamId?: string) => {

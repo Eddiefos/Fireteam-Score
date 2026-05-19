@@ -3,13 +3,13 @@ import { FT, SFR, SF, MONO, PLAYER_COLORS } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import { StatusBar, HomeIndicator, ParChip, Avatar, TopoBg, EmptyState, IconChevronRight, IconChevronLeft } from '../components/atoms'
 import { useProfile } from '../hooks/useProfile'
-import { useRounds } from '../hooks/useRounds'
+import { usePlayerRounds } from '../hooks/usePlayerRounds'
 import { computePlayerStats, playerTotal, playerVsPar, formatShortDate } from '../lib/gameLogic'
 import { hashCode } from '../lib/uid'
 
 function StatsScreen({ go, userId }) {
   const { profile, loading: profileLoading } = useProfile(userId)
-  const { rounds, loading: roundsLoading } = useRounds(userId)
+  const { rounds, loading: roundsLoading } = usePlayerRounds(userId)
   const [filter, setFilter] = useState('all') // 'all' | 'wins' | 'losses'
 
   const loading = profileLoading || roundsLoading
@@ -24,16 +24,15 @@ function StatsScreen({ go, userId }) {
 
   const stats = useMemo(() => {
     if (!profile) return null
-    const fullRounds = rounds.filter((r) => r.players)
-    return computePlayerStats(fullRounds, user)
+    return computePlayerStats(rounds, user)
   }, [rounds, profile, user])
 
   const myRounds = useMemo(() => {
     if (!user) return []
     return completed
-      .filter((r) => r.players && r.players.some((p) => p.name === user))
+      .filter((r) => r.players?.some((p) => p.displayName === user))
       .map((r) => {
-        const me = r.players.find((p) => p.name === user)
+        const me = r.players.find((p) => p.displayName === user)
         const myScore = playerTotal(r, me.id)
         const myVs = playerVsPar(r, me.id)
         let strictlyBest = true
