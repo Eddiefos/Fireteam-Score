@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect } from 'react'
 import { FT, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
-import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconChevronLeft, IconTrash } from '../components/atoms'
+import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconChevronLeft, IconTrash, useToast } from '../components/atoms'
 import { useRounds } from '../hooks/useRounds'
-import { deleteRound } from '../services/rounds'
+import { dismissRound } from '../services/rounds'
 import { useScores } from '../hooks/useScores'
 import { useRoundPlayers } from '../hooks/useRoundPlayers'
 import { useCourses } from '../hooks/useCourses'
@@ -61,6 +61,7 @@ function RoundDetailScreen({ go, params, userId }) {
   const { scores, loading: scoresLoading } = useScores(params.roundId)
   const { players, loading: playersLoading } = useRoundPlayers(params?.roundId)
   const { courses, loading: coursesLoading } = useCourses(userId)
+  const toast = useToast()
 
   const anyLoading = roundsLoading || scoresLoading || playersLoading || coursesLoading
 
@@ -70,17 +71,23 @@ function RoundDetailScreen({ go, params, userId }) {
     if (!rawRound || players.length === 0) return null
     const course = courses.find((c) => c.id === rawRound.course_id)
     const pars = course?.pars ?? []
-    if (!pars.length) return null
+    // Infer hole count from actual scores when pars unavailable (orphaned round)
+    let holesCount = pars.length
+    if (!holesCount) {
+      for (const s of scores) {
+        if (s.hole_number > holesCount) holesCount = s.hole_number
+      }
+    }
     const scoreMap = {}
-    for (const p of players) scoreMap[p.id] = Array(pars.length).fill(null)
+    for (const p of players) scoreMap[p.id] = Array(holesCount).fill(null)
     for (const s of scores) {
-      if (s.round_player_id && scoreMap[s.round_player_id]) {
+      if (s.round_player_id && scoreMap[s.round_player_id] && s.hole_number - 1 < holesCount) {
         scoreMap[s.round_player_id][s.hole_number - 1] = s.strokes
       }
     }
     return {
       id: rawRound.id,
-      courseName: course?.name ?? '',
+      courseName: course?.name ?? null,
       startedAt: new Date(rawRound.started_at).getTime(),
       completedAt: rawRound.finished_at ? new Date(rawRound.finished_at).getTime() : null,
       pars,
@@ -91,8 +98,9 @@ function RoundDetailScreen({ go, params, userId }) {
   }, [rawRound, players, courses, scores])
 
   useEffect(() => {
-    if (!anyLoading && !round) go('home')
-  }, [anyLoading, round])
+    // Only redirect when the round itself is gone (e.g. deleted), not when course is missing
+    if (!anyLoading && !rawRound) go('home')
+  }, [anyLoading, rawRound])
 
   if (anyLoading || !round) {
     return (
@@ -104,16 +112,28 @@ function RoundDetailScreen({ go, params, userId }) {
     )
   }
 
+
   const handleDelete = async () => {
-    await deleteRound(params.roundId)
-    go('home')
+    try {
+      await dismissRound(params.roundId, userId)
+      go('home')
+    } catch {
+      toast.show('Could not remove round. Try again.')
+    }
   }
 
-  return <RoundDetailImpl go={go} params={params} round={round} onDelete={handleDelete} />
+  return (
+    <>
+      <RoundDetailImpl go={go} params={params} round={round} onDelete={handleDelete} />
+      {toast.node}
+    </>
+  )
 }
 
 function RoundDetailImpl({ go, params, round, onDelete }) {
   const [confirmDel, setConfirmDel] = useState(false);
+
+  const isOrphaned = !round.pars.length
 
   const finals = useMemo(() => {
     return [...round.players]
@@ -223,10 +243,18 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
         } />
 
       <div className="ft-scroll">
+        {/* Orphaned round notice */}
+        {isOrphaned && (
+          <div style={{ margin: '0 16px 8px', padding: '10px 14px', borderRadius: 12, background: 'rgba(42,31,23,0.07)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 15 }}>⚠️</span>
+            <span style={{ fontFamily: SFR, fontSize: 13, color: FT.dim }}>The course for this round was deleted. You can still view scores or delete the round.</span>
+          </div>
+        )}
+
         {/* Hero result */}
         <div style={{ padding: '4px 22px 16px' }}>
           <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>
-            {isComplete ? 'Final · ' : 'In progress · '}{round.courseName}
+            {isComplete ? 'Final · ' : 'In progress · '}{round.courseName ?? 'Deleted course'}
           </div>
           <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 38, letterSpacing: -1.4, lineHeight: 1, marginTop: 6 }}>
             {!isComplete ? "Still going." :
@@ -260,7 +288,7 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
                       border={isWinner ? `2px solid ${FT.ink}` : 'none'} />
                     <div style={{ flex: 1, fontFamily: SFR, fontWeight: 800, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.displayName}</div>
                     <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 22, letterSpacing: -0.5 }}>{p.total}</div>
-                    <ParChip value={p.vs} size="md" tone={isWinner ? 'par' : undefined} />
+                    {!isOrphaned && <ParChip value={p.vs} size="md" tone={isWinner ? 'par' : undefined} />}
                   </div>
                 );
               })}
@@ -268,8 +296,8 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
           </div>
         </div>
 
-        {/* Scorecard table */}
-        <div style={{ padding: '14px 16px 0' }}>
+        {/* Scorecard table — hidden for orphaned rounds (no par data) */}
+        <div style={{ padding: '14px 16px 0', display: isOrphaned ? 'none' : undefined }}>
           <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase', marginBottom: 8 }}>Scorecard</div>
           {chunks.map((c, ci) => (
             <div key={ci} style={{ marginBottom: 6 }}>
@@ -312,9 +340,9 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
       )}
 
       <Modal open={confirmDel}
-        title="Delete this round?"
-        body="The scorecard will be removed. This can't be undone."
-        confirmLabel="Delete" danger
+        title="Remove from your history?"
+        body="This round will be removed from your history and stats. Other players won't be affected — they'll still see their copy."
+        confirmLabel="Remove" danger
         onCancel={() => setConfirmDel(false)}
         onConfirm={removeRound} />
 

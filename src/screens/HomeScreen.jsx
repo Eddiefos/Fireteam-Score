@@ -189,7 +189,7 @@ function HomeScreen({ go, userId }) {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {recent.map((r) => {
-                const courseName = courses.find((c) => c.id === r.course_id)?.name || 'Course'
+                const courseName = r.course_id === null ? 'Deleted course' : courses.find((c) => c.id === r.course_id)?.name || 'Course'
                 return (
                   <button key={r.id} onClick={() => go('round', { roundId: r.id })} className="flat" style={{
                     display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left',
