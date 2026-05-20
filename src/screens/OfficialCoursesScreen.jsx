@@ -1,12 +1,7 @@
 import { useState } from 'react'
+import { FT, SFR, MONO } from '../constants/colors'
+import { StatusBar } from '../components/atoms'
 import { useOfficialCourses } from '../hooks/useOfficialCourses'
-
-const FT = {
-  forest: '#1F3D2B', cream: '#F4EFE4', paper: '#FAF6EC',
-  ink: '#15110D', orange: '#FF6B1F',
-  dim: 'rgba(42,31,23,0.55)', hair: 'rgba(42,31,23,0.12)',
-  error: '#c0392b',
-}
 
 export function OfficialCoursesScreen({ go, onToast }) {
   const { courses, loading, error, search } = useOfficialCourses()
@@ -16,10 +11,7 @@ export function OfficialCoursesScreen({ go, onToast }) {
 
   return (
     <div style={{ background: FT.cream, minHeight: '100vh', fontFamily: '-apple-system, SF Pro Display, system-ui, sans-serif' }}>
-      {/* Status bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 18px 6px', fontSize: 10, fontWeight: 600, color: FT.ink }}>
-        <span>9:41</span><span>●●●</span>
-      </div>
+      <StatusBar />
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 14px 6px' }}>
