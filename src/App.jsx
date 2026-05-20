@@ -12,7 +12,8 @@ import { StatsScreen } from './screens/StatsScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { StartRoundScreen } from './screens/StartRoundScreen';
 import { LiveScorecardScreen } from './screens/LiveScorecardScreen';
-import { RoundDetailScreen } from './screens/RoundDetailScreen';
+import { RoundDetailScreen } from './screens/RoundDetailScreen'
+import { CourseDetailScreen } from './screens/CourseDetailScreen';
 
 // App-level toast portal — exposed so any screen can call it via onToast prop
 let _toastFn = () => {};
@@ -198,7 +199,8 @@ function App() {
     case 'newCourse':  body = <NewCourseScreen go={go} params={params} userId={user?.id} onToast={toast} />; break;
     case 'start':      body = <StartRoundScreen go={go} userId={user?.id} />; break;
     case 'live':       body = <LiveScorecardScreen go={go} userId={user?.id} />; break;
-    case 'round':      body = <RoundDetailScreen go={go} params={params} userId={user?.id} />; break;
+    case 'round':        body = <RoundDetailScreen go={go} params={params} userId={user?.id} />; break;
+    case 'courseDetail': body = <CourseDetailScreen go={go} params={params} />; break;
     default:           body = <HomeScreen go={go} userId={user?.id} />;
   }
 
