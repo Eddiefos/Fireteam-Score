@@ -14,6 +14,8 @@ import { useFireteam } from '../hooks/useFireteam'
 import { totalPar } from '../lib/gameLogic'
 
 function StartRoundScreen({ go, userId, params = {} }) {
+  const { courseId, returnTo } = params
+
   const { courses, loading: coursesLoading } = useCourses(userId, true)
   const { startRound } = useRounds(userId)
   const { profile } = useProfile(userId)
@@ -21,7 +23,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
   const { fireteam } = useFireteam(userId)
   const { courses: officialCourses } = useOfficialCourses()
 
-  const [mode, setMode] = useState(() => params?.courseId ? 'ready' : 'pick')
+  const [mode, setMode] = useState(() => courseId ? 'ready' : 'pick')
   const [selectedCourseId, setSelectedCourseId] = useState(null)
   const [starting, setStarting] = useState(false)
   const [guestInput, setGuestInput] = useState('')
@@ -80,7 +82,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
     setShowGuestInput(false)
   }
 
-  const preselectedCourse = params?.courseId ? officialCourses.find(c => c.id === params.courseId) ?? null : null
+  const preselectedCourse = courseId ? officialCourses.find(c => c.id === courseId) ?? null : null
   const selectedCourse = mode === 'ready'
     ? preselectedCourse
     : courses.find((c) => c.id === selectedCourseId)
@@ -271,7 +273,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
                 <div style={{ fontSize: 12, color: FT.dim, marginTop: 2 }}>{preselectedCourse.location}</div>
               </div>
               <button
-                onClick={() => go('start')}
+                onClick={() => go(returnTo ?? 'start')}
                 className="flat"
                 style={{ fontSize: 11, color: FT.orange, background: 'none', border: 'none', cursor: 'pointer', position: 'relative', zIndex: 1, flexShrink: 0 }}
               >
