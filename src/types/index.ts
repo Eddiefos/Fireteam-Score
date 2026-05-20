@@ -4,6 +4,7 @@ export type Profile = {
   display_name: string
   initials: string
   avatar_color: string
+  is_admin: boolean
   created_at: string
 }
 
@@ -22,7 +23,7 @@ export type Course = {
   holes: number
   par_total: number | null
   pars: number[]
-  source: 'pdga' | 'user'
+  source: 'official' | 'user'
   is_public: boolean
   created_by: string | null
   created_at: string
@@ -144,4 +145,28 @@ export type SavedCourse = {
   user_id: string
   course_id: string
   saved_at: string
+}
+
+export interface WeatherData {
+  temperature: number;      // Celsius
+  windSpeed: number;        // m/s
+  windDirection: number;    // degrees 0–360
+  symbolCode: string;       // Met.no symbol_code e.g. "clearsky_day"
+  fetchedAt: number;        // Date.now() timestamp
+}
+
+export interface CourseSubmission {
+  id: string;
+  submitted_by: string;
+  name: string;
+  location: string | null;
+  lat: number | null;
+  lng: number | null;
+  holes: number;
+  holes_detail: Array<{ hole_number: number; par: number }> | null;
+  notes: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
 }

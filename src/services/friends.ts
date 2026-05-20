@@ -7,6 +7,7 @@ type FriendProfileRow = {
   username: string
   initials: string
   avatar_color: string
+  is_admin?: boolean
 }
 
 type FriendRow = {
@@ -77,6 +78,7 @@ export async function getPendingRequests(userId: string): Promise<FriendRequest[
       username: row.profile.username,
       initials: row.profile.initials,
       avatar_color: row.profile.avatar_color,
+      is_admin: row.profile.is_admin ?? false,
       created_at: row.profile.created_at,
     },
     createdAt: row.created_at,
@@ -105,6 +107,7 @@ export async function getSentRequests(userId: string): Promise<FriendRequest[]> 
       username: row.profile.username,
       initials: row.profile.initials,
       avatar_color: row.profile.avatar_color,
+      is_admin: row.profile.is_admin ?? false,
       created_at: row.profile.created_at,
     },
     createdAt: row.created_at,
@@ -114,7 +117,7 @@ export async function getSentRequests(userId: string): Promise<FriendRequest[]> 
 export async function searchUsers(query: string, currentUserId: string): Promise<Profile[]> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username, display_name, initials, avatar_color, created_at')
+    .select('id, username, display_name, initials, avatar_color, is_admin, created_at')
     .ilike('username', `%${query}%`)
     .neq('id', currentUserId)
     .limit(10)
