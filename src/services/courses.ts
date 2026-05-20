@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
-import type { Course, CourseHole } from '../types'
+import type { Course, CourseHole, CourseSubmission } from '../types'
+import { del } from 'idb-keyval'
 
 export async function getCourses(userId: string, onlyMine = false): Promise<Course[]> {
   let query = supabase.from('courses').select('*')
@@ -100,4 +101,105 @@ export async function deleteCourse(id: string): Promise<void> {
     .eq('id', id)
   if (error) throw new Error(error.message)
   if (count === 0) throw new Error('Delete blocked — missing RLS policy')
+}
+
+export async function getOfficialCourses(): Promise<Course[]> {
+  const { data, error } = await supabase
+    .from('courses')
+    .select('*, course_holes(hole_number, par)')
+    .eq('source', 'official')
+    .order('name')
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as Course[]
+}
+
+export interface SubmissionInput {
+  name: string
+  location: string | null
+  lat: number | null
+  lng: number | null
+  holes: number
+  holes_detail: Array<{ hole_number: number; par: number }> | null
+  notes: string | null
+}
+
+export async function submitCourse(
+  userId: string,
+  input: SubmissionInput,
+): Promise<CourseSubmission> {
+  const { data, error } = await supabase
+    .from('course_submissions')
+    .insert({ ...input, submitted_by: userId })
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data as CourseSubmission
+}
+
+export async function approveSubmission(
+  adminId: string,
+  sub: CourseSubmission,
+): Promise<void> {
+  const { data: courseRow, error: courseErr } = await supabase
+    .from('courses')
+    .insert({
+      name: sub.name,
+      location: sub.location,
+      lat: sub.lat,
+      lng: sub.lng,
+      holes: sub.holes,
+      source: 'official',
+      is_public: true,
+      created_by: null,
+    })
+    .select()
+    .single()
+
+  if (courseErr) throw new Error(courseErr.message)
+
+  if (sub.holes_detail?.length) {
+    const { error: holesErr } = await supabase
+      .from('course_holes')
+      .insert(
+        sub.holes_detail.map(h => ({
+          course_id: courseRow.id,
+          hole_number: h.hole_number,
+          par: h.par,
+        })),
+      )
+    if (holesErr) throw new Error(holesErr.message)
+  }
+
+  const { error: updateErr } = await supabase
+    .from('course_submissions')
+    .update({
+      status: 'approved',
+      reviewed_by: adminId,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq('id', sub.id)
+
+  if (updateErr) throw new Error(updateErr.message)
+
+  await del('official-courses')
+}
+
+export async function rejectSubmission(adminId: string, submissionId: string): Promise<void> {
+  const { error } = await supabase
+    .from('course_submissions')
+    .update({ status: 'rejected', reviewed_by: adminId, reviewed_at: new Date().toISOString() })
+    .eq('id', submissionId)
+  if (error) throw error
+}
+
+export async function getPendingSubmissions(): Promise<CourseSubmission[]> {
+  const { data, error } = await supabase
+    .from('course_submissions')
+    .select('*')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data ?? []
 }

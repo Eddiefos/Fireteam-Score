@@ -15,7 +15,7 @@ function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel',
   if (!open) return null;
   return (
     <div onClick={onCancel} style={{
-      position: 'absolute', inset: 0, background: 'rgba(21,17,13,0.45)',
+      position: 'absolute', inset: 0, background: FT.inkAlpha45,
       zIndex: 90, display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 24, animation: 'fadeIn 160ms ease-out',
     }}>
@@ -28,7 +28,7 @@ function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel',
         <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
           <button onClick={onCancel} style={{
             flex: 1, height: 44, borderRadius: 12, border: 'none',
-            background: 'rgba(42,31,23,0.08)', color: FT.ink,
+            background: FT.barkAlpha08, color: FT.ink,
             fontFamily: SFR, fontWeight: 800, fontSize: 15,
           }}>{cancelLabel}</button>
           <button onClick={onConfirm} style={{
@@ -49,7 +49,7 @@ function TopBar({ onBack, label, right }) {
   return (
     <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
       {onBack ? (
-        <button onClick={onBack} className="flat" style={{
+        <button onClick={onBack} className="flat" aria-label="Back" style={{
           width: 36, height: 36, borderRadius: 12, background: FT.paper,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: `1px solid ${FT.hair}`,
@@ -62,11 +62,16 @@ function TopBar({ onBack, label, right }) {
 }
 
 // ────────────────────────────────────────────────────────────────────────
-//  Courses list — manage saved courses
+//  Course Library — manage saved courses
 // ────────────────────────────────────────────────────────────────────────
 function CoursesScreen({ go, userId, onToast = () => {} }) {
   const { courses, loading, deleteCourse } = useCourses(userId, true)
   const [confirmDel, setConfirmDel] = useState(null)
+  const [filter, setFilter] = useState('recent')
+  const chips = ['recent', 'official', 'mine']
+  const chipLabels = { recent: 'Recent', official: 'Official', mine: 'My Courses' }
+
+  const recentCourses = courses.slice(0, 5)
 
   const remove = async (id) => {
     try {
@@ -81,7 +86,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
 
   if (loading) {
     return (
-      <ScreenShell label="Courses">
+      <ScreenShell label="Course Library">
         <StatusBar />
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: FT.orange, opacity: 0.8 }} />
@@ -91,17 +96,66 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
   }
 
   return (
-    <ScreenShell label="Courses">
+    <ScreenShell label="Course Library">
       <StatusBar />
-      <TopBar onBack={() => go('home')} label={`${courses.length} SAVED`} />
+      <TopBar onBack={() => go('home')} label="COURSE LIBRARY" />
 
       <div style={{ padding: '6px 24px 16px' }}>
         <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, lineHeight: 1 }}>
-          Your courses.
+          Course Library.
         </div>
       </div>
 
+      <div style={{ display: 'flex', gap: 6, padding: '0 14px 12px', overflowX: 'auto' }}>
+        {chips.map(c => (
+          <button
+            key={c}
+            onClick={() => {
+              if (c === 'official') { go('officialCourses'); return }
+              setFilter(c)
+            }}
+            style={{
+              padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: filter === c ? 600 : 500,
+              whiteSpace: 'nowrap', border: `1px solid ${filter === c && c !== 'official' ? FT.forest : FT.hair}`,
+              background: filter === c && c !== 'official' ? FT.forest : FT.paper,
+              color: filter === c && c !== 'official' ? FT.cream : FT.dim,
+              cursor: 'pointer'
+            }}
+          >
+            {chipLabels[c]}
+          </button>
+        ))}
+      </div>
+
       <div className="ft-scroll">
+        {filter === 'recent' && (
+          <div style={{ padding: '0 10px' }}>
+            {recentCourses.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px 20px', color: FT.dim, fontSize: 13, lineHeight: 1.6 }}>
+                Add a course to see it here.
+              </div>
+            ) : (
+              recentCourses.map(course => (
+                <div key={course.id} style={{ background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 14, padding: '10px 11px', display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: FT.forest, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, color: FT.cream, flexShrink: 0 }}>
+                    {course.pars.length}H
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{course.name}</div>
+                    <div style={{ fontSize: 10, color: FT.dim, marginTop: 2 }}>
+                      {course.location ?? `Par ${totalPar(course.pars)}`}
+                      {course.source === 'official' && (
+                        <span style={{ background: FT.orangeAlpha12, color: FT.orange, fontSize: 8, fontWeight: 600, padding: '1px 4px', borderRadius: 3, marginLeft: 4, fontFamily: MONO }}>OFFICIAL</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {filter === 'mine' && (
         <div style={{ padding: '0 20px' }}>
           {courses.length === 0 ? (
             <EmptyState icon="🌲" title="No courses yet"
@@ -125,27 +179,28 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
                   </div>
                   <button onClick={() => go('newCourse', { courseId: c.id })} className="flat" style={{
                     width: 32, height: 32, borderRadius: 10, border: 'none',
-                    background: 'rgba(42,31,23,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: FT.barkAlpha06, display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontFamily: SFR, fontWeight: 800, fontSize: 11, color: FT.dim,
                   }}>Edit</button>
-                  <button onClick={() => setConfirmDel(c)} className="flat" style={{
+                  <button onClick={() => setConfirmDel(c)} className="flat" aria-label="Delete course" style={{
                     width: 32, height: 32, borderRadius: 10, border: 'none',
-                    background: 'rgba(42,31,23,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: FT.barkAlpha06, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}><IconTrash /></button>
                 </div>
               ))}
             </div>
           )}
         </div>
+        )}
       </div>
 
       <div style={{ padding: '12px 20px 28px', flexShrink: 0,
-        background: 'linear-gradient(to top, rgba(244,239,228,1) 60%, rgba(244,239,228,0))' }}>
+        background: `linear-gradient(to top, ${FT.cream} 60%, ${FT.creamAlpha00})` }}>
         <button onClick={() => go('newCourse')} style={{
           width: '100%', height: 60, borderRadius: 18, border: 'none',
           background: FT.orange, color: FT.ink,
           fontFamily: SFR, fontWeight: 900, fontSize: 17, letterSpacing: -0.3,
-          boxShadow: '0 6px 0 rgba(0,0,0,0.22), 0 14px 24px rgba(255,107,31,0.35)',
+          boxShadow: `0 6px 0 ${FT.shadowDark}, 0 14px 24px ${FT.orangeAlpha35}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         }}><IconPlus /> Add a course</button>
       </div>
@@ -302,13 +357,13 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%', justifyContent: 'space-between' }}>
                   <button onClick={() => setPar(i, p - 1)} className="flat" style={{
                     width: 18, height: 24, borderRadius: 6, border: 'none', flexShrink: 0,
-                    background: 'rgba(42,31,23,0.07)', color: FT.ink,
+                    background: FT.barkAlpha07, color: FT.ink,
                     fontFamily: SFR, fontWeight: 900, fontSize: 13, padding: 0,
                   }}>–</button>
                   <span style={{ fontFamily: SFR, fontWeight: 900, fontSize: 17, textAlign: 'center', minWidth: 0, flex: 1 }}>{p}</span>
                   <button onClick={() => setPar(i, p + 1)} className="flat" style={{
                     width: 18, height: 24, borderRadius: 6, border: 'none', flexShrink: 0,
-                    background: 'rgba(42,31,23,0.07)', color: FT.ink,
+                    background: FT.barkAlpha07, color: FT.ink,
                     fontFamily: SFR, fontWeight: 900, fontSize: 13, padding: 0,
                   }}>+</button>
                 </div>
@@ -319,13 +374,13 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
       </div>
 
       <div style={{ padding: '12px 20px 28px', flexShrink: 0,
-        background: 'linear-gradient(to top, rgba(244,239,228,1) 60%, rgba(244,239,228,0))' }}>
+        background: `linear-gradient(to top, ${FT.cream} 60%, ${FT.creamAlpha00})` }}>
         <button onClick={save} disabled={!canSave} style={{
           width: '100%', height: 60, borderRadius: 18, border: 'none',
-          background: canSave ? FT.orange : 'rgba(42,31,23,0.15)',
+          background: canSave ? FT.orange : FT.barkAlpha15,
           color: canSave ? FT.ink : FT.dim,
           fontFamily: SFR, fontWeight: 900, fontSize: 19, letterSpacing: -0.3,
-          boxShadow: canSave ? '0 6px 0 rgba(0,0,0,0.22), 0 14px 24px rgba(255,107,31,0.35)' : 'none',
+          boxShadow: canSave ? `0 6px 0 ${FT.shadowDark}, 0 14px 24px ${FT.orangeAlpha35}` : 'none',
         }}>{editing ? 'Save changes' : 'Save course'}</button>
       </div>
       <HomeIndicator />

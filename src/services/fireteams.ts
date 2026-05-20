@@ -32,7 +32,7 @@ export async function getMyFireteam(userId: string): Promise<Fireteam | null> {
 export async function getFireteamMembers(fireteamId: string): Promise<Profile[]> {
   const { data, error } = await supabase
     .from('fireteam_members')
-    .select('profiles(id, username, display_name, initials, avatar_color, created_at)')
+    .select('profiles(id, username, display_name, initials, avatar_color, is_admin, created_at)')
     .eq('fireteam_id', fireteamId)
   if (error) throw new Error(error.message)
   return ((data ?? []) as any[]).map((row) => row.profiles as Profile)

@@ -4,8 +4,11 @@ vi.mock('../supabase', () => ({
   supabase: { from: vi.fn() },
 }))
 
+vi.mock('idb-keyval', () => ({ del: vi.fn(), get: vi.fn(), set: vi.fn() }))
+
 import { supabase } from '../supabase'
-import { getCourses, createCourse, deleteCourse } from '../courses'
+import { getCourses, createCourse, deleteCourse, getOfficialCourses, submitCourse, approveSubmission } from '../courses'
+import { del } from 'idb-keyval'
 
 beforeEach(() => vi.clearAllMocks())
 
@@ -160,5 +163,135 @@ describe('deleteCourse', () => {
     vi.mocked(supabase.from).mockReturnValue(chain as any)
 
     await expect(deleteCourse('c1')).rejects.toThrow('Delete blocked')
+  })
+})
+
+describe('getOfficialCourses', () => {
+  it('returns official courses with holes ordered by name', async () => {
+    const mockCourses = [
+      {
+        id: 'c1',
+        name: 'Bølgane Frisbeegolfpark',
+        location: 'Kristiansand',
+        lat: 58.14,
+        lng: 7.99,
+        holes: 18,
+        par_total: 54,
+        source: 'official',
+        pdga_id: '12345',
+        created_by: null,
+        is_public: true,
+        created_at: '2026-01-01T00:00:00Z',
+        course_holes: [
+          { hole_number: 1, par: 3 },
+          { hole_number: 2, par: 4 },
+        ],
+      },
+    ]
+
+    const chain = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: mockCourses, error: null }),
+    }
+    vi.mocked(supabase.from).mockReturnValueOnce(chain as any)
+
+    const result = await getOfficialCourses()
+
+    expect(supabase.from).toHaveBeenCalledWith('courses')
+    expect(chain.select).toHaveBeenCalledWith('*, course_holes(hole_number, par)')
+    expect(chain.eq).toHaveBeenCalledWith('source', 'official')
+    expect(chain.order).toHaveBeenCalledWith('name')
+    expect(result).toHaveLength(1)
+    expect(result[0].name).toBe('Bølgane Frisbeegolfpark')
+    expect(result[0].course_holes).toHaveLength(2)
+  })
+
+  it('throws on DB error', async () => {
+    const chain = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: null, error: { message: 'DB error' } }),
+    }
+    vi.mocked(supabase.from).mockReturnValueOnce(chain as any)
+
+    await expect(getOfficialCourses()).rejects.toThrow('DB error')
+  })
+})
+
+describe('submitCourse', () => {
+  it('inserts a submission row and returns it', async () => {
+    const submission = {
+      name: 'My Local Course',
+      location: 'Bergen',
+      lat: 60.39,
+      lng: 5.32,
+      holes: 9,
+      holes_detail: [{ hole_number: 1, par: 3 }],
+      notes: 'Nice wooded course',
+    }
+    const mockRow = { id: 's1', ...submission, submitted_by: 'u1', status: 'pending', created_at: '2026-01-01T00:00:00Z', reviewed_by: null, reviewed_at: null }
+
+    const chain = {
+      insert: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: mockRow, error: null }),
+    }
+    vi.mocked(supabase.from).mockReturnValueOnce(chain as any)
+
+    const result = await submitCourse('u1', submission)
+    expect(chain.insert).toHaveBeenCalledWith({ ...submission, submitted_by: 'u1' })
+    expect(result.id).toBe('s1')
+  })
+})
+
+describe('approveSubmission', () => {
+  it('creates course + holes, marks submission approved, invalidates cache', async () => {
+    const sub = {
+      id: 's1',
+      name: 'New Course',
+      location: 'Trondheim',
+      lat: 63.43,
+      lng: 10.39,
+      holes: 9,
+      holes_detail: [
+        { hole_number: 1, par: 3 },
+        { hole_number: 2, par: 3 },
+      ],
+      notes: null,
+      submitted_by: 'u2',
+      status: 'pending' as const,
+      reviewed_by: null,
+      reviewed_at: null,
+      created_at: '2026-01-01T00:00:00Z',
+    }
+
+    // Mock courses insert
+    const coursesChain = {
+      insert: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { id: 'c99' }, error: null }),
+    }
+    // Mock course_holes insert
+    const holesChain = {
+      insert: vi.fn().mockResolvedValue({ error: null }),
+    }
+    // Mock submissions update
+    const subChain = {
+      update: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ error: null }),
+    }
+
+    vi.mocked(supabase.from)
+      .mockReturnValueOnce(coursesChain as any)
+      .mockReturnValueOnce(holesChain as any)
+      .mockReturnValueOnce(subChain as any)
+
+    await approveSubmission('admin1', sub)
+
+    expect(vi.mocked(del)).toHaveBeenCalledWith('official-courses')
+    expect(subChain.update).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'approved', reviewed_by: 'admin1' }),
+    )
   })
 })

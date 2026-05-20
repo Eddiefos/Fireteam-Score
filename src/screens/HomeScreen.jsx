@@ -173,7 +173,7 @@ function HomeScreen({ go, userId }) {
             border: `1px solid ${FT.hair}`, textAlign: 'left',
           }}>
             <div style={{ fontSize: 20, lineHeight: 1, marginBottom: 8 }}>🌲</div>
-            <div style={{ fontWeight: 600, fontSize: 15, color: FT.ink }}>Courses</div>
+            <div style={{ fontWeight: 600, fontSize: 15, color: FT.ink }}>Course Library</div>
             <div style={{ fontSize: 12, color: FT.dim, marginTop: 2, fontWeight: 400 }}>{myCourseCount} saved</div>
           </button>
         </div>

@@ -492,6 +492,25 @@ function AccountScreen({ session, go, userId }) {
           </button>
         </div>
 
+        {/* Admin: Course Submissions */}
+        {profile?.is_admin && (
+          <button
+            onClick={() => go('admin')}
+            style={{
+              width: '100%', background: FT.paper, border: `1px solid ${FT.hair}`,
+              borderRadius: 12, padding: '12px 14px', display: 'flex',
+              alignItems: 'center', justifyContent: 'space-between',
+              cursor: 'pointer', textAlign: 'left', marginTop: 8,
+            }}
+          >
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 13, color: FT.ink }}>Course Submissions</div>
+              <div style={{ fontSize: 11, color: FT.dim, marginTop: 2 }}>Review pending community submissions</div>
+            </div>
+            <span style={{ fontSize: 12, color: FT.dim }}>→</span>
+          </button>
+        )}
+
         {/* Sign out */}
         <button
           onClick={handleSignOut}
