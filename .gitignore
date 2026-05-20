@@ -30,8 +30,9 @@ Thumbs.db
 public/sw.js
 public/workbox-*.js
 
-# Scripts — local-only artefacts
+# Scripts — local-only artefacts (except predefined seed data)
 scripts/*.json
+!scripts/predefined-courses.json
 scripts/dist/
 .superpowers/
 
