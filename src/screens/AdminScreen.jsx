@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FT, SFR, MONO } from '../constants/colors'
 import { StatusBar, HomeIndicator } from '../components/atoms'
+import { ScreenShell } from '../components/layout/ScreenShell'
 import { getPendingSubmissions, approveSubmission, rejectSubmission } from '../services/courses'
 
 export function AdminScreen({ go, userId, onToast }) {
@@ -35,7 +36,7 @@ export function AdminScreen({ go, userId, onToast }) {
   }
 
   return (
-    <div style={{ background: FT.cream, minHeight: '100vh', fontFamily: '-apple-system, SF Pro Display, system-ui, sans-serif' }}>
+    <ScreenShell>
       <StatusBar />
 
       {/* Nav header */}
@@ -139,6 +140,6 @@ export function AdminScreen({ go, userId, onToast }) {
 
       <div style={{ height: 32 }} />
       <HomeIndicator />
-    </div>
+    </ScreenShell>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FT, SFR, MONO } from '../constants/colors'
 import { StatusBar, HomeIndicator } from '../components/atoms'
+import { ScreenShell } from '../components/layout/ScreenShell'
 import { submitCourse } from '../services/courses'
 
 export function CourseSubmissionScreen({ go, userId, onToast }) {
@@ -55,7 +56,7 @@ export function CourseSubmissionScreen({ go, userId, onToast }) {
   }
 
   return (
-    <div style={{ background: FT.cream, minHeight: '100vh', fontFamily: '-apple-system, SF Pro Display, system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
+    <ScreenShell>
       <StatusBar />
 
       {/* Nav header */}
@@ -159,6 +160,6 @@ export function CourseSubmissionScreen({ go, userId, onToast }) {
 
       <div style={{ height: 32 }} />
       <HomeIndicator />
-    </div>
+    </ScreenShell>
   )
 }
