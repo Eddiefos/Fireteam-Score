@@ -3,10 +3,15 @@
 -- 1. Add is_admin to profiles
 alter table profiles add column if not exists is_admin boolean not null default false;
 
--- 2. Update courses source check: rename 'pdga' to 'official' for new rows
---    (existing rows, if any, are treated the same way — just update the allowed values)
---    No constraint to add/drop since source is free text in the original schema.
---    Add an explicit check constraint so the DB enforces the enum.
+-- 2. Update courses source check: rename 'pdga' / 'udisc_import' to 'official'
+--    Migrate any existing rows before adding the enum constraint, otherwise
+--    the constraint will hard-fail on databases that already have 'pdga' data.
+update courses set source = 'official' where source = 'pdga';
+update courses set source = 'official' where source = 'udisc_import';
+
+--    Add an explicit check constraint so the DB enforces the enum going forward.
+alter table courses
+  drop constraint if exists courses_source_check;
 alter table courses
   add constraint courses_source_check
   check (source in ('official', 'user'));
@@ -16,6 +21,10 @@ alter table courses
 --    user courses are only writable by their creator
 drop policy if exists "Users can create courses" on courses;
 drop policy if exists "Creators can update their own courses" on courses;
+drop policy if exists "Creators can delete their own courses" on courses;
+drop policy if exists "Users can create user courses" on courses;
+drop policy if exists "Creators can update own user courses" on courses;
+drop policy if exists "Creators can delete own user courses" on courses;
 
 create policy "Users can create user courses" on courses for insert
   with check (auth.uid() = created_by and source = 'user');
@@ -45,6 +54,11 @@ create table if not exists course_submissions (
 );
 
 alter table course_submissions enable row level security;
+
+drop policy if exists "Anyone can submit a course" on course_submissions;
+drop policy if exists "Submitter can view own submissions" on course_submissions;
+drop policy if exists "Admins can view all submissions" on course_submissions;
+drop policy if exists "Admins can update submissions" on course_submissions;
 
 create policy "Anyone can submit a course" on course_submissions for insert
   with check (auth.uid() = submitted_by);
