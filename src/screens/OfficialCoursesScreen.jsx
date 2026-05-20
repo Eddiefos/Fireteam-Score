@@ -5,6 +5,7 @@ const FT = {
   forest: '#1F3D2B', cream: '#F4EFE4', paper: '#FAF6EC',
   ink: '#15110D', orange: '#FF6B1F',
   dim: 'rgba(42,31,23,0.55)', hair: 'rgba(42,31,23,0.12)',
+  error: '#c0392b',
 }
 
 export function OfficialCoursesScreen({ go, onToast }) {
@@ -56,7 +57,7 @@ export function OfficialCoursesScreen({ go, onToast }) {
         <div style={{ textAlign: 'center', padding: 32, color: FT.dim, fontSize: 13 }}>Loading courses…</div>
       )}
       {error && (
-        <div style={{ textAlign: 'center', padding: 32, color: '#c0392b', fontSize: 13 }}>{error}</div>
+        <div style={{ textAlign: 'center', padding: 32, color: FT.error, fontSize: 13 }}>{error}</div>
       )}
       {!loading && !error && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '0 10px' }}>
