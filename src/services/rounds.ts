@@ -90,6 +90,15 @@ export async function finishRound(roundId: string, holesPlayed: number): Promise
   if (error) throw new Error(error.message)
 }
 
+export async function deleteRound(roundId: string): Promise<void> {
+  const { error, count } = await supabase
+    .from('rounds')
+    .delete({ count: 'exact' })
+    .eq('id', roundId)
+  if (error) throw new Error(error.message)
+  if (count === 0) throw new Error('Delete blocked — missing RLS policy')
+}
+
 export async function abandonRound(roundId: string): Promise<void> {
   const { error } = await supabase
     .from('rounds')

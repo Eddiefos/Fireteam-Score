@@ -192,7 +192,7 @@ function App() {
     case 'friends':    body = <SquadScreen go={go} userId={user?.id} />; break;
     case 'stats':      body = <StatsScreen go={go} userId={user?.id} />; break;
     case 'fireteam':   body = <FireteamScreen go={go} userId={user?.id} />; break;
-    case 'account':    body = <AccountScreen session={{ user }} />; break;
+    case 'account':    body = <AccountScreen session={{ user }} go={go} userId={user?.id} />; break;
     case 'settings':   body = <SettingsScreen go={go} userId={user?.id} />; break;
     case 'courses':    body = <CoursesScreen go={go} userId={user?.id} onToast={toast} />; break;
     case 'newCourse':  body = <NewCourseScreen go={go} params={params} userId={user?.id} onToast={toast} />; break;

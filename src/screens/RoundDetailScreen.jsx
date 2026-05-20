@@ -3,6 +3,7 @@ import { FT, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconChevronLeft, IconTrash } from '../components/atoms'
 import { useRounds } from '../hooks/useRounds'
+import { deleteRound } from '../services/rounds'
 import { useScores } from '../hooks/useScores'
 import { useRoundPlayers } from '../hooks/useRoundPlayers'
 import { useCourses } from '../hooks/useCourses'
@@ -56,7 +57,7 @@ function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel',
 }
 
 function RoundDetailScreen({ go, params, userId }) {
-  const { rounds, loading: roundsLoading, abandonRound } = useRounds(userId)
+  const { rounds, loading: roundsLoading } = useRounds(userId)
   const { scores, loading: scoresLoading } = useScores(params.roundId)
   const { players, loading: playersLoading } = useRoundPlayers(params?.roundId)
   const { courses, loading: coursesLoading } = useCourses(userId)
@@ -104,7 +105,7 @@ function RoundDetailScreen({ go, params, userId }) {
   }
 
   const handleDelete = async () => {
-    await abandonRound(params.roundId)
+    await deleteRound(params.roundId)
     go('home')
   }
 

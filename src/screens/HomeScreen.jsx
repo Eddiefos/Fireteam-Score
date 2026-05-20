@@ -4,10 +4,11 @@ import { ScreenShell } from '../components/layout/ScreenShell'
 import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconArrow, EmptyState } from '../components/atoms'
 import { useProfile } from '../hooks/useProfile'
 import { useRounds } from '../hooks/useRounds'
+import { usePlayerRounds } from '../hooks/usePlayerRounds'
 import { useCourses } from '../hooks/useCourses'
 import { useRoundPlayers } from '../hooks/useRoundPlayers'
 import { useFireteam } from '../hooks/useFireteam'
-import { formatDate } from '../lib/gameLogic'
+import { formatDate, playerVsPar } from '../lib/gameLogic'
 
 function HomeScreen({ go, userId }) {
   const { profile, loading: profileLoading } = useProfile(userId)
@@ -16,8 +17,19 @@ function HomeScreen({ go, userId }) {
   const myCourseCount = courses.filter((c) => c.created_by === userId).length
   const { players: activePlayers } = useRoundPlayers(activeRound?.id)
   const { members: fireteamMembers } = useFireteam(userId)
+  const { rounds: playerRounds } = usePlayerRounds(userId)
 
   const loading = profileLoading || roundsLoading
+
+  // vs-par for the current user per finished round
+  const vsByRound = useMemo(() => {
+    const map = {}
+    for (const r of playerRounds) {
+      const me = r.players.find((p) => p.userId === userId)
+      if (me) map[r.id] = playerVsPar(r, me.id)
+    }
+    return map
+  }, [playerRounds, userId])
 
   const user = profile?.display_name ?? ''
 
@@ -198,7 +210,9 @@ function HomeScreen({ go, userId }) {
                         {formatDate(new Date(r.finished_at).getTime())}
                       </div>
                     </div>
-                    {/* ParChip removed — no vs-par data without scores */}
+                    {typeof vsByRound[r.id] === 'number' && (
+                      <ParChip value={vsByRound[r.id]} size="sm" />
+                    )}
                   </button>
                 )
               })}

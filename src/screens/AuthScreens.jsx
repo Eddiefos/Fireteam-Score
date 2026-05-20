@@ -427,11 +427,15 @@ function LoginScreen({ onBack, onSignup }) {
 // ────────────────────────────────────────────────────────────────────────
 //  Account screen
 // ────────────────────────────────────────────────────────────────────────
-function AccountScreen({ session }) {
+function AccountScreen({ session, go, userId }) {
   const email    = session?.user?.email ?? '';
   const username = session?.user?.user_metadata?.username || email.split('@')[0];
-  const initials = username.slice(0, 2).toUpperCase();
+  const { profile } = useProfile(userId);
   const [signingOut, setSigningOut] = useState(false);
+
+  const displayName = profile?.display_name || username;
+  const initials    = profile?.initials || username.slice(0, 2).toUpperCase();
+  const avatarColor = profile?.avatar_color || FT.orange;
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -451,15 +455,10 @@ function AccountScreen({ session }) {
           background: FT.paper, borderRadius: 16, border: `1px solid ${FT.hair}`,
           padding: '20px', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12,
         }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 16,
-            background: FT.forest, color: FT.cream,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: SFR, fontWeight: 900, fontSize: 20, flexShrink: 0,
-          }}>{initials}</div>
+          <Avatar name={initials} color={avatarColor} size={56} fontSize={20} />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 17, color: FT.ink, marginBottom: 3 }}>
-              {username}
+              {displayName}
             </div>
             <div style={{ fontFamily: SF, fontSize: 13, color: FT.dim, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {email}
@@ -467,7 +466,7 @@ function AccountScreen({ session }) {
           </div>
         </div>
 
-        {/* Divider section */}
+        {/* Info + edit profile */}
         <div style={{
           background: FT.paper, borderRadius: 16, border: `1px solid ${FT.hair}`,
           overflow: 'hidden', marginBottom: 24,
@@ -475,15 +474,22 @@ function AccountScreen({ session }) {
           {[
             { label: 'Username', value: username },
             { label: 'Member since', value: new Date(session?.user?.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) },
-          ].map(({ label, value }, i, arr) => (
+          ].map(({ label, value }) => (
             <div key={label} style={{
               padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              borderBottom: i < arr.length - 1 ? `1px solid ${FT.hair}` : 'none',
+              borderBottom: `1px solid ${FT.hair}`,
             }}>
               <span style={{ fontFamily: SF, fontSize: 15, color: FT.ink }}>{label}</span>
               <span style={{ fontFamily: SF, fontSize: 15, color: FT.dim }}>{value}</span>
             </div>
           ))}
+          <button onClick={() => go('settings')} className="flat" style={{
+            width: '100%', padding: '14px 18px', border: 'none', background: 'none',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <span style={{ fontFamily: SF, fontSize: 15, color: FT.ink }}>Edit profile</span>
+            <span style={{ color: FT.dim, fontSize: 15 }}>›</span>
+          </button>
         </div>
 
         {/* Sign out */}
