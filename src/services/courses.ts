@@ -101,3 +101,14 @@ export async function deleteCourse(id: string): Promise<void> {
   if (error) throw new Error(error.message)
   if (count === 0) throw new Error('Delete blocked — missing RLS policy')
 }
+
+export async function getOfficialCourses(): Promise<Course[]> {
+  const { data, error } = await supabase
+    .from('courses')
+    .select('*, course_holes(hole_number, par)')
+    .eq('source', 'official')
+    .order('name')
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as Course[]
+}

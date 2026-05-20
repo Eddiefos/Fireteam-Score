@@ -5,7 +5,7 @@ vi.mock('../supabase', () => ({
 }))
 
 import { supabase } from '../supabase'
-import { getCourses, createCourse, deleteCourse } from '../courses'
+import { getCourses, createCourse, deleteCourse, getOfficialCourses } from '../courses'
 
 beforeEach(() => vi.clearAllMocks())
 
@@ -160,5 +160,58 @@ describe('deleteCourse', () => {
     vi.mocked(supabase.from).mockReturnValue(chain as any)
 
     await expect(deleteCourse('c1')).rejects.toThrow('Delete blocked')
+  })
+})
+
+describe('getOfficialCourses', () => {
+  it('returns official courses with holes ordered by name', async () => {
+    const mockCourses = [
+      {
+        id: 'c1',
+        name: 'Bølgane Frisbeegolfpark',
+        location: 'Kristiansand',
+        lat: 58.14,
+        lng: 7.99,
+        holes: 18,
+        par_total: 54,
+        source: 'official',
+        pdga_id: '12345',
+        created_by: null,
+        is_public: true,
+        created_at: '2026-01-01T00:00:00Z',
+        course_holes: [
+          { hole_number: 1, par: 3 },
+          { hole_number: 2, par: 4 },
+        ],
+      },
+    ]
+
+    const chain = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: mockCourses, error: null }),
+    }
+    vi.mocked(supabase.from).mockReturnValueOnce(chain as any)
+
+    const result = await getOfficialCourses()
+
+    expect(supabase.from).toHaveBeenCalledWith('courses')
+    expect(chain.select).toHaveBeenCalledWith('*, course_holes(hole_number, par)')
+    expect(chain.eq).toHaveBeenCalledWith('source', 'official')
+    expect(chain.order).toHaveBeenCalledWith('name')
+    expect(result).toHaveLength(1)
+    expect(result[0].name).toBe('Bølgane Frisbeegolfpark')
+    expect(result[0].course_holes).toHaveLength(2)
+  })
+
+  it('throws on DB error', async () => {
+    const chain = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockResolvedValue({ data: null, error: { message: 'DB error' } }),
+    }
+    vi.mocked(supabase.from).mockReturnValueOnce(chain as any)
+
+    await expect(getOfficialCourses()).rejects.toThrow('DB error')
   })
 })
