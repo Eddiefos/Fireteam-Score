@@ -15,7 +15,7 @@ function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel',
   if (!open) return null;
   return (
     <div onClick={onCancel} style={{
-      position: 'absolute', inset: 0, background: 'rgba(21,17,13,0.45)',
+      position: 'absolute', inset: 0, background: FT.inkAlpha45,
       zIndex: 90, display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 24, animation: 'fadeIn 160ms ease-out',
     }}>
@@ -28,7 +28,7 @@ function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel',
         <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
           <button onClick={onCancel} style={{
             flex: 1, height: 44, borderRadius: 12, border: 'none',
-            background: 'rgba(42,31,23,0.08)', color: FT.ink,
+            background: FT.barkAlpha08, color: FT.ink,
             fontFamily: SFR, fontWeight: 800, fontSize: 15,
           }}>{cancelLabel}</button>
           <button onClick={onConfirm} style={{
@@ -179,12 +179,12 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
                   </div>
                   <button onClick={() => go('newCourse', { courseId: c.id })} className="flat" style={{
                     width: 32, height: 32, borderRadius: 10, border: 'none',
-                    background: 'rgba(42,31,23,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: FT.barkAlpha06, display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontFamily: SFR, fontWeight: 800, fontSize: 11, color: FT.dim,
                   }}>Edit</button>
                   <button onClick={() => setConfirmDel(c)} className="flat" style={{
                     width: 32, height: 32, borderRadius: 10, border: 'none',
-                    background: 'rgba(42,31,23,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: FT.barkAlpha06, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}><IconTrash /></button>
                 </div>
               ))}
@@ -195,12 +195,12 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
       </div>
 
       <div style={{ padding: '12px 20px 28px', flexShrink: 0,
-        background: 'linear-gradient(to top, rgba(244,239,228,1) 60%, rgba(244,239,228,0))' }}>
+        background: `linear-gradient(to top, ${FT.cream} 60%, ${FT.creamAlpha00})` }}>
         <button onClick={() => go('newCourse')} style={{
           width: '100%', height: 60, borderRadius: 18, border: 'none',
           background: FT.orange, color: FT.ink,
           fontFamily: SFR, fontWeight: 900, fontSize: 17, letterSpacing: -0.3,
-          boxShadow: '0 6px 0 rgba(0,0,0,0.22), 0 14px 24px rgba(255,107,31,0.35)',
+          boxShadow: `0 6px 0 ${FT.shadowDark}, 0 14px 24px ${FT.orangeAlpha35}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         }}><IconPlus /> Add a course</button>
       </div>
@@ -357,13 +357,13 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%', justifyContent: 'space-between' }}>
                   <button onClick={() => setPar(i, p - 1)} className="flat" style={{
                     width: 18, height: 24, borderRadius: 6, border: 'none', flexShrink: 0,
-                    background: 'rgba(42,31,23,0.07)', color: FT.ink,
+                    background: FT.barkAlpha07, color: FT.ink,
                     fontFamily: SFR, fontWeight: 900, fontSize: 13, padding: 0,
                   }}>–</button>
                   <span style={{ fontFamily: SFR, fontWeight: 900, fontSize: 17, textAlign: 'center', minWidth: 0, flex: 1 }}>{p}</span>
                   <button onClick={() => setPar(i, p + 1)} className="flat" style={{
                     width: 18, height: 24, borderRadius: 6, border: 'none', flexShrink: 0,
-                    background: 'rgba(42,31,23,0.07)', color: FT.ink,
+                    background: FT.barkAlpha07, color: FT.ink,
                     fontFamily: SFR, fontWeight: 900, fontSize: 13, padding: 0,
                   }}>+</button>
                 </div>
@@ -374,13 +374,13 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
       </div>
 
       <div style={{ padding: '12px 20px 28px', flexShrink: 0,
-        background: 'linear-gradient(to top, rgba(244,239,228,1) 60%, rgba(244,239,228,0))' }}>
+        background: `linear-gradient(to top, ${FT.cream} 60%, ${FT.creamAlpha00})` }}>
         <button onClick={save} disabled={!canSave} style={{
           width: '100%', height: 60, borderRadius: 18, border: 'none',
-          background: canSave ? FT.orange : 'rgba(42,31,23,0.15)',
+          background: canSave ? FT.orange : FT.barkAlpha15,
           color: canSave ? FT.ink : FT.dim,
           fontFamily: SFR, fontWeight: 900, fontSize: 19, letterSpacing: -0.3,
-          boxShadow: canSave ? '0 6px 0 rgba(0,0,0,0.22), 0 14px 24px rgba(255,107,31,0.35)' : 'none',
+          boxShadow: canSave ? `0 6px 0 ${FT.shadowDark}, 0 14px 24px ${FT.orangeAlpha35}` : 'none',
         }}>{editing ? 'Save changes' : 'Save course'}</button>
       </div>
       <HomeIndicator />

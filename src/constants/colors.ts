@@ -18,11 +18,18 @@ export const FT = {
   barkAlpha30:   'rgba(42,31,23,0.30)',
   barkAlpha35:   'rgba(42,31,23,0.35)',
   barkAlpha50:   'rgba(42,31,23,0.50)',
+  creamAlpha00:  'rgba(244,239,228,0)',
   creamAlpha06:  'rgba(244,239,228,0.06)',
   creamAlpha08:  'rgba(244,239,228,0.08)',
   forestAlpha04: 'rgba(31,61,43,0.04)',
   forestAlpha10: 'rgba(31,61,43,0.10)',
+  inkAlpha45:    'rgba(21,17,13,0.45)',
   orangeAlpha12: 'rgba(255,107,31,0.12)',
+  orangeAlpha35: 'rgba(255,107,31,0.35)',
+  shadowDark:    'rgba(0,0,0,0.22)',
+  barkAlpha06:   'rgba(42,31,23,0.06)',
+  barkAlpha07:   'rgba(42,31,23,0.07)',
+  barkAlpha15:   'rgba(42,31,23,0.15)',
 } as const
 
 export const PLAYER_COLORS = [
