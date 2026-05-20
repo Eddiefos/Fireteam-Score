@@ -30,6 +30,7 @@ export const FT = {
   barkAlpha06:   'rgba(42,31,23,0.06)',
   barkAlpha07:   'rgba(42,31,23,0.07)',
   barkAlpha15:   'rgba(42,31,23,0.15)',
+  error:         '#c0392b',
 } as const
 
 export const PLAYER_COLORS = [
