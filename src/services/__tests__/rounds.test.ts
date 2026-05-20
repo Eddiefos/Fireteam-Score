@@ -61,8 +61,8 @@ describe('finishRound', () => {
   it('sets status to finished', async () => {
     const chain = { update: vi.fn().mockReturnThis(), eq: vi.fn().mockResolvedValue({ error: null }) }
     vi.mocked(supabase.from).mockReturnValue(chain as any)
-    await finishRound('r1')
-    expect(chain.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'finished' }))
+    await finishRound('r1', 18)
+    expect(chain.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'finished', holes_played: 18 }))
   })
 })
 

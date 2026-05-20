@@ -29,7 +29,7 @@ const mockHoles = [
 ]
 
 describe('getCourses', () => {
-  it('fetches courses and hydrates pars from holes', async () => {
+  it('fetches own courses and hydrates pars from holes', async () => {
     const courseChain = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockResolvedValue({ data: [mockCourse], error: null }),
@@ -43,7 +43,7 @@ describe('getCourses', () => {
       .mockReturnValueOnce(courseChain as any)
       .mockReturnValueOnce(holeChain as any)
 
-    const result = await getCourses('u1')
+    const result = await getCourses('u1', true)
     expect(result[0].pars).toEqual([3, 3])
     expect(result[0].name).toBe('Bear Creek')
   })
@@ -63,7 +63,7 @@ describe('getCourses', () => {
       .mockReturnValueOnce(courseChain as any)
       .mockReturnValueOnce(holeChain as any)
 
-    const result = await getCourses('u1')
+    const result = await getCourses('u1', true)
     expect(result[0].pars).toEqual([3, 3, 3, 3, 3, 3, 3, 3, 3])
   })
 
@@ -74,7 +74,7 @@ describe('getCourses', () => {
     }
     vi.mocked(supabase.from).mockReturnValue(courseChain as any)
 
-    await expect(getCourses('u1')).rejects.toThrow('fetch error')
+    await expect(getCourses('u1', true)).rejects.toThrow('fetch error')
   })
 })
 
@@ -132,23 +132,33 @@ describe('deleteCourse', () => {
   it('calls delete with correct id', async () => {
     const chain = {
       delete: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockResolvedValue({ error: null }),
+      eq: vi.fn().mockResolvedValue({ error: null, count: 1 }),
     }
     vi.mocked(supabase.from).mockReturnValue(chain as any)
 
     await deleteCourse('c1')
     expect(supabase.from).toHaveBeenCalledWith('courses')
-    expect(chain.delete).toHaveBeenCalled()
+    expect(chain.delete).toHaveBeenCalledWith({ count: 'exact' })
     expect(chain.eq).toHaveBeenCalledWith('id', 'c1')
   })
 
   it('throws if delete fails', async () => {
     const chain = {
       delete: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockResolvedValue({ error: { message: 'delete error' } }),
+      eq: vi.fn().mockResolvedValue({ error: { message: 'delete error' }, count: 0 }),
     }
     vi.mocked(supabase.from).mockReturnValue(chain as any)
 
     await expect(deleteCourse('c1')).rejects.toThrow('delete error')
+  })
+
+  it('throws if 0 rows deleted (RLS blocked)', async () => {
+    const chain = {
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ error: null, count: 0 }),
+    }
+    vi.mocked(supabase.from).mockReturnValue(chain as any)
+
+    await expect(deleteCourse('c1')).rejects.toThrow('Delete blocked')
   })
 })
