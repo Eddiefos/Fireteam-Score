@@ -19,7 +19,7 @@ function RivalryCard({ profile, wins, losses, streak, streakType }) {
     }}>
       <Avatar name={profile.display_name} color={profile.avatar_color} size={42} fontSize={14} />
       <div>
-        <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 14, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ fontWeight: 500, fontSize: 13, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {profile.display_name}
         </div>
         {total === 0 ? (
@@ -86,7 +86,7 @@ function InviteModal({ friends, memberIds, onInvite, onClose }) {
         padding: '20px 20px 0', display: 'flex', flexDirection: 'column', maxHeight: '70%',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 18, color: FT.ink }}>Invite members</div>
+          <div style={{ fontWeight: 600, fontSize: 18, color: FT.ink }}>Invite members</div>
           <button onClick={onClose} className="flat" style={{
             width: 30, height: 30, borderRadius: 9, border: 'none',
             background: 'rgba(42,31,23,0.08)', color: FT.dim,
@@ -109,8 +109,8 @@ function InviteModal({ friends, memberIds, onInvite, onClose }) {
                 }}>
                   <Avatar name={f.displayName} color={f.avatarColor} size={40} fontSize={13} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 15, color: FT.ink }}>{f.displayName}</div>
-                    <div style={{ fontSize: 12, color: FT.dim }}>@{f.username}</div>
+                    <div style={{ fontWeight: 500, fontSize: 15, color: FT.ink }}>{f.displayName}</div>
+                    <div style={{ fontSize: 12, color: FT.dim, fontWeight: 400 }}>@{f.username}</div>
                   </div>
                   <div style={{
                     width: 24, height: 24, borderRadius: 7, flexShrink: 0,
@@ -135,7 +135,7 @@ function InviteModal({ friends, memberIds, onInvite, onClose }) {
               width: '100%', padding: '14px', borderRadius: 16, border: 'none',
               background: selected.size ? FT.forest : 'rgba(42,31,23,0.1)',
               color: selected.size ? FT.cream : FT.dim,
-              fontFamily: SFR, fontWeight: 800, fontSize: 16,
+              fontFamily: SFR, fontWeight: 600, fontSize: 16,
             }}>
             {sending ? 'Sending…' : `Send ${selected.size > 0 ? `${selected.size} ` : ''}Invite${selected.size !== 1 ? 's' : ''}`}
           </button>
@@ -172,19 +172,19 @@ function NoFireteamState({ pendingInvites, onAccept, onDecline, onCreate }) {
               <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 15, color: FT.ink }}>
                 {inv.inviter_name} invited you to
               </div>
-              <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 20, color: FT.forest, marginTop: 2 }}>
+              <div style={{ fontWeight: 600, fontSize: 20, color: FT.forest, marginTop: 2 }}>
                 {inv.fireteam_name}
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                 <button onClick={() => onAccept(inv)} className="flat" style={{
                   flex: 1, padding: '11px', borderRadius: 12, border: 'none',
                   background: FT.forest, color: FT.cream,
-                  fontFamily: SFR, fontWeight: 800, fontSize: 14,
+                  fontFamily: SFR, fontWeight: 600, fontSize: 14,
                 }}>Accept</button>
                 <button onClick={() => onDecline(inv.id)} className="flat" style={{
                   flex: 1, padding: '11px', borderRadius: 12, border: 'none',
                   background: 'rgba(42,31,23,0.08)', color: FT.dim,
-                  fontFamily: SFR, fontWeight: 700, fontSize: 14,
+                  fontFamily: SFR, fontWeight: 500, fontSize: 14,
                 }}>Decline</button>
               </div>
             </div>
@@ -194,7 +194,7 @@ function NoFireteamState({ pendingInvites, onAccept, onDecline, onCreate }) {
 
       <div style={{ padding: '40px 24px 0', textAlign: 'center' }}>
         <div style={{ fontSize: 52, marginBottom: 12 }}>🎯</div>
-        <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 24, letterSpacing: -0.5, color: FT.ink }}>
+        <div style={{ fontWeight: 600, fontSize: 24, letterSpacing: -0.5, color: FT.ink }}>
           Start your fireteam
         </div>
         <div style={{ fontSize: 14, color: FT.dim, marginTop: 6, lineHeight: 1.5 }}>
@@ -221,13 +221,13 @@ function NoFireteamState({ pendingInvites, onAccept, onDecline, onCreate }) {
               padding: '14px', borderRadius: 14, border: 'none',
               background: name.trim() ? FT.forest : 'rgba(42,31,23,0.1)',
               color: name.trim() ? FT.cream : FT.dim,
-              fontFamily: SFR, fontWeight: 800, fontSize: 16,
+              fontFamily: SFR, fontWeight: 600, fontSize: 16,
             }}>
               {creating ? 'Creating…' : 'Create Fireteam'}
             </button>
             <button onClick={() => setShowCreate(false)} className="flat" style={{
               padding: '10px', borderRadius: 14, border: 'none', background: 'none',
-              color: FT.dim, fontFamily: SFR, fontWeight: 700, fontSize: 14,
+              color: FT.dim, fontFamily: SFR, fontWeight: 500, fontSize: 14,
             }}>Cancel</button>
           </div>
         ) : (
@@ -235,7 +235,7 @@ function NoFireteamState({ pendingInvites, onAccept, onDecline, onCreate }) {
             width: '100%', padding: '14px', borderRadius: 14, border: 'none',
             background: pendingInvites.length > 0 ? 'rgba(42,31,23,0.07)' : FT.orange,
             color: pendingInvites.length > 0 ? FT.dim : FT.ink,
-            fontFamily: SFR, fontWeight: 800, fontSize: 16,
+            fontFamily: SFR, fontWeight: 600, fontSize: 16,
           }}>
             + Create a Fireteam
           </button>
@@ -292,7 +292,7 @@ function FireteamScreen({ go, userId }) {
       <ScreenShell label="Fireteam" bg={FT.cream}>
         <StatusBar />
         <div style={{ padding: '6px 24px 0' }}>
-          <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, color: FT.ink }}>Fireteam</div>
+          <div style={{ fontWeight: 600, fontSize: 34, letterSpacing: -1.0, color: FT.ink, lineHeight: 1.1 }}>Fireteam</div>
         </div>
         <NoFireteamState
           pendingInvites={pendingInvites}
@@ -310,17 +310,17 @@ function FireteamScreen({ go, userId }) {
       <StatusBar />
 
       {/* Header */}
-      <div style={{ padding: '6px 20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
-          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 2, color: FT.dim }}>FIRETEAM</div>
-          <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 28, letterSpacing: -0.8, color: FT.ink, lineHeight: 1.1 }}>
+          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 2.5, color: FT.dim, marginBottom: 3 }}>FIRETEAM</div>
+          <div style={{ fontWeight: 600, fontSize: 26, letterSpacing: -0.6, color: FT.ink, lineHeight: 1.1 }}>
             {fireteam.name}
           </div>
         </div>
         <button onClick={() => setShowInvite(true)} className="flat" style={{
-          height: 34, padding: '0 14px', borderRadius: 12, border: 'none',
+          height: 32, padding: '0 14px', borderRadius: 10, border: 'none',
           background: FT.forest, color: FT.cream,
-          fontFamily: SFR, fontWeight: 800, fontSize: 13,
+          fontFamily: SFR, fontWeight: 600, fontSize: 12, marginBottom: 4,
         }}>+ Invite</button>
       </div>
 
@@ -367,7 +367,7 @@ function FireteamScreen({ go, userId }) {
                   </div>
                   <Avatar name={entry.profile.display_name} color={entry.profile.avatar_color} size={36} fontSize={12} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 15, color: FT.ink }}>
+                    <div style={{ fontWeight: 500, fontSize: 14, color: FT.ink }}>
                       {entry.profile.display_name}
                       {entry.profile.id === userId && (
                         <span style={{ marginLeft: 6, fontSize: 10, fontFamily: MONO, color: FT.dim }}>YOU</span>
@@ -414,10 +414,10 @@ function FireteamScreen({ go, userId }) {
                       <span style={{ fontSize: 18 }}>🥏</span>
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 14, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontWeight: 500, fontSize: 14, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {r.course_name}
                       </div>
-                      <div style={{ fontSize: 11, color: FT.dim, marginTop: 1 }}>
+                      <div style={{ fontSize: 11, color: FT.dim, marginTop: 2, fontWeight: 400 }}>
                         {formatShortDate(new Date(r.started_at).getTime())}
                         {winner && <span> · {winner.displayName} won</span>}
                       </div>

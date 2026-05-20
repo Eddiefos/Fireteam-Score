@@ -79,8 +79,8 @@ function StatsScreen({ go, userId }) {
 
       <div className="ft-scroll">
         <div style={{ padding: '4px 22px 12px' }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>Your stats</div>
-          <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, lineHeight: 1, marginTop: 4 }}>
+          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 2.5, color: FT.dim, textTransform: 'uppercase' }}>Your stats</div>
+          <div style={{ fontWeight: 600, fontSize: 34, letterSpacing: -1.0, lineHeight: 1, marginTop: 4 }}>
             {noUser ? 'Set your name.' : `The book on ${user.split(' ')[0]}.`}
           </div>
         </div>
@@ -93,7 +93,7 @@ function StatsScreen({ go, userId }) {
                 <button onClick={() => go('settings')} className="flat" style={{
                   marginTop: 14, padding: '10px 16px', borderRadius: 12, border: 'none',
                   background: FT.orange, color: FT.ink,
-                  fontFamily: SFR, fontWeight: 800, fontSize: 14,
+                  fontFamily: SFR, fontWeight: 600, fontSize: 14,
                 }}>Set name</button>
               } />
           </div>
@@ -105,7 +105,7 @@ function StatsScreen({ go, userId }) {
                 <button onClick={() => go('start')} className="flat" style={{
                   marginTop: 14, padding: '10px 16px', borderRadius: 12, border: 'none',
                   background: FT.orange, color: FT.ink,
-                  fontFamily: SFR, fontWeight: 800, fontSize: 14,
+                  fontFamily: SFR, fontWeight: 600, fontSize: 14,
                 }}>Start a round</button>
               } />
           </div>
@@ -117,7 +117,7 @@ function StatsScreen({ go, userId }) {
                 <TopoBg color="rgba(244,239,228,0.08)" />
                 <div style={{ position: 'relative' }}>
                   <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 1.5, opacity: 0.6 }}>AVG vs PAR</div>
-                  <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 44, letterSpacing: -2, lineHeight: 0.95, marginTop: 4 }}>
+                  <div style={{ fontWeight: 700, fontSize: 40, letterSpacing: -2, lineHeight: 0.95, marginTop: 4 }}>
                     {stats.totalRounds === 0 ? '–' :
                      stats.avgVs === 0 ? 'E' :
                      stats.avgVs > 0 ? `+${stats.avgVs.toFixed(1)}` : stats.avgVs.toFixed(1)}
@@ -129,13 +129,13 @@ function StatsScreen({ go, userId }) {
               </div>
               <div style={{ background: FT.paper, borderRadius: 18, padding: '14px 14px', border: `1px solid ${FT.hair}` }}>
                 <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 1.5, color: FT.dim }}>BIRDIES</div>
-                <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 32, letterSpacing: -1, lineHeight: 1, marginTop: 4, color: FT.orange }}>{stats.birdies}</div>
-                <div style={{ fontSize: 11, color: FT.dim, marginTop: 2 }}>career</div>
+                <div style={{ fontWeight: 700, fontSize: 30, letterSpacing: -1, lineHeight: 1, marginTop: 4, color: FT.orange }}>{stats.birdies}</div>
+                <div style={{ fontSize: 11, color: FT.dim, marginTop: 4, fontWeight: 400 }}>career</div>
               </div>
               <div style={{ background: FT.paper, borderRadius: 18, padding: '14px 14px', border: `1px solid ${FT.hair}` }}>
                 <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 1.5, color: FT.dim }}>WIN %</div>
-                <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 32, letterSpacing: -1, lineHeight: 1, marginTop: 4 }}>{stats.winPct}</div>
-                <div style={{ fontSize: 11, color: FT.dim, marginTop: 2 }}>{stats.wins} of {stats.totalRounds}</div>
+                <div style={{ fontWeight: 700, fontSize: 30, letterSpacing: -1, lineHeight: 1, marginTop: 4 }}>{stats.winPct}</div>
+                <div style={{ fontSize: 11, color: FT.dim, marginTop: 4, fontWeight: 400 }}>{stats.wins} of {stats.totalRounds}</div>
               </div>
             </div>
 
@@ -153,8 +153,8 @@ function StatsScreen({ go, userId }) {
                       display: 'flex', alignItems: 'center', gap: 12,
                     }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.courseName}</div>
-                        <div style={{ fontSize: 11, color: FT.dim, marginTop: 1, fontFamily: MONO, letterSpacing: 0.5 }}>
+                        <div style={{ fontWeight: 500, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: FT.ink }}>{c.courseName}</div>
+                        <div style={{ fontSize: 10, color: FT.dim, marginTop: 2, fontFamily: MONO, letterSpacing: 0.5 }}>
                           {c.rounds} {c.rounds === 1 ? 'ROUND' : 'ROUNDS'} · BEST {c.best}
                         </div>
                       </div>
@@ -185,8 +185,8 @@ function StatsScreen({ go, userId }) {
                         <Avatar name={p.name} color={PLAYER_COLORS[Math.abs(hashCode(p.name)) % PLAYER_COLORS.length]} size={36} fontSize={12} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                            <span style={{ fontFamily: SFR, fontWeight: 700, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>vs {p.name}</span>
-                            <span style={{ fontFamily: SFR, fontWeight: 900, fontSize: 15, fontVariantNumeric: 'tabular-nums' }}>
+                            <span style={{ fontWeight: 500, fontSize: 14, color: FT.ink }}>vs {p.name}</span>
+                            <span style={{ fontWeight: 600, fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>
                               <span style={{ color: FT.forest }}>{p.w}</span>
                               <span style={{ color: FT.dim, margin: '0 4px' }}>—</span>
                               <span style={{ color: FT.bark }}>{p.l}</span>
@@ -203,7 +203,7 @@ function StatsScreen({ go, userId }) {
                           background: p.last === 'W' ? FT.orange : p.last === 'L' ? 'rgba(42,31,23,0.1)' : 'rgba(42,31,23,0.06)',
                           color: p.last === 'W' ? FT.ink : FT.dim,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontFamily: SFR, fontWeight: 900, fontSize: 11, flexShrink: 0,
+                          fontWeight: 600, fontSize: 11, flexShrink: 0,
                         }}>{p.last}</div>
                       </div>
                     )
@@ -225,7 +225,7 @@ function StatsScreen({ go, userId }) {
                     padding: '4px 10px', borderRadius: 999, border: 'none',
                     background: filter === f.key ? FT.ink : 'rgba(42,31,23,0.07)',
                     color: filter === f.key ? FT.cream : FT.ink,
-                    fontFamily: SFR, fontWeight: 700, fontSize: 11,
+                    fontFamily: SFR, fontWeight: 500, fontSize: 11,
                   }}>{f.label}</button>
                 ))}
               </div>
@@ -246,8 +246,8 @@ function StatsScreen({ go, userId }) {
                     background: win ? FT.orange : 'rgba(42,31,23,0.2)',
                   }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.course_name}</div>
-                    <div style={{ fontSize: 11, color: FT.dim, marginTop: 1, fontFamily: MONO, letterSpacing: 0.5 }}>
+                    <div style={{ fontWeight: 500, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: FT.ink }}>{r.course_name}</div>
+                    <div style={{ fontSize: 11, color: FT.dim, marginTop: 2, fontFamily: MONO, letterSpacing: 0.5 }}>
                       {formatShortDate(new Date(r.finished_at).getTime()).toUpperCase()} · {r.players.length} PLAYERS
                     </div>
                   </div>

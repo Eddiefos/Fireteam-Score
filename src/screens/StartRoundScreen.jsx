@@ -128,7 +128,7 @@ function StartRoundScreen({ go, userId }) {
 
       <div className="ft-scroll">
         <div style={{ padding: '6px 24px 16px' }}>
-          <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, lineHeight: 1 }}>
+          <div style={{ fontWeight: 600, fontSize: 32, letterSpacing: -1.0, lineHeight: 1.05 }}>
             Pick your<br/>course.
           </div>
         </div>
@@ -141,7 +141,7 @@ function StartRoundScreen({ go, userId }) {
                 <button onClick={() => go('newCourse', { returnTo: 'start' })} className="flat" style={{
                   marginTop: 14, padding: '10px 16px', borderRadius: 12, border: 'none',
                   background: FT.orange, color: FT.ink,
-                  fontFamily: SFR, fontWeight: 800, fontSize: 14,
+                  fontFamily: SFR, fontWeight: 600, fontSize: 14,
                 }}>+ Add a course</button>
               } />
           </div>
@@ -163,12 +163,12 @@ function StartRoundScreen({ go, userId }) {
                     width: 46, height: 46, borderRadius: 14,
                     background: sel ? FT.orange : FT.forest,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: SFR, fontWeight: 900, fontSize: 14,
+                    fontWeight: 600, fontSize: 13,
                     color: sel ? FT.ink : FT.cream, position: 'relative', zIndex: 1, flexShrink: 0,
                   }}>{c.pars.length}H</div>
                   <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
-                    <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 17, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</div>
-                    <div style={{ fontSize: 12, opacity: 0.7, marginTop: 1 }}>Par {totalPar(c.pars)}</div>
+                    <div style={{ fontWeight: 600, fontSize: 16, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</div>
+                    <div style={{ fontSize: 12, opacity: 0.65, marginTop: 2, fontWeight: 400 }}>Par {totalPar(c.pars)}</div>
                   </div>
                   <div style={{
                     width: 22, height: 22, borderRadius: 11, position: 'relative', zIndex: 1, flexShrink: 0,
@@ -184,7 +184,7 @@ function StartRoundScreen({ go, userId }) {
             <button onClick={() => go('newCourse', { returnTo: 'start' })} className="flat" style={{
               padding: '12px 16px', borderRadius: 14, border: `1px dashed ${FT.hair}`,
               background: 'transparent', color: FT.dim,
-              fontFamily: SFR, fontWeight: 700, fontSize: 14,
+              fontFamily: SFR, fontWeight: 500, fontSize: 14,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
             }}>
               <IconPlus size={14} /> Add course
@@ -204,7 +204,7 @@ function StartRoundScreen({ go, userId }) {
                 padding: '5px 10px 5px 6px',
               }}>
                 <Avatar name={p.displayName} color={p.color} size={24} fontSize={9} />
-                <span style={{ fontFamily: SFR, fontWeight: 700, fontSize: 12, color: FT.ink }}>{p.displayName}</span>
+                <span style={{ fontWeight: 500, fontSize: 13, color: FT.ink }}>{p.displayName}</span>
                 {i > 0 && (
                   <button onClick={() => removePlayer(p.roundPlayerId)} className="flat" style={{
                     background: 'none', border: 'none', padding: 0, marginLeft: 2,
@@ -224,8 +224,8 @@ function StartRoundScreen({ go, userId }) {
                   <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0' }}>
                     <Avatar name={f.displayName} color={f.avatarColor} size={34} fontSize={11} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 14, color: FT.ink }}>{f.displayName}</div>
-                      <div style={{ fontSize: 11, color: FT.dim }}>@{f.username}</div>
+                      <div style={{ fontWeight: 500, fontSize: 14, color: FT.ink }}>{f.displayName}</div>
+                      <div style={{ fontSize: 11, color: FT.dim, fontWeight: 400 }}>@{f.username}</div>
                     </div>
                     <button
                       onClick={() => added ? removePlayer(`friend-${f.userId}`) : addFriend(f)}
@@ -261,11 +261,11 @@ function StartRoundScreen({ go, userId }) {
                 />
                 <button onClick={addGuest} className="flat" style={{
                   height: 40, padding: '0 14px', borderRadius: 12, border: 'none',
-                  background: FT.forest, color: FT.cream, fontFamily: SFR, fontWeight: 800, fontSize: 13,
+                  background: FT.forest, color: FT.cream, fontFamily: SFR, fontWeight: 600, fontSize: 13,
                 }}>Add</button>
                 <button onClick={() => setShowGuestInput(false)} className="flat" style={{
                   height: 40, padding: '0 10px', borderRadius: 12, border: 'none',
-                  background: 'rgba(42,31,23,0.08)', color: FT.dim, fontFamily: SFR, fontWeight: 700, fontSize: 13,
+                  background: 'rgba(42,31,23,0.08)', color: FT.dim, fontFamily: SFR, fontWeight: 500, fontSize: 13,
                 }}>✕</button>
               </div>
             ) : (
@@ -280,8 +280,8 @@ function StartRoundScreen({ go, userId }) {
                   fontSize: 16, color: 'rgba(42,31,23,0.3)',
                 }}>+</div>
                 <div>
-                  <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 14, color: 'rgba(42,31,23,0.5)' }}>Add guest player</div>
-                  <div style={{ fontSize: 11, color: FT.dim }}>No account needed</div>
+                  <div style={{ fontWeight: 500, fontSize: 14, color: 'rgba(42,31,23,0.5)' }}>Add guest player</div>
+                  <div style={{ fontSize: 11, color: FT.dim, fontWeight: 400 }}>No account needed</div>
                 </div>
               </button>
             )}
@@ -300,7 +300,7 @@ function StartRoundScreen({ go, userId }) {
             width: '100%', padding: '16px', borderRadius: 18, border: 'none',
             background: canStart ? FT.forest : 'rgba(42,31,23,0.1)',
             color: canStart ? FT.cream : FT.dim,
-            fontFamily: SFR, fontWeight: 800, fontSize: 17, letterSpacing: -0.3,
+            fontFamily: SFR, fontWeight: 600, fontSize: 16, letterSpacing: -0.2,
           }}>
           {starting ? 'Starting…' : `Start Round${allPlayers.length > 1 ? ` · ${allPlayers.length} players` : ''} →`}
         </button>
