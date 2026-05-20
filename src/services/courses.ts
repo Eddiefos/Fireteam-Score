@@ -185,3 +185,21 @@ export async function approveSubmission(
 
   await del('official-courses')
 }
+
+export async function rejectSubmission(adminId: string, submissionId: string): Promise<void> {
+  const { error } = await supabase
+    .from('course_submissions')
+    .update({ status: 'rejected', reviewed_by: adminId, reviewed_at: new Date().toISOString() })
+    .eq('id', submissionId)
+  if (error) throw error
+}
+
+export async function getPendingSubmissions(): Promise<CourseSubmission[]> {
+  const { data, error } = await supabase
+    .from('course_submissions')
+    .select('*')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data ?? []
+}
