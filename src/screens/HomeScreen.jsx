@@ -68,11 +68,14 @@ function HomeScreen({ go, userId }) {
       <StatusBar />
       <div className="ft-scroll">
         {/* Hero block */}
-        <div style={{ padding: '8px 24px 22px' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ padding: '20px 24px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 38, lineHeight: 0.95, marginTop: 6, letterSpacing: -1.5 }}>
-                Hey,<br/>{user || 'friend'} 👋
+              <div style={{ fontWeight: 300, fontSize: 15, color: FT.dim, letterSpacing: 0.1, marginBottom: 2 }}>
+                Good to see you,
+              </div>
+              <div style={{ fontWeight: 600, fontSize: 34, lineHeight: 1.05, letterSpacing: -1.0, color: FT.ink }}>
+                {user || 'friend'} 👋
               </div>
             </div>
             {fireteam.length > 0 && (
@@ -90,7 +93,7 @@ function HomeScreen({ go, userId }) {
             <button onClick={() => go('settings')} className="flat" style={{
               marginTop: 12, padding: '8px 12px', borderRadius: 10, border: 'none',
               background: 'rgba(255,107,31,0.14)', color: FT.bark,
-              fontFamily: SFR, fontWeight: 700, fontSize: 13,
+              fontFamily: SFR, fontWeight: 600, fontSize: 13,
             }}>Tap to set your name →</button>
           )}
         </div>
@@ -110,7 +113,7 @@ function HomeScreen({ go, userId }) {
               }}><IconArrow color={FT.ink} size={18} /></div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, opacity: 0.6 }}>RESUME · {activeCourse?.name || 'Course'}</div>
-                <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 16, marginTop: 2 }}>
+                <div style={{ fontWeight: 600, fontSize: 16, marginTop: 2 }}>
                   Hole {Math.min(activeCourse?.holes || 18, (activeRound.holes_played || 0) + 1)} of {activeCourse?.holes || '?'}
                 </div>
                 {activePlayers.length > 0 && (
@@ -135,21 +138,21 @@ function HomeScreen({ go, userId }) {
           <button onClick={() => go('start')} className="flat" style={{
             width: '100%', position: 'relative', overflow: 'hidden',
             background: FT.forest, color: FT.cream, border: 'none',
-            borderRadius: 24, padding: '24px 22px', textAlign: 'left',
-            boxShadow: '0 12px 28px rgba(31,61,43,0.32), inset 0 -4px 0 rgba(0,0,0,0.18)',
+            borderRadius: 22, padding: '20px 22px', textAlign: 'left',
+            boxShadow: '0 8px 20px rgba(31,61,43,0.26), inset 0 -3px 0 rgba(0,0,0,0.14)',
           }}>
-            <TopoBg color="rgba(244,239,228,0.09)" />
+            <TopoBg color="rgba(244,239,228,0.07)" />
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, opacity: 0.7, textTransform: 'uppercase' }}>Tap to begin</div>
-                <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 32, lineHeight: 1, letterSpacing: -1, marginTop: 4 }}>
+                <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 2.5, opacity: 0.55, marginBottom: 5 }}>TAP TO BEGIN</div>
+                <div style={{ fontWeight: 600, fontSize: 26, lineHeight: 1.05, letterSpacing: -0.6 }}>
                   Start New Round
                 </div>
               </div>
               <div style={{
-                width: 56, height: 56, borderRadius: 28, background: FT.orange,
+                width: 48, height: 48, borderRadius: 24, background: FT.orange, flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 6px 0 rgba(0,0,0,0.25)',
+                boxShadow: '0 4px 0 rgba(0,0,0,0.2)',
               }}><IconArrow /></div>
             </div>
           </button>
@@ -161,17 +164,17 @@ function HomeScreen({ go, userId }) {
             background: FT.paper, borderRadius: 18, padding: '14px 16px',
             border: `1px solid ${FT.hair}`, textAlign: 'left',
           }}>
-            <div style={{ fontSize: 22, lineHeight: 1, marginBottom: 8 }}>📋</div>
-            <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 17 }}>History</div>
-            <div style={{ fontSize: 12, color: FT.dim, marginTop: 1 }}>{completed.length} {completed.length === 1 ? 'round' : 'rounds'}</div>
+            <div style={{ fontSize: 20, lineHeight: 1, marginBottom: 8 }}>📋</div>
+            <div style={{ fontWeight: 600, fontSize: 15, color: FT.ink }}>History</div>
+            <div style={{ fontSize: 12, color: FT.dim, marginTop: 2, fontWeight: 400 }}>{completed.length} {completed.length === 1 ? 'round' : 'rounds'}</div>
           </button>
           <button onClick={() => go('courses')} className="flat" style={{
-            background: FT.paper, borderRadius: 18, padding: '14px 16px',
+            background: FT.paper, borderRadius: 16, padding: '14px 16px',
             border: `1px solid ${FT.hair}`, textAlign: 'left',
           }}>
-            <div style={{ fontSize: 22, lineHeight: 1, marginBottom: 8 }}>🌲</div>
-            <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 17 }}>Courses</div>
-            <div style={{ fontSize: 12, color: FT.dim, marginTop: 1 }}>{myCourseCount} saved</div>
+            <div style={{ fontSize: 20, lineHeight: 1, marginBottom: 8 }}>🌲</div>
+            <div style={{ fontWeight: 600, fontSize: 15, color: FT.ink }}>Courses</div>
+            <div style={{ fontSize: 12, color: FT.dim, marginTop: 2, fontWeight: 400 }}>{myCourseCount} saved</div>
           </button>
         </div>
 
@@ -180,7 +183,7 @@ function HomeScreen({ go, userId }) {
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
             <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>Recent rounds</div>
             {completed.length > recent.length && (
-              <button onClick={() => go('stats')} className="flat" style={{ background: 'none', border: 'none', fontSize: 13, color: FT.orange, fontWeight: 700, padding: 0 }}>See all</button>
+              <button onClick={() => go('stats')} className="flat" style={{ background: 'none', border: 'none', fontSize: 13, color: FT.orange, fontWeight: 500, padding: 0 }}>See all</button>
             )}
           </div>
           {recent.length === 0 ? (
@@ -197,13 +200,13 @@ function HomeScreen({ go, userId }) {
                     border: `1px solid ${FT.hair}`, width: '100%',
                   }}>
                     <div style={{
-                      width: 44, height: 44, borderRadius: 12, background: FT.forest,
+                      width: 40, height: 40, borderRadius: 11, background: FT.forest, flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: SFR, fontWeight: 900, color: FT.cream, fontSize: 13,
+                      fontWeight: 600, color: FT.cream, fontSize: 12,
                     }}>{r.holes_played || '?'}H</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{courseName}</div>
-                      <div style={{ fontSize: 12, color: FT.dim, marginTop: 1 }}>
+                      <div style={{ fontWeight: 500, fontSize: 14, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: FT.ink }}>{courseName}</div>
+                      <div style={{ fontSize: 11, color: FT.dim, marginTop: 2, fontWeight: 400 }}>
                         {formatDate(new Date(r.finished_at).getTime())}
                       </div>
                     </div>
