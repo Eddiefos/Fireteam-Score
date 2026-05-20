@@ -12,6 +12,11 @@ export function CourseSubmissionScreen({ go, userId, onToast }) {
 
   const handleSubmit = async () => {
     if (!form.name.trim()) { onToast?.('Course name is required'); return }
+    const holesNum = parseInt(form.holes, 10)
+    if (!holesNum || holesNum < 1 || holesNum > 36) {
+      onToast?.('Holes must be between 1 and 36')
+      return
+    }
     setSubmitting(true)
     try {
       await submitCourse(userId, {
@@ -19,7 +24,7 @@ export function CourseSubmissionScreen({ go, userId, onToast }) {
         location: form.location.trim() || null,
         lat: null,
         lng: null,
-        holes: parseInt(form.holes, 10) || 18,
+        holes: holesNum,
         holes_detail: null,
         notes: form.notes.trim() || null,
       })

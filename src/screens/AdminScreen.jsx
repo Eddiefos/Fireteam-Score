@@ -7,6 +7,7 @@ import { getPendingSubmissions, approveSubmission, rejectSubmission } from '../s
 export function AdminScreen({ go, userId, onToast }) {
   const [submissions, setSubmissions] = useState([])
   const [loading, setLoading] = useState(true)
+  const [processingId, setProcessingId] = useState(null)
 
   useEffect(() => {
     getPendingSubmissions()
@@ -16,22 +17,28 @@ export function AdminScreen({ go, userId, onToast }) {
   }, [])
 
   const handleApprove = async (sub) => {
+    setProcessingId(sub.id)
     try {
       await approveSubmission(userId, sub)
       setSubmissions(prev => prev.filter(s => s.id !== sub.id))
       onToast?.(`${sub.name} approved!`)
     } catch {
       onToast?.('Approval failed. Try again.')
+    } finally {
+      setProcessingId(null)
     }
   }
 
   const handleReject = async (sub) => {
+    setProcessingId(sub.id)
     try {
       await rejectSubmission(userId, sub.id)
       setSubmissions(prev => prev.filter(s => s.id !== sub.id))
       onToast?.('Submission rejected.')
     } catch {
       onToast?.('Rejection failed. Try again.')
+    } finally {
+      setProcessingId(null)
     }
   }
 
@@ -100,6 +107,7 @@ export function AdminScreen({ go, userId, onToast }) {
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   onClick={() => handleApprove(sub)}
+                  disabled={processingId === sub.id}
                   style={{
                     flex: 1,
                     padding: '9px 0',
@@ -110,13 +118,15 @@ export function AdminScreen({ go, userId, onToast }) {
                     fontFamily: SFR,
                     fontWeight: 700,
                     fontSize: 13,
-                    cursor: 'pointer',
+                    cursor: processingId === sub.id ? 'not-allowed' : 'pointer',
+                    opacity: processingId === sub.id ? 0.5 : 1,
                   }}
                 >
-                  Approve
+                  {processingId === sub.id ? '…' : 'Approve'}
                 </button>
                 <button
                   onClick={() => handleReject(sub)}
+                  disabled={processingId === sub.id}
                   style={{
                     flex: 1,
                     padding: '9px 0',
@@ -127,7 +137,8 @@ export function AdminScreen({ go, userId, onToast }) {
                     fontFamily: SFR,
                     fontWeight: 700,
                     fontSize: 13,
-                    cursor: 'pointer',
+                    cursor: processingId === sub.id ? 'not-allowed' : 'pointer',
+                    opacity: processingId === sub.id ? 0.5 : 1,
                   }}
                 >
                   Reject
