@@ -62,11 +62,16 @@ function TopBar({ onBack, label, right }) {
 }
 
 // ────────────────────────────────────────────────────────────────────────
-//  Courses list — manage saved courses
+//  Course Library — manage saved courses
 // ────────────────────────────────────────────────────────────────────────
 function CoursesScreen({ go, userId, onToast = () => {} }) {
   const { courses, loading, deleteCourse } = useCourses(userId, true)
   const [confirmDel, setConfirmDel] = useState(null)
+  const [filter, setFilter] = useState('recent')
+  const chips = ['recent', 'official', 'mine']
+  const chipLabels = { recent: 'Recent', official: 'Official', mine: 'My Courses' }
+
+  const recentCourses = courses.slice(0, 5)
 
   const remove = async (id) => {
     try {
@@ -81,7 +86,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
 
   if (loading) {
     return (
-      <ScreenShell label="Courses">
+      <ScreenShell label="Course Library">
         <StatusBar />
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: FT.orange, opacity: 0.8 }} />
@@ -91,17 +96,66 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
   }
 
   return (
-    <ScreenShell label="Courses">
+    <ScreenShell label="Course Library">
       <StatusBar />
-      <TopBar onBack={() => go('home')} label={`${courses.length} SAVED`} />
+      <TopBar onBack={() => go('home')} label="COURSE LIBRARY" />
 
       <div style={{ padding: '6px 24px 16px' }}>
         <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, lineHeight: 1 }}>
-          Your courses.
+          Course Library.
         </div>
       </div>
 
+      <div style={{ display: 'flex', gap: 6, padding: '0 14px 12px', overflowX: 'auto' }}>
+        {chips.map(c => (
+          <button
+            key={c}
+            onClick={() => {
+              if (c === 'official') { go('officialCourses'); return }
+              setFilter(c)
+            }}
+            style={{
+              padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: filter === c ? 600 : 500,
+              whiteSpace: 'nowrap', border: `1px solid ${filter === c && c !== 'official' ? FT.forest : FT.hair}`,
+              background: filter === c && c !== 'official' ? FT.forest : FT.paper,
+              color: filter === c && c !== 'official' ? FT.cream : FT.dim,
+              cursor: 'pointer'
+            }}
+          >
+            {chipLabels[c]}
+          </button>
+        ))}
+      </div>
+
       <div className="ft-scroll">
+        {filter === 'recent' && (
+          <div style={{ padding: '0 10px' }}>
+            {recentCourses.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px 20px', color: FT.dim, fontSize: 13, lineHeight: 1.6 }}>
+                Play a round to see your recent courses here.
+              </div>
+            ) : (
+              recentCourses.map(course => (
+                <div key={course.id} style={{ background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 14, padding: '10px 11px', display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: FT.forest, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, color: FT.cream, flexShrink: 0 }}>
+                    {course.pars.length}H
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{course.name}</div>
+                    <div style={{ fontSize: 10, color: FT.dim, marginTop: 2 }}>
+                      {course.location ?? `Par ${totalPar(course.pars)}`}
+                      {course.source === 'official' && (
+                        <span style={{ background: FT.orangeAlpha12, color: FT.orange, fontSize: 8, fontWeight: 600, padding: '1px 4px', borderRadius: 3, marginLeft: 4, fontFamily: MONO }}>OFFICIAL</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {filter === 'mine' && (
         <div style={{ padding: '0 20px' }}>
           {courses.length === 0 ? (
             <EmptyState icon="🌲" title="No courses yet"
@@ -137,6 +191,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
             </div>
           )}
         </div>
+        )}
       </div>
 
       <div style={{ padding: '12px 20px 28px', flexShrink: 0,
