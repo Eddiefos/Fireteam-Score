@@ -33,7 +33,12 @@ describe('fetchWeather', () => {
 
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/functions/v1/weather-proxy?lat=58.14&lon=7.99'),
-      expect.objectContaining({ headers: expect.any(Object) })
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-key',
+          apikey: 'test-key',
+        })
+      })
     )
     expect(result.temperature).toBe(14)
     expect(result.symbolCode).toBe('partlycloudy_day')

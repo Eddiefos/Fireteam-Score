@@ -2,8 +2,9 @@ import { supabase } from './supabase'
 import type { WeatherData } from '../types'
 
 export async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+  // Access public properties from the Supabase client
+  const supabaseUrl = (supabase as any).supabaseUrl
+  const supabaseKey = (supabase as any).supabaseKey
 
   const url = `${supabaseUrl}/functions/v1/weather-proxy?lat=${lat}&lon=${lon}`
 
