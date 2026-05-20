@@ -445,8 +445,8 @@ function AccountScreen({ session, go, userId }) {
   return (
     <ScreenShell label="account" bg={FT.cream}>
       <StatusBar />
-      <div className="ft-scroll" style={{ padding: '16px 24px 32px' }}>
-        <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 28, color: FT.ink, marginBottom: 24 }}>
+      <div className="ft-scroll" style={{ padding: '20px 24px 32px' }}>
+        <div style={{ fontFamily: SFR, fontWeight: 600, fontSize: 34, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink, marginBottom: 24 }}>
           Account
         </div>
 

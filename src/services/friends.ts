@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { Friend, FriendRequest, Profile } from '../types'
+import type { Friend, FriendActivityRound, FriendRequest, Profile } from '../types'
 
 type FriendProfileRow = {
   id: string
@@ -162,4 +162,57 @@ export async function removeFriend(requestId: string): Promise<void> {
     .delete()
     .eq('id', requestId)
   if (error) throw new Error(error.message)
+}
+
+export async function getFriendActivity(friendUserId: string): Promise<FriendActivityRound[]> {
+  const { data: roundsData, error } = await supabase
+    .from('rounds')
+    .select('id, course_id, started_at, holes_played, courses(name, course_holes(hole_number, par))')
+    .eq('status', 'finished')
+    .eq('created_by', friendUserId)
+    .not('course_id', 'is', null)
+    .order('started_at', { ascending: false })
+    .limit(5)
+
+  if (error) throw new Error(error.message)
+  if (!roundsData?.length) return []
+
+  const roundIds = roundsData.map((r: any) => r.id)
+
+  const [{ data: playersData }, { data: scoresData }] = await Promise.all([
+    supabase.from('round_players').select('id, round_id').in('round_id', roundIds).eq('user_id', friendUserId),
+    supabase.from('scores').select('round_player_id, hole_number, strokes').in('round_id', roundIds),
+  ])
+
+  const playerIdByRound: Record<string, string> = {}
+  for (const p of (playersData ?? []) as any[]) {
+    playerIdByRound[p.round_id] = p.id
+  }
+
+  const strokesByPlayer: Record<string, number[]> = {}
+  for (const s of (scoresData ?? []) as any[]) {
+    if (!strokesByPlayer[s.round_player_id]) strokesByPlayer[s.round_player_id] = []
+    strokesByPlayer[s.round_player_id][s.hole_number - 1] = s.strokes
+  }
+
+  return roundsData.map((r: any) => {
+    const pars = ((r.courses?.course_holes ?? []) as any[])
+      .sort((a: any, b: any) => a.hole_number - b.hole_number)
+      .map((h: any) => h.par as number)
+
+    const playerId = playerIdByRound[r.id]
+    const strokes = playerId ? (strokesByPlayer[playerId] ?? []) : []
+    const filledStrokes = strokes.filter((s) => s != null)
+    const totalStrokes = filledStrokes.length ? filledStrokes.reduce((a, b) => a + b, 0) : null
+    const totalPar = filledStrokes.length ? pars.slice(0, filledStrokes.length).reduce((a: number, b: number) => a + b, 0) : null
+    const scoreVsPar = totalStrokes !== null && totalPar !== null ? totalStrokes - totalPar : null
+
+    return {
+      id: r.id,
+      courseName: r.courses?.name ?? (r.course_id === null ? 'Deleted course' : 'Unknown course'),
+      startedAt: r.started_at,
+      holesPlayed: r.holes_played,
+      scoreVsPar,
+    }
+  })
 }

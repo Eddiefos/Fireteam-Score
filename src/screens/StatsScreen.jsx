@@ -69,7 +69,7 @@ function StatsScreen({ go, userId }) {
       <StatusBar />
 
       {/* Inlined TopBar */}
-      <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      <div style={{ padding: '20px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <button onClick={() => go('home')} className="flat" style={{ width: 36, height: 36, borderRadius: 12, background: FT.paper, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${FT.hair}` }}>
           <IconChevronLeft />
         </button>

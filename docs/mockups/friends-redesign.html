@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Friends Screen — Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --forest: #1F3D2B;
+    --moss: #3A5A40;
+    --cream: #F4EFE4;
+    --paper: #FAF6EC;
+    --bark: #2A1F17;
+    --ink: #15110D;
+    --orange: #FF6B1F;
+    --amber: #FFB627;
+    --dim: rgba(42,31,23,0.55);
+    --hair: rgba(42,31,23,0.12);
+    --bg-chip: rgba(42,31,23,0.08);
+  }
+
+  body {
+    background: #E8E3D8;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 32px 16px;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
+  }
+
+  .phone {
+    width: 390px;
+    background: var(--cream);
+    border-radius: 44px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.1);
+    position: relative;
+  }
+
+  .phone-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(42,31,23,0.4);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-family: -apple-system, "SF Mono", monospace;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .status-right { display: flex; gap: 5px; align-items: center; font-size: 11px; }
+
+  /* Screen content */
+  .screen { padding: 0; }
+
+  /* Heading */
+  .heading {
+    padding: 6px 24px 0;
+    font-family: -apple-system, "SF Pro Rounded", system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 34;
+    letter-spacing: -1.2px;
+    line-height: 1.05;
+    color: var(--ink);
+    font-size: 34px;
+  }
+
+  /* Chip tabs */
+  .chip-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px 0;
+  }
+
+  .chip {
+    padding: 7px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
+  }
+
+  .chip.active {
+    background: var(--forest);
+    color: var(--cream);
+  }
+
+  .chip.inactive {
+    background: var(--bg-chip);
+    color: var(--dim);
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--hair);
+    margin: 12px 0 0;
+  }
+
+  /* Scrollable content */
+  .content { padding-bottom: 32px; }
+
+  /* Section label */
+  .section-label {
+    padding: 14px 20px 4px;
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: var(--dim);
+    font-family: -apple-system, "SF Mono", monospace;
+    text-transform: uppercase;
+  }
+
+  /* Activity item */
+  .activity-group { padding: 10px 20px 2px; }
+
+  .activity-friend-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cream);
+    flex-shrink: 0;
+    font-family: -apple-system, "SF Pro Rounded", system-ui, sans-serif;
+  }
+
+  .avatar-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .friend-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .rounds-together {
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 1px;
+  }
+
+  .activity-rounds { padding-left: 46px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+
+  .round-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: var(--paper);
+    border-radius: 10px;
+    border: 1px solid var(--hair);
+  }
+
+  .round-meta { font-size: 12px; color: var(--dim); }
+  .round-course { font-size: 12px; font-weight: 500; color: var(--ink); }
+
+  .score-chip {
+    padding: 3px 8px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: -apple-system, "SF Mono", monospace;
+  }
+  .score-birdie { background: var(--orange); color: var(--ink); }
+  .score-par { background: var(--bg-chip); color: var(--ink); }
+  .score-bogey { background: rgba(42,31,23,0.75); color: var(--cream); }
+  .score-double { background: var(--bark); color: var(--cream); }
+
+  /* Friends tab */
+  .friend-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+  }
+
+  .friend-info { flex: 1; min-width: 0; }
+  .friend-display { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .friend-username { font-size: 12px; color: var(--dim); margin-top: 1px; }
+  .friend-stat {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--dim);
+    font-family: -apple-system, "SF Mono", monospace;
+    background: var(--bg-chip);
+    padding: 3px 8px;
+    border-radius: 7px;
+  }
+
+  /* Request row */
+  .request-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+  }
+
+  .btn {
+    padding: 6px 14px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
+  }
+  .btn-accept { background: var(--forest); color: var(--cream); }
+  .btn-decline { background: var(--bg-chip); color: var(--dim); }
+  .btn-cancel { background: var(--bg-chip); color: var(--dim); }
+
+  /* Friend profile */
+  .profile-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px 6px;
+    font-size: 13px;
+    color: var(--orange);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 20px 16px;
+  }
+
+  .profile-name { font-size: 20px; font-weight: 600; color: var(--ink); letter-spacing: -0.4px; }
+  .profile-username { font-size: 13px; color: var(--dim); margin-top: 2px; }
+
+  .profile-stat-row {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 16px;
+  }
+
+  .stat-chip {
+    flex: 1;
+    background: var(--paper);
+    border: 1px solid var(--hair);
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .stat-chip .val { font-size: 18px; font-weight: 700; color: var(--ink); }
+  .stat-chip .lbl { font-size: 8px; letter-spacing: 1.5px; color: var(--dim); font-family: monospace; margin-top: 2px; text-transform: uppercase; }
+
+  .remove-btn {
+    margin: 16px 20px 0;
+    width: calc(100% - 40px);
+    padding: 13px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(180,40,40,0.25);
+    background: rgba(180,40,40,0.06);
+    color: #b42828;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
+  }
+
+  /* Search bar */
+  .search-bar {
+    margin: 10px 20px 0;
+    background: var(--bg-chip);
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .search-bar input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: var(--ink);
+    font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
+  }
+
+  /* Home indicator */
+  .home-indicator {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 12px;
+  }
+  .home-pill {
+    width: 120px;
+    height: 5px;
+    background: rgba(42,31,23,0.2);
+    border-radius: 3px;
+  }
+
+  .separator { height: 1px; background: var(--hair); margin: 0 20px; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1: Activity Tab -->
+<div>
+  <div class="phone-label">Activity Tab</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-right">
+        <span>●●●</span><span>WiFi</span><span>🔋</span>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="heading">Friends</div>
+
+      <div class="chip-tabs">
+        <button class="chip active">Activity</button>
+        <button class="chip inactive">Friends</button>
+      </div>
+      <div class="divider"></div>
+
+      <div class="content">
+
+        <!-- Friend 1 -->
+        <div class="activity-group">
+          <div class="activity-friend-row">
+            <div class="avatar" style="background:#FF6B1F">ED</div>
+            <div>
+              <div class="friend-name">Eddi</div>
+            </div>
+          </div>
+          <div class="activity-rounds">
+            <div class="round-row">
+              <div>
+                <div class="round-course">Bølgane Frisbeegolfpark</div>
+                <div class="round-meta">2 days ago · 18 holes</div>
+              </div>
+              <div class="score-chip score-bogey">+3</div>
+            </div>
+            <div class="round-row">
+              <div>
+                <div class="round-course">Bølgane Frisbeegolfpark</div>
+                <div class="round-meta">5 days ago · 18 holes</div>
+              </div>
+              <div class="score-chip score-bogey">+5</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- Friend 2 -->
+        <div class="activity-group">
+          <div class="activity-friend-row">
+            <div class="avatar" style="background:#FFB627">SO</div>
+            <div>
+              <div class="friend-name">Soren</div>
+            </div>
+          </div>
+          <div class="activity-rounds">
+            <div class="round-row">
+              <div>
+                <div class="round-course">Ekeberg Disc Golf</div>
+                <div class="round-meta">1 day ago · 18 holes</div>
+              </div>
+              <div class="score-chip score-birdie">−1</div>
+            </div>
+            <div class="round-row">
+              <div>
+                <div class="round-course">Lade Disc Golf</div>
+                <div class="round-meta">4 days ago · 18 holes</div>
+              </div>
+              <div class="score-chip score-bogey">+2</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- Friend 3 -->
+        <div class="activity-group">
+          <div class="activity-friend-row">
+            <div class="avatar" style="background:#3A5A40">MA</div>
+            <div>
+              <div class="friend-name">Magnus</div>
+            </div>
+          </div>
+          <div class="activity-rounds">
+            <div class="round-row">
+              <div>
+                <div class="round-course">Frogner Disc Golf</div>
+                <div class="round-meta">3 days ago · 9 holes</div>
+              </div>
+              <div class="score-chip score-par">E</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="home-indicator"><div class="home-pill"></div></div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Friends Tab -->
+<div>
+  <div class="phone-label">Friends Tab</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-right">
+        <span>●●●</span><span>WiFi</span><span>🔋</span>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="heading">Friends</div>
+
+      <div class="chip-tabs">
+        <button class="chip inactive">Activity</button>
+        <button class="chip active">Friends</button>
+      </div>
+      <div class="divider"></div>
+
+      <div class="search-bar">
+        <span>🔍</span>
+        <input placeholder="Find players by username…" disabled />
+      </div>
+
+      <div class="content">
+
+        <div class="section-label">Friends</div>
+
+        <div class="friend-row">
+          <div class="avatar" style="background:#FF6B1F">ED</div>
+          <div class="friend-info">
+            <div class="friend-display">Eddi</div>
+            <div class="friend-username">@eddi · 12 rounds together</div>
+          </div>
+          <div class="friend-stat">+3.2 avg</div>
+        </div>
+        <div class="separator"></div>
+
+        <div class="friend-row">
+          <div class="avatar" style="background:#FFB627">SO</div>
+          <div class="friend-info">
+            <div class="friend-display">Soren</div>
+            <div class="friend-username">@soren · 8 rounds together</div>
+          </div>
+          <div class="friend-stat">+1.8 avg</div>
+        </div>
+        <div class="separator"></div>
+
+        <div class="friend-row">
+          <div class="avatar" style="background:#3A5A40">MA</div>
+          <div class="friend-info">
+            <div class="friend-display">Magnus</div>
+            <div class="friend-username">@magnus · 3 rounds together</div>
+          </div>
+          <div class="friend-stat">+4.0 avg</div>
+        </div>
+
+        <div class="section-label" style="margin-top:8px">Requests</div>
+
+        <div class="request-row">
+          <div class="avatar avatar-sm" style="background:#588157">KA</div>
+          <div class="friend-info">
+            <div class="friend-display" style="font-size:13px">Kaja</div>
+            <div class="friend-username">@kaja</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-accept">Accept</button>
+            <button class="btn btn-decline">✕</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="home-indicator"><div class="home-pill"></div></div>
+  </div>
+</div>
+
+<!-- SCREEN 3: Friend Profile -->
+<div>
+  <div class="phone-label">Friend Profile (tap a friend)</div>
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-right">
+        <span>●●●</span><span>WiFi</span><span>🔋</span>
+      </div>
+    </div>
+
+    <div class="screen">
+
+      <div class="profile-back">‹ Back</div>
+
+      <div class="profile-header">
+        <div class="avatar" style="background:#FF6B1F;width:52px;height:52px;border-radius:16px;font-size:16px">ED</div>
+        <div>
+          <div class="profile-name">Eddi</div>
+          <div class="profile-username">@eddi</div>
+        </div>
+      </div>
+
+      <div class="profile-stat-row">
+        <div class="stat-chip">
+          <div class="val">12</div>
+          <div class="lbl">Rounds</div>
+        </div>
+        <div class="stat-chip">
+          <div class="val">+3.2</div>
+          <div class="lbl">Avg vs par</div>
+        </div>
+        <div class="stat-chip">
+          <div class="val">3</div>
+          <div class="lbl">Wins vs you</div>
+        </div>
+      </div>
+
+      <div class="section-label">Recent Activity</div>
+
+      <div style="padding: 6px 20px; display:flex;flex-direction:column;gap:6px;">
+        <div class="round-row">
+          <div>
+            <div class="round-course">Bølgane Frisbeegolfpark</div>
+            <div class="round-meta">2 days ago · 18 holes</div>
+          </div>
+          <div class="score-chip score-bogey">+3</div>
+        </div>
+        <div class="round-row">
+          <div>
+            <div class="round-course">Bølgane Frisbeegolfpark</div>
+            <div class="round-meta">5 days ago · 18 holes</div>
+          </div>
+          <div class="score-chip score-bogey">+5</div>
+        </div>
+        <div class="round-row">
+          <div>
+            <div class="round-course">Ekeberg Disc Golf</div>
+            <div class="round-meta">9 days ago · 18 holes</div>
+          </div>
+          <div class="score-chip score-bogey">+4</div>
+        </div>
+        <div class="round-row">
+          <div>
+            <div class="round-course">Frogner Disc Golf</div>
+            <div class="round-meta">12 days ago · 9 holes</div>
+          </div>
+          <div class="score-chip score-par">E</div>
+        </div>
+        <div class="round-row">
+          <div>
+            <div class="round-course">Bølgane Frisbeegolfpark</div>
+            <div class="round-meta">18 days ago · 18 holes</div>
+          </div>
+          <div class="score-chip score-bogey">+6</div>
+        </div>
+      </div>
+
+      <button class="remove-btn">Remove Friend</button>
+
+    </div>
+    <div class="home-indicator"><div class="home-pill"></div></div>
+  </div>
+</div>
+
+</body>
+</html>

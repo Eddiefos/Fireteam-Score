@@ -97,6 +97,32 @@ export async function declineInvite(inviteId: string): Promise<void> {
   if (error) throw new Error(error.message)
 }
 
+export async function renameFireteam(fireteamId: string, name: string): Promise<void> {
+  const { error } = await supabase
+    .from('fireteams')
+    .update({ name })
+    .eq('id', fireteamId)
+  if (error) throw new Error(error.message)
+}
+
+export async function kickMember(fireteamId: string, memberId: string): Promise<void> {
+  const { error } = await supabase
+    .from('fireteam_members')
+    .delete()
+    .eq('fireteam_id', fireteamId)
+    .eq('user_id', memberId)
+  if (error) throw new Error(error.message)
+}
+
+export async function leaveFireteam(fireteamId: string, userId: string): Promise<void> {
+  const { error } = await supabase
+    .from('fireteam_members')
+    .delete()
+    .eq('fireteam_id', fireteamId)
+    .eq('user_id', userId)
+  if (error) throw new Error(error.message)
+}
+
 export async function getFireteamRoundsWithData(fireteamId: string): Promise<Round[]> {
   const { data: roundsData, error: roundsError } = await supabase
     .from('rounds')

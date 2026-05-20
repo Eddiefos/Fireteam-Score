@@ -17,6 +17,7 @@ import { CourseDetailScreen } from './screens/CourseDetailScreen';
 import { OfficialCoursesScreen } from './screens/OfficialCoursesScreen';
 import { CourseSubmissionScreen } from './screens/CourseSubmissionScreen';
 import { AdminScreen } from './screens/AdminScreen';
+import { FriendProfileScreen } from './screens/FriendProfileScreen';
 
 // App-level toast portal — exposed so any screen can call it via onToast prop
 let _toastFn = () => {};
@@ -193,7 +194,8 @@ function App() {
   let body;
   switch (screen) {
     case 'home':       body = <HomeScreen go={go} userId={user?.id} />; break;
-    case 'friends':    body = <SquadScreen go={go} userId={user?.id} />; break;
+    case 'friends':      body = <SquadScreen go={go} userId={user?.id} />; break;
+    case 'friendProfile': body = <FriendProfileScreen go={go} params={params} userId={user?.id} />; break;
     case 'stats':      body = <StatsScreen go={go} userId={user?.id} />; break;
     case 'fireteam':   body = <FireteamScreen go={go} userId={user?.id} />; break;
     case 'account':    body = <AccountScreen session={{ user }} go={go} userId={user?.id} />; break;

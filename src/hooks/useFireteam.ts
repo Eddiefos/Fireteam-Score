@@ -9,6 +9,9 @@ import {
   acceptInvite as acceptInviteService,
   declineInvite as declineInviteService,
   getFireteamRoundsWithData,
+  renameFireteam as renameFireteamService,
+  kickMember as kickMemberService,
+  leaveFireteam as leaveFireteamService,
 } from '../services/fireteams'
 
 export function useFireteam(userId: string | undefined) {
@@ -73,6 +76,23 @@ export function useFireteam(userId: string | undefined) {
     setPendingInvites((prev) => prev.filter((i) => i.id !== inviteId))
   }, [])
 
+  const renameFireteam = useCallback(async (fireteamId: string, name: string) => {
+    await renameFireteamService(fireteamId, name)
+    setFireteam((prev) => prev ? { ...prev, name } : prev)
+  }, [])
+
+  const kickMember = useCallback(async (fireteamId: string, memberId: string) => {
+    await kickMemberService(fireteamId, memberId)
+    setMembers((prev) => prev.filter((m) => m.id !== memberId))
+  }, [])
+
+  const leaveFireteam = useCallback(async (fireteamId: string, uid: string) => {
+    await leaveFireteamService(fireteamId, uid)
+    setFireteam(null)
+    setMembers([])
+    setRounds([])
+  }, [])
+
   return {
     fireteam,
     members,
@@ -84,6 +104,9 @@ export function useFireteam(userId: string | undefined) {
     inviteMember,
     acceptInvite,
     declineInvite,
+    renameFireteam,
+    kickMember,
+    leaveFireteam,
     refresh,
   }
 }

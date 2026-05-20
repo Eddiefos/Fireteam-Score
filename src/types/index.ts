@@ -156,6 +156,14 @@ export interface WeatherData {
   fetchedAt: number;        // Date.now() timestamp
 }
 
+export type FriendActivityRound = {
+  id: string
+  courseName: string
+  startedAt: string
+  holesPlayed: number
+  scoreVsPar: number | null
+}
+
 export interface CourseSubmission {
   id: string;
   submitted_by: string;

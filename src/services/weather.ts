@@ -2,15 +2,9 @@ import type { WeatherData } from '../types'
 
 export async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
   const baseUrl = import.meta.env.VITE_SUPABASE_URL as string
-  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
   const url = `${baseUrl}/functions/v1/weather-proxy?lat=${lat}&lon=${lon}`
 
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${anonKey}`,
-      apikey: anonKey,
-    }
-  })
+  const res = await fetch(url)
 
   if (!res.ok) throw new Error(`Weather fetch failed: ${res.status}`)
 
