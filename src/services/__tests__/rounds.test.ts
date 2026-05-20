@@ -5,7 +5,7 @@ vi.mock('../supabase', () => ({
 }))
 
 import { supabase } from '../supabase'
-import { startRound, finishRound, abandonRound } from '../rounds'
+import { startRound, finishRound, abandonRound, updateHolesPlayed } from '../rounds'
 
 beforeEach(() => vi.clearAllMocks())
 
@@ -72,5 +72,18 @@ describe('abandonRound', () => {
     vi.mocked(supabase.from).mockReturnValue(chain as any)
     await abandonRound('r1')
     expect(chain.update).toHaveBeenCalledWith({ status: 'abandoned' })
+  })
+})
+
+describe('updateHolesPlayed', () => {
+  it('updates holes_played for a round', async () => {
+    const chain = {
+      update: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ error: null }),
+    }
+    vi.mocked(supabase.from).mockReturnValue(chain as any)
+    await updateHolesPlayed('r1', 5)
+    expect(chain.update).toHaveBeenCalledWith({ holes_played: 5 })
+    expect(chain.eq).toHaveBeenCalledWith('id', 'r1')
   })
 })

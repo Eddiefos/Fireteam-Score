@@ -10,6 +10,7 @@ import { useScores } from '../hooks/useScores'
 import { useRoundPlayers } from '../hooks/useRoundPlayers'
 import { useCourses } from '../hooks/useCourses'
 import { playerTotal, playerVsPar, liveTimer } from '../lib/gameLogic'
+import { updateHolesPlayed } from '../services/rounds'
 
 function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel', onConfirm, onCancel, danger = false }) {
   if (!open) return null
@@ -49,6 +50,7 @@ function LiveScorecardScreen({ go, userId }) {
   const { courses, loading: coursesLoading } = useCourses(userId)
 
   const isFinishingRef = useRef(false)
+  const syncedHolesRef = useRef(-1)
 
   useEffect(() => {
     if (!roundsLoading && !activeRound && !isFinishingRef.current) go('home')
@@ -77,6 +79,23 @@ function LiveScorecardScreen({ go, userId }) {
       createdBy: activeRound.created_by,
     }
   }, [activeRound, players, courses, scores])
+
+  const holesCompleted = useMemo(() => {
+    if (!round) return 0
+    let count = 0
+    for (let h = 0; h < round.pars.length; h++) {
+      if (round.players.every((p) => typeof round.scores[p.id]?.[h] === 'number')) {
+        count = h + 1
+      }
+    }
+    return count
+  }, [round])
+
+  useEffect(() => {
+    if (!activeRound?.id || holesCompleted === syncedHolesRef.current) return
+    syncedHolesRef.current = holesCompleted
+    updateHolesPlayed(activeRound.id, holesCompleted).catch(() => {})
+  }, [holesCompleted, activeRound?.id])
 
   if (anyLoading || !round) {
     return (

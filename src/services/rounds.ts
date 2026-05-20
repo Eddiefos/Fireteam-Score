@@ -74,6 +74,14 @@ export async function getActiveRound(_userId: string): Promise<{
   return (data as any) ?? null
 }
 
+export async function updateHolesPlayed(roundId: string, holesPlayed: number): Promise<void> {
+  const { error } = await supabase
+    .from('rounds')
+    .update({ holes_played: holesPlayed })
+    .eq('id', roundId)
+  if (error) throw new Error(error.message)
+}
+
 export async function finishRound(roundId: string, holesPlayed: number): Promise<void> {
   const { error } = await supabase
     .from('rounds')

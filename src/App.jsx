@@ -193,7 +193,7 @@ function App() {
     case 'stats':      body = <StatsScreen go={go} userId={user?.id} />; break;
     case 'fireteam':   body = <FireteamScreen go={go} userId={user?.id} />; break;
     case 'account':    body = <AccountScreen session={{ user }} />; break;
-    case 'settings':   body = <SettingsScreen go={go} user={profile?.display_name ?? ''} onSave={() => {}} />; break;
+    case 'settings':   body = <SettingsScreen go={go} userId={user?.id} />; break;
     case 'courses':    body = <CoursesScreen go={go} userId={user?.id} onToast={toast} />; break;
     case 'newCourse':  body = <NewCourseScreen go={go} params={params} userId={user?.id} onToast={toast} />; break;
     case 'start':      body = <StartRoundScreen go={go} userId={user?.id} />; break;

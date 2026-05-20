@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { supabase } from '../services/supabase'
-import { FT, SFR, SF, MONO } from '../constants/colors'
+import { FT, SFR, SF, MONO, PLAYER_COLORS } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import {
   StatusBar, TopoBg,
-  IconChevronLeft, IconArrow,
+  IconChevronLeft, IconArrow, Avatar,
 } from '../components/atoms'
+import { useProfile } from '../hooks/useProfile'
 
 // ────────────────────────────────────────────────────────────────────────
 //  Auth screens  (Landing → CreateAccount | Login)
@@ -507,16 +508,58 @@ function AccountScreen({ session }) {
 //  Settings (just a name field for now)
 //  Props-based to avoid circular imports with App.jsx
 // ────────────────────────────────────────────────────────────────────────
-function SettingsScreen({ go, user: initialUser, onSave }) {
-  const [name, setName] = useState(initialUser || '');
-  const save = () => {
-    onSave(name.trim());
-    go('home');
-  };
+function deriveInitials(name) {
+  const words = name.trim().split(/\s+/).filter(Boolean)
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase()
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return ''
+}
+
+function SettingsScreen({ go, userId }) {
+  const { profile, updateProfile } = useProfile(userId)
+
+  const [name, setName] = useState('')
+  const [initials, setInitials] = useState('')
+  const [color, setColor] = useState(FT.orange)
+  const [initialsEdited, setInitialsEdited] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [loaded, setLoaded] = useState(false)
+
+  // Populate fields once profile loads (only on first load)
+  if (profile && !loaded) {
+    setName(profile.display_name || '')
+    setInitials(profile.initials || '')
+    setColor(profile.avatar_color || FT.orange)
+    setLoaded(true)
+  }
+
+  const handleNameChange = (val) => {
+    setName(val)
+    if (!initialsEdited) setInitials(deriveInitials(val))
+  }
+
+  const handleInitialsChange = (val) => {
+    const clean = val.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2)
+    setInitials(clean)
+    setInitialsEdited(true)
+  }
+
+  const canSave = name.trim().length > 0 && initials.length > 0
+
+  const save = async () => {
+    if (!canSave || saving) return
+    setSaving(true)
+    try {
+      await updateProfile({ display_name: name.trim(), initials, avatar_color: color })
+      go('home')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <ScreenShell label="Settings">
       <StatusBar />
-      {/* Inline TopBar — TopBar lives in App.jsx; replicated here to avoid circular import */}
       <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <button onClick={() => go('home')} className="flat" style={{
           width: 36, height: 36, borderRadius: 12, background: FT.paper,
@@ -526,37 +569,80 @@ function SettingsScreen({ go, user: initialUser, onSave }) {
         <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim }}>YOU</div>
         <div style={{ width: 36 }} />
       </div>
+
       <div className="ft-scroll">
-        <div style={{ padding: '6px 24px 16px' }}>
-          <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, lineHeight: 1 }}>
-            Who's<br/>throwing?
-          </div>
-          <div style={{ fontSize: 14, color: FT.dim, marginTop: 10, lineHeight: 1.4 }}>
-            We'll greet you on the home screen and use this to track your stats.
-          </div>
+        {/* Avatar preview */}
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 24px' }}>
+          <Avatar name={initials || name} color={color} size={88} fontSize={28} />
         </div>
-        <div style={{ padding: '0 20px' }}>
-          <input value={name} onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-            style={{
-              width: '100%', height: 60, padding: '0 18px',
-              background: FT.paper, border: `2px solid ${FT.hair}`, borderRadius: 16,
-              fontFamily: SFR, fontWeight: 800, fontSize: 22, color: FT.ink,
-              outline: 'none',
-            }}
-            onFocus={(e) => e.target.style.borderColor = FT.orange}
-            onBlur={(e) => e.target.style.borderColor = FT.hair}
-          />
-          <button onClick={save} disabled={!name.trim()} className="flat" style={{
-            width: '100%', marginTop: 16, height: 56, borderRadius: 16, border: 'none',
-            background: name.trim() ? FT.forest : 'rgba(42,31,23,0.15)',
-            color: name.trim() ? FT.cream : FT.dim,
+
+        <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Name */}
+          <div>
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginBottom: 6 }}>NAME</div>
+            <input
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              placeholder="Your name"
+              style={{
+                width: '100%', height: 56, padding: '0 18px',
+                background: FT.paper, border: `2px solid ${FT.hair}`, borderRadius: 14,
+                fontFamily: SFR, fontWeight: 800, fontSize: 20, color: FT.ink, outline: 'none',
+              }}
+              onFocus={(e) => e.target.style.borderColor = FT.orange}
+              onBlur={(e) => e.target.style.borderColor = FT.hair}
+            />
+          </div>
+
+          {/* Initials */}
+          <div>
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginBottom: 6 }}>INITIALS</div>
+            <input
+              value={initials}
+              onChange={(e) => handleInitialsChange(e.target.value)}
+              placeholder="EF"
+              maxLength={2}
+              style={{
+                width: '100%', height: 56, padding: '0 18px',
+                background: FT.paper, border: `2px solid ${FT.hair}`, borderRadius: 14,
+                fontFamily: MONO, fontWeight: 800, fontSize: 22, letterSpacing: 4, color: FT.ink, outline: 'none',
+              }}
+              onFocus={(e) => e.target.style.borderColor = FT.orange}
+              onBlur={(e) => e.target.style.borderColor = FT.hair}
+            />
+          </div>
+
+          {/* Color picker */}
+          <div>
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginBottom: 10 }}>COLOUR</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              {PLAYER_COLORS.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setColor(c)}
+                  className="flat"
+                  style={{
+                    flex: 1, aspectRatio: '1', borderRadius: '50%',
+                    background: c, border: 'none',
+                    outline: color === c ? `3px solid ${FT.ink}` : '3px solid transparent',
+                    outlineOffset: 2,
+                    transition: 'outline 120ms',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <button onClick={save} disabled={!canSave || saving} className="flat" style={{
+            width: '100%', marginTop: 8, height: 56, borderRadius: 16, border: 'none',
+            background: canSave ? FT.forest : 'rgba(42,31,23,0.15)',
+            color: canSave ? FT.cream : FT.dim,
             fontFamily: SFR, fontWeight: 900, fontSize: 17, letterSpacing: -0.3,
-          }}>Save</button>
+          }}>{saving ? 'Saving…' : 'Save'}</button>
         </div>
       </div>
     </ScreenShell>
-  );
+  )
 }
 
 export { LandingScreen, CreateAccountScreen, LoginScreen, AccountScreen, SettingsScreen }

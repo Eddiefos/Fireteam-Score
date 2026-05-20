@@ -5,7 +5,20 @@ vi.mock('../../services/roundPlayers', () => ({
   getRoundPlayers: vi.fn().mockResolvedValue([]),
 }))
 
+const { mockChannel } = vi.hoisted(() => {
+  const mockChannel = { on: vi.fn().mockReturnThis(), subscribe: vi.fn() }
+  return { mockChannel }
+})
+
+vi.mock('../../services/supabase', () => ({
+  supabase: {
+    channel: vi.fn().mockReturnValue(mockChannel),
+    removeChannel: vi.fn(),
+  },
+}))
+
 import * as rpService from '../../services/roundPlayers'
+import { supabase } from '../../services/supabase'
 import { useRoundPlayers } from '../useRoundPlayers'
 
 beforeEach(() => vi.clearAllMocks())
@@ -33,5 +46,16 @@ describe('useRoundPlayers', () => {
     await act(async () => {})
     expect(result.current.players).toHaveLength(0)
     expect(rpService.getRoundPlayers).not.toHaveBeenCalled()
+  })
+
+  it('subscribes to INSERT events for the round', async () => {
+    renderHook(() => useRoundPlayers('r1'))
+    await act(async () => {})
+    expect(vi.mocked(supabase.channel)).toHaveBeenCalledWith('round_players:r1')
+    expect(mockChannel.on).toHaveBeenCalledWith(
+      'postgres_changes',
+      expect.objectContaining({ event: 'INSERT', table: 'round_players', filter: 'round_id=eq.r1' }),
+      expect.any(Function),
+    )
   })
 })
