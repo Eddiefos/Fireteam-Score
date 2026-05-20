@@ -49,7 +49,7 @@ function TopBar({ onBack, label, right }) {
   return (
     <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
       {onBack ? (
-        <button onClick={onBack} className="flat" style={{
+        <button onClick={onBack} className="flat" aria-label="Back" style={{
           width: 36, height: 36, borderRadius: 12, background: FT.paper,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: `1px solid ${FT.hair}`,
@@ -132,7 +132,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
           <div style={{ padding: '0 10px' }}>
             {recentCourses.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '32px 20px', color: FT.dim, fontSize: 13, lineHeight: 1.6 }}>
-                Play a round to see your recent courses here.
+                Add a course to see it here.
               </div>
             ) : (
               recentCourses.map(course => (
@@ -182,7 +182,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
                     background: FT.barkAlpha06, display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontFamily: SFR, fontWeight: 800, fontSize: 11, color: FT.dim,
                   }}>Edit</button>
-                  <button onClick={() => setConfirmDel(c)} className="flat" style={{
+                  <button onClick={() => setConfirmDel(c)} className="flat" aria-label="Delete course" style={{
                     width: 32, height: 32, borderRadius: 10, border: 'none',
                     background: FT.barkAlpha06, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}><IconTrash /></button>
