@@ -12,6 +12,17 @@ export const FT = {
   rose:   '#E5556A',
   dim:    'rgba(42,31,23,0.55)',
   hair:   'rgba(42,31,23,0.12)',
+  barkAlpha08:   'rgba(42,31,23,0.08)',
+  barkAlpha10:   'rgba(42,31,23,0.10)',
+  barkAlpha25:   'rgba(42,31,23,0.25)',
+  barkAlpha30:   'rgba(42,31,23,0.30)',
+  barkAlpha35:   'rgba(42,31,23,0.35)',
+  barkAlpha50:   'rgba(42,31,23,0.50)',
+  creamAlpha06:  'rgba(244,239,228,0.06)',
+  creamAlpha08:  'rgba(244,239,228,0.08)',
+  forestAlpha04: 'rgba(31,61,43,0.04)',
+  forestAlpha10: 'rgba(31,61,43,0.10)',
+  orangeAlpha12: 'rgba(255,107,31,0.12)',
 } as const
 
 export const PLAYER_COLORS = [

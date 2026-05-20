@@ -100,7 +100,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
         color: p.color,
         isGuest: p.isGuest,
       }))
-      await startRound(selectedCourseId, players, fireteam?.id)
+      await startRound(selectedCourse?.id ?? selectedCourseId, players, fireteam?.id)
       go('live')
     } catch {
       setStarting(false)
@@ -123,7 +123,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
       <StatusBar />
 
       <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <button onClick={() => go('home')} className="flat" style={{
+        <button onClick={() => go('home')} className="flat" aria-label="Back" style={{
           width: 36, height: 36, borderRadius: 12, background: FT.paper,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: `1px solid ${FT.hair}`,
@@ -152,7 +152,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
                   border: 'none', textAlign: 'left', color: FT.cream, width: '100%',
                 }}
               >
-                <TopoBg color="rgba(244,239,228,0.06)" />
+                <TopoBg color={FT.creamAlpha06} />
                 <div style={{ fontFamily: MONO, fontSize: 8, letterSpacing: 2, opacity: 0.55, textTransform: 'uppercase', marginBottom: 4, position: 'relative', zIndex: 1 }}>Browse</div>
                 <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: -0.4, paddingRight: 40, position: 'relative', zIndex: 1 }}>Official Courses</div>
                 <div style={{ fontSize: 12, opacity: 0.6, marginTop: 3, paddingRight: 40, position: 'relative', zIndex: 1 }}>Norwegian courses with par data</div>
@@ -172,7 +172,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
                 <div style={{ fontFamily: MONO, fontSize: 8, letterSpacing: 2, opacity: 0.55, textTransform: 'uppercase', marginBottom: 4 }}>Your saved</div>
                 <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: -0.4, paddingRight: 40 }}>My Courses</div>
                 <div style={{ fontSize: 12, opacity: 0.5, marginTop: 3, paddingRight: 40 }}>Custom courses you&#39;ve created</div>
-                <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: 16, background: 'rgba(42,31,23,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: FT.dim, fontWeight: 700 }}>→</div>
+                <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: 16, background: FT.barkAlpha08, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: FT.dim, fontWeight: 700 }}>→</div>
               </button>
             </div>
           </div>
@@ -215,7 +215,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
                       display: 'flex', alignItems: 'center', gap: 14, position: 'relative', overflow: 'hidden',
                       textAlign: 'left',
                     }}>
-                      {sel && <TopoBg color="rgba(244,239,228,0.08)" />}
+                      {sel && <TopoBg color={FT.creamAlpha08} />}
                       <div style={{
                         width: 46, height: 46, borderRadius: 14,
                         background: sel ? FT.orange : FT.forest,
@@ -229,7 +229,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
                       </div>
                       <div style={{
                         width: 22, height: 22, borderRadius: 11, position: 'relative', zIndex: 1, flexShrink: 0,
-                        border: `2px solid ${sel ? FT.cream : 'rgba(42,31,23,0.3)'}`,
+                        border: `2px solid ${sel ? FT.cream : FT.barkAlpha30}`,
                         background: sel ? FT.cream : 'transparent',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
@@ -262,7 +262,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
               padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14,
               position: 'relative', overflow: 'hidden',
             }}>
-              <TopoBg color="rgba(31,61,43,0.04)" />
+              <TopoBg color={FT.forestAlpha04} />
               <div style={{
                 width: 46, height: 46, borderRadius: 14, background: FT.forest,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -298,9 +298,9 @@ function StartRoundScreen({ go, userId, params = {} }) {
                   <Avatar name={p.displayName} color={p.color} size={24} fontSize={9} />
                   <span style={{ fontWeight: 500, fontSize: 13, color: FT.ink }}>{p.displayName}</span>
                   {i > 0 && (
-                    <button onClick={() => removePlayer(p.roundPlayerId)} className="flat" style={{
+                    <button onClick={() => removePlayer(p.roundPlayerId)} className="flat" aria-label={`Remove ${p.displayName}`} style={{
                       background: 'none', border: 'none', padding: 0, marginLeft: 2,
-                      color: 'rgba(42,31,23,0.35)', fontSize: 13, lineHeight: 1, cursor: 'pointer',
+                      color: FT.barkAlpha35, fontSize: 13, lineHeight: 1, cursor: 'pointer',
                     }}>✕</button>
                   )}
                 </div>
@@ -322,9 +322,10 @@ function StartRoundScreen({ go, userId, params = {} }) {
                       <button
                         onClick={() => added ? removePlayer(`friend-${f.userId}`) : addFriend(f)}
                         className="flat"
+                        aria-label={added ? `Remove ${f.displayName}` : `Add ${f.displayName}`}
                         style={{
                           width: 30, height: 30, borderRadius: 9, border: 'none',
-                          background: added ? 'rgba(31,61,43,0.1)' : 'rgba(255,107,31,0.12)',
+                          background: added ? FT.forestAlpha10 : FT.orangeAlpha12,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: added ? 14 : 18, color: added ? FT.forest : FT.orange, fontWeight: 700,
                         }}>
@@ -355,9 +356,9 @@ function StartRoundScreen({ go, userId, params = {} }) {
                     height: 40, padding: '0 14px', borderRadius: 12, border: 'none',
                     background: FT.forest, color: FT.cream, fontFamily: SFR, fontWeight: 600, fontSize: 13,
                   }}>Add</button>
-                  <button onClick={() => setShowGuestInput(false)} className="flat" style={{
+                  <button onClick={() => setShowGuestInput(false)} className="flat" aria-label="Cancel" style={{
                     height: 40, padding: '0 10px', borderRadius: 12, border: 'none',
-                    background: 'rgba(42,31,23,0.08)', color: FT.dim, fontFamily: SFR, fontWeight: 500, fontSize: 13,
+                    background: FT.barkAlpha08, color: FT.dim, fontFamily: SFR, fontWeight: 500, fontSize: 13,
                   }}>✕</button>
                 </div>
               ) : (
@@ -367,12 +368,12 @@ function StartRoundScreen({ go, userId, params = {} }) {
                 }}>
                   <div style={{
                     width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                    border: `1.5px dashed rgba(42,31,23,0.25)`,
+                    border: `1.5px dashed ${FT.barkAlpha25}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, color: 'rgba(42,31,23,0.3)',
+                    fontSize: 16, color: FT.barkAlpha30,
                   }}>+</div>
                   <div>
-                    <div style={{ fontWeight: 500, fontSize: 14, color: 'rgba(42,31,23,0.5)' }}>Add guest player</div>
+                    <div style={{ fontWeight: 500, fontSize: 14, color: FT.barkAlpha50 }}>Add guest player</div>
                     <div style={{ fontSize: 11, color: FT.dim, fontWeight: 400 }}>No account needed</div>
                   </div>
                 </button>
@@ -392,7 +393,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
             className="flat"
             style={{
               width: '100%', padding: '16px', borderRadius: 18, border: 'none',
-              background: canStart ? FT.forest : 'rgba(42,31,23,0.1)',
+              background: canStart ? FT.forest : FT.barkAlpha10,
               color: canStart ? FT.cream : FT.dim,
               fontFamily: SFR, fontWeight: 600, fontSize: 16, letterSpacing: -0.2,
             }}>
