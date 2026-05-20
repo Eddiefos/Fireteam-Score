@@ -27,6 +27,7 @@ export type Course = {
   is_public: boolean
   created_by: string | null
   created_at: string
+  course_holes?: CourseHole[]
 }
 
 export type RoundPlayer = {
