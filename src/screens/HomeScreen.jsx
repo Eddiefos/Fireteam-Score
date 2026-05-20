@@ -71,9 +71,6 @@ function HomeScreen({ go, userId }) {
         <div style={{ padding: '8px 24px 22px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>
-                Fireteam · {fireteam.length || 0} {fireteam.length === 1 ? 'member' : 'members'}
-              </div>
               <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 38, lineHeight: 0.95, marginTop: 6, letterSpacing: -1.5 }}>
                 Hey,<br/>{user || 'friend'} 👋
               </div>

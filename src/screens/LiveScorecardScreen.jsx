@@ -232,12 +232,7 @@ function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinis
             <span style={{ color: FT.orange }}>● </span>LIVE · {liveTimer(r.startedAt)}
           </div>
         </div>
-        <button onClick={() => go('home')} className="flat" style={{
-          width: 36, height: 36, borderRadius: 12, border: 'none',
-          background: 'rgba(244,239,228,0.1)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', color: FT.cream,
-          fontFamily: SFR, fontWeight: 800, fontSize: 11,
-        }}>·</button>
+        <div style={{ width: 36 }} />
       </div>
 
       <div className="ft-scroll" style={{ paddingBottom: 0 }}>

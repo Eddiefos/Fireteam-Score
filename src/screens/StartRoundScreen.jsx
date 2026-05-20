@@ -138,7 +138,7 @@ function StartRoundScreen({ go, userId }) {
             <EmptyState icon="🌲" title="No courses yet"
               body="Add a course first — name and par for each hole."
               cta={
-                <button onClick={() => go('newCourse')} className="flat" style={{
+                <button onClick={() => go('newCourse', { returnTo: 'start' })} className="flat" style={{
                   marginTop: 14, padding: '10px 16px', borderRadius: 12, border: 'none',
                   background: FT.orange, color: FT.ink,
                   fontFamily: SFR, fontWeight: 800, fontSize: 14,
@@ -181,7 +181,7 @@ function StartRoundScreen({ go, userId }) {
                 </button>
               )
             })}
-            <button onClick={() => go('newCourse')} className="flat" style={{
+            <button onClick={() => go('newCourse', { returnTo: 'start' })} className="flat" style={{
               padding: '12px 16px', borderRadius: 14, border: `1px dashed ${FT.hair}`,
               background: 'transparent', color: FT.dim,
               fontFamily: SFR, fontWeight: 700, fontSize: 14,

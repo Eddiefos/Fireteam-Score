@@ -222,7 +222,7 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
         await createCourse({ name: name.trim(), pars: [...pars] })
         onToast('Course saved')
       }
-      go('courses')
+      go(params.returnTo || 'courses')
     } catch (err) {
       onToast('Failed to save course')
     }
@@ -231,7 +231,7 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
   return (
     <ScreenShell label="New Course">
       <StatusBar />
-      <TopBar onBack={() => go('courses')} label={editing ? 'EDIT COURSE' : 'NEW COURSE'} />
+      <TopBar onBack={() => go(params.returnTo || 'courses')} label={editing ? 'EDIT COURSE' : 'NEW COURSE'} />
 
       <div style={{ padding: '6px 24px 14px' }}>
         <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, lineHeight: 1 }}>
