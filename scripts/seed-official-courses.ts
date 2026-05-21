@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import courses from './predefined-courses.json'
 
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
+  (process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL)!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
@@ -12,11 +12,12 @@ async function seed() {
   for (const course of courses) {
     const { course_holes, ...courseData } = course
 
-    const { data: existing } = await supabase
-      .from('courses')
-      .select('id')
-      .eq('pdga_id', courseData.pdga_id)
-      .maybeSingle()
+    const existingQuery = supabase.from('courses').select('id')
+    const { data: existing } = await (
+      courseData.pdga_id
+        ? existingQuery.eq('pdga_id', courseData.pdga_id).maybeSingle()
+        : existingQuery.eq('name', courseData.name).maybeSingle()
+    )
 
     let courseId: string
 

@@ -3,7 +3,7 @@ import { get, set } from 'idb-keyval'
 import { getOfficialCourses } from '../services/courses'
 import type { Course } from '../types'
 
-const CACHE_KEY = 'official-courses'
+const CACHE_KEY = 'official-courses-v2'
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000  // 24 hours
 
 interface CacheEntry {

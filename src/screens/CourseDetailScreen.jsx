@@ -6,8 +6,32 @@ import { useOfficialCourses } from '../hooks/useOfficialCourses'
 import { fetchWeather, weatherEmoji, windCompass } from '../services/weather'
 
 // Lazy load MapLibre to keep initial bundle small
-const MapGL = lazy(() =>
-  import('react-map-gl/maplibre').then((m) => ({ default: m.Map }))
+const CourseMap = lazy(() =>
+  import('react-map-gl/maplibre').then((m) => {
+    function Inner({ lat, lng, mapStyle }) {
+      return (
+        <m.Map
+          initialViewState={{ longitude: lng, latitude: lat, zoom: 13 }}
+          style={{ width: '100%', height: '100%' }}
+          mapStyle={mapStyle}
+        >
+          <m.Marker longitude={lng} latitude={lat}>
+            <div
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: '50%',
+                background: FT.orange,
+                border: '2.5px solid white',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
+              }}
+            />
+          </m.Marker>
+        </m.Map>
+      )
+    }
+    return { default: Inner }
+  })
 )
 
 const KARTVERKET_STYLE = {
@@ -222,15 +246,10 @@ export function CourseDetailScreen({ go, params = {} }) {
                 </div>
               }
             >
-              <MapGL
-                initialViewState={{
-                  longitude: course.lng,
-                  latitude: course.lat,
-                  zoom: 14,
-                }}
-                style={{ width: '100%', height: '100%' }}
+              <CourseMap
+                lat={course.lat}
+                lng={course.lng}
                 mapStyle={KARTVERKET_STYLE}
-                interactive={false}
               />
             </Suspense>
           </div>
