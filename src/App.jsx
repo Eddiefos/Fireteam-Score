@@ -202,7 +202,7 @@ function App() {
     case 'settings':   body = <SettingsScreen go={go} userId={user?.id} />; break;
     case 'courses':    body = <CoursesScreen go={go} userId={user?.id} onToast={toast} />; break;
     case 'newCourse':  body = <NewCourseScreen go={go} params={params} userId={user?.id} onToast={toast} />; break;
-    case 'start':      body = <StartRoundScreen go={go} userId={user?.id} />; break;
+    case 'start':      body = <StartRoundScreen go={go} userId={user?.id} params={params} />; break;
     case 'live':       body = <LiveScorecardScreen go={go} userId={user?.id} />; break;
     case 'round':        body = <RoundDetailScreen go={go} params={params} userId={user?.id} />; break;
     case 'courseDetail': body = <CourseDetailScreen go={go} params={params} />; break;
