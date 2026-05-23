@@ -48,7 +48,7 @@ export async function getRounds(userId: string): Promise<{
   holes_played: number
   created_by: string
 }[]> {
-  const [{ data, error }, { data: dismissals }] = await Promise.all([
+  const [{ data, error }, { data: dismissals, error: dismissalsError }] = await Promise.all([
     supabase
       .from('rounds')
       .select('id, course_id, started_at, finished_at, status, holes_played, created_by')
@@ -59,6 +59,7 @@ export async function getRounds(userId: string): Promise<{
       .eq('user_id', userId),
   ])
   if (error) throw new Error(error.message)
+  if (dismissalsError) throw new Error(dismissalsError.message)
   const dismissed = new Set((dismissals ?? []).map((d: any) => d.round_id))
   return ((data ?? []) as any[]).filter((r) => !dismissed.has(r.id))
 }
@@ -141,10 +142,12 @@ export async function getPlayerRoundsWithData(userId: string): Promise<Round[]> 
 
   const roundIds = filtered.map((r: any) => r.id)
 
-  const [{ data: playersData }, { data: scoresData }] = await Promise.all([
+  const [{ data: playersData, error: playersError }, { data: scoresData, error: scoresError }] = await Promise.all([
     supabase.from('round_players').select('id, round_id, user_id, guest_name, display_name, initials, color, is_guest').in('round_id', roundIds),
     supabase.from('scores').select('round_id, round_player_id, hole_number, strokes').in('round_id', roundIds),
   ])
+  if (playersError) throw new Error(playersError.message)
+  if (scoresError) throw new Error(scoresError.message)
 
   const playersByRound: Record<string, RoundPlayer[]> = {}
   for (const p of (playersData ?? []) as any[]) {

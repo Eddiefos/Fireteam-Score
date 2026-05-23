@@ -303,7 +303,7 @@ function FireteamScreen({ go, userId }) {
     if (!userId) return []
     return members
       .filter((m) => m.id !== userId)
-      .map((opp) => ({ profile: opp, ...computeHeadToHead(opp.id, userId, rounds) }))
+      .map((opp) => ({ profile: opp, ...computeHeadToHead(userId, opp.id, rounds) }))
   }, [userId, members, rounds])
 
   const leaderboard = useMemo(

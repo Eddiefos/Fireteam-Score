@@ -140,7 +140,7 @@ function App() {
       const sc = document.querySelector('.ft-scroll');
       if (sc) sc.scrollTop = 0;
     });
-  }, [screen, params]);
+  }, []);
 
   const goTab = useCallback((tab) => {
     setScreen(tab);

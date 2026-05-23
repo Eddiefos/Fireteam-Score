@@ -190,9 +190,9 @@ export function computeFireteamLeaderboard(
     .sort((a, b) => b.wins - a.wins || a.avgVsPar - b.avgVsPar)
 }
 
-export function computePlayerStats(rounds: Round[], playerName: string): PlayerStats {
+export function computePlayerStats(rounds: Round[], playerUserId: string): PlayerStats {
   const completed = rounds.filter((r) => r.finished_at)
-  const mine = completed.filter((r) => r.players.some((p) => p.displayName === playerName))
+  const mine = completed.filter((r) => r.players.some((p) => p.userId === playerUserId))
   let totalVs = 0
   let totalRounds = 0
   let birdies = 0
@@ -204,7 +204,7 @@ export function computePlayerStats(rounds: Round[], playerName: string): PlayerS
   const h2h: Record<string, { w: number; l: number; t: number; last: string }> = {}
 
   for (const r of mine) {
-    const me = r.players.find((p) => p.displayName === playerName)
+    const me = r.players.find((p) => p.userId === playerUserId)
     if (!me) continue
     const myScore = playerTotal(r, me.id)
     const myVs = playerVsPar(r, me.id)
