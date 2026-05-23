@@ -4,7 +4,7 @@ import { FT, SFR, SF, MONO, PLAYER_COLORS } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import {
   StatusBar, TopoBg,
-  IconChevronLeft, IconArrow, Avatar,
+  IconArrowBack, IconArrow, Avatar,
 } from '../components/atoms'
 import { useProfile } from '../hooks/useProfile'
 
@@ -38,7 +38,7 @@ function AuthHero({ slim = false }) {
       <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
         {!slim && <AuthDisc />}
         <div style={{
-          fontFamily: SFR, fontWeight: 800, fontSize: slim ? 22 : 32,
+          fontFamily: SFR, fontWeight: 700, fontSize: slim ? 22 : 36,
           color: FT.cream, marginTop: slim ? 0 : 16, letterSpacing: -0.5,
         }}>Fireteam Score</div>
         {!slim && (
@@ -66,7 +66,7 @@ function PasswordInput({ value, onChange, placeholder = 'Password', id }) {
         maxLength={128}
         style={{
           width: '100%', boxSizing: 'border-box',
-          padding: '13px 44px 13px 14px', borderRadius: 12,
+          height: 44, padding: '0 44px 0 14px', borderRadius: 12,
           border: `1.5px solid ${FT.hair}`, background: FT.paper,
           fontFamily: SF, fontSize: 16, color: FT.ink,
           outline: 'none', WebkitAppearance: 'none',
@@ -106,7 +106,7 @@ function AuthInput({ value, onChange, type = 'text', placeholder, autoComplete, 
       maxLength={maxLength}
       style={{
         width: '100%', boxSizing: 'border-box',
-        padding: '13px 14px', borderRadius: 12,
+        height: 44, padding: '0 14px', borderRadius: 12,
         border: `1.5px solid ${FT.hair}`, background: FT.paper,
         fontFamily: SF, fontSize: 16, color: FT.ink,
         outline: 'none', WebkitAppearance: 'none',
@@ -271,10 +271,10 @@ function CreateAccountScreen({ onBack, onLogin }) {
     <ScreenShell label="signup" bg={FT.cream}>
       <AuthHero slim />
       <div className="ft-scroll" style={{ padding: '28px 28px 40px' }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 20px', display: 'flex', alignItems: 'center', gap: 6, color: FT.dim, fontFamily: SF, fontSize: 14 }}>
-          <IconChevronLeft color={FT.dim} size={16} /> Back
+        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 20px', display: 'flex', alignItems: 'center', gap: 6, color: FT.dim, fontFamily: SF, fontSize: 14, minHeight: 44 }}>
+          <IconArrowBack color={FT.dim} size={16} /> Back
         </button>
-        <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 22, color: FT.ink, marginBottom: 6 }}>Create account</div>
+        <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 22, color: FT.ink, marginBottom: 6 }}>Create account</div>
         <div style={{ fontFamily: SF, fontSize: 15, color: FT.dim, marginBottom: 28, lineHeight: 1.5 }}>
           Pick a username and set up your account.
         </div>
@@ -374,10 +374,10 @@ function LoginScreen({ onBack, onSignup }) {
     <ScreenShell label="login" bg={FT.cream}>
       <AuthHero slim />
       <div className="ft-scroll" style={{ padding: '28px 28px 40px' }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 20px', display: 'flex', alignItems: 'center', gap: 6, color: FT.dim, fontFamily: SF, fontSize: 14 }}>
-          <IconChevronLeft color={FT.dim} size={16} /> Back
+        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 20px', display: 'flex', alignItems: 'center', gap: 6, color: FT.dim, fontFamily: SF, fontSize: 14, minHeight: 44 }}>
+          <IconArrowBack color={FT.dim} size={16} /> Back
         </button>
-        <div style={{ fontFamily: SFR, fontWeight: 800, fontSize: 22, color: FT.ink, marginBottom: 6 }}>
+        <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 22, color: FT.ink, marginBottom: 6 }}>
           Log in
         </div>
         <div style={{ fontFamily: SF, fontSize: 15, color: FT.dim, marginBottom: 28, lineHeight: 1.5 }}>
@@ -446,7 +446,7 @@ function AccountScreen({ session, go, userId }) {
     <ScreenShell label="account" bg={FT.cream}>
       <StatusBar />
       <div className="ft-scroll" style={{ padding: '20px 24px 32px' }}>
-        <div style={{ fontFamily: SFR, fontWeight: 600, fontSize: 34, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink, marginBottom: 24 }}>
+        <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink, marginBottom: 24 }}>
           Account
         </div>
 
@@ -585,14 +585,14 @@ function SettingsScreen({ go, userId }) {
   return (
     <ScreenShell label="Settings">
       <StatusBar />
-      <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      <div style={{ padding: '20px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <button onClick={() => go('home')} className="flat" style={{
-          width: 36, height: 36, borderRadius: 12, background: FT.paper,
+          width: 44, height: 44, borderRadius: 12, background: FT.paper,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: `1px solid ${FT.hair}`,
-        }}><IconChevronLeft /></button>
-        <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim }}>YOU</div>
-        <div style={{ width: 36 }} />
+        }}><IconArrowBack color={FT.ink} size={18} /></button>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim }}>YOU</div>
+        <div style={{ width: 44 }} />
       </div>
 
       <div className="ft-scroll">

@@ -123,18 +123,36 @@ export async function leaveFireteam(fireteamId: string, userId: string): Promise
   if (error) throw new Error(error.message)
 }
 
-export async function getFireteamRoundsWithData(fireteamId: string): Promise<Round[]> {
-  const { data: roundsData, error: roundsError } = await supabase
-    .from('rounds')
-    .select('id, course_id, started_at, finished_at, status, holes_played, created_by, courses(name, course_holes(hole_number, par))')
-    .eq('fireteam_id', fireteamId)
-    .eq('status', 'finished')
-    .order('started_at', { ascending: false })
-    .limit(20)
+export async function deleteFireteam(fireteamId: string): Promise<void> {
+  const { error } = await supabase
+    .from('fireteams')
+    .delete()
+    .eq('id', fireteamId)
+  if (error) throw new Error(error.message)
+}
+
+export async function getFireteamRoundsWithData(fireteamId: string, userId: string): Promise<Round[]> {
+  const [{ data: roundsData, error: roundsError }, { data: dismissals }] = await Promise.all([
+    supabase
+      .from('rounds')
+      .select('id, course_id, started_at, finished_at, status, holes_played, created_by, courses(name, course_holes(hole_number, par))')
+      .eq('fireteam_id', fireteamId)
+      .eq('status', 'finished')
+      .order('started_at', { ascending: false })
+      .limit(20),
+    supabase
+      .from('round_dismissals')
+      .select('round_id')
+      .eq('user_id', userId),
+  ])
   if (roundsError) throw new Error(roundsError.message)
   if (!roundsData?.length) return []
 
-  const roundIds = roundsData.map((r: any) => r.id)
+  const dismissed = new Set((dismissals ?? []).map((d: any) => d.round_id))
+  const filteredRounds = (roundsData as any[]).filter((r) => !dismissed.has(r.id))
+  if (!filteredRounds.length) return []
+
+  const roundIds = filteredRounds.map((r: any) => r.id)
 
   const { data: playersData, error: playersError } = await supabase
     .from('round_players')
@@ -171,7 +189,7 @@ export async function getFireteamRoundsWithData(fireteamId: string): Promise<Rou
     scoresByRound[s.round_id][s.round_player_id][s.hole_number - 1] = s.strokes
   }
 
-  return (roundsData as any[]).map((r) => {
+  return filteredRounds.map((r) => {
     const pars = ((r.courses?.course_holes ?? []) as any[])
       .sort((a: any, b: any) => a.hole_number - b.hole_number)
       .map((h: any) => h.par as number)

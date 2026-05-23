@@ -3,7 +3,7 @@ import { FT, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import {
   StatusBar, HomeIndicator,
-  IconChevronLeft, IconTrash, IconPlus, EmptyState,
+  IconArrowBack, IconTrash, IconPlus, IconMapPin, IconBadge, EmptyState,
 } from '../components/atoms'
 import { useCourses } from '../hooks/useCourses'
 import { totalPar } from '../lib/gameLogic'
@@ -47,16 +47,16 @@ function Modal({ open, title, body, confirmLabel = 'OK', cancelLabel = 'Cancel',
 // ────────────────────────────────────────────────────────────────────────
 function TopBar({ onBack, label, right }) {
   return (
-    <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+    <div style={{ padding: '20px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
       {onBack ? (
         <button onClick={onBack} className="flat" aria-label="Back" style={{
-          width: 36, height: 36, borderRadius: 12, background: FT.paper,
+          width: 44, height: 44, borderRadius: 12, background: FT.paper,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: `1px solid ${FT.hair}`,
-        }}><IconChevronLeft /></button>
-      ) : <div style={{ width: 36 }} />}
-      {label && <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim }}>{label}</div>}
-      {right || <div style={{ width: 36 }} />}
+        }}><IconArrowBack color={FT.ink} size={18} /></button>
+      ) : <div style={{ width: 44 }} />}
+      {label && <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim }}>{label}</div>}
+      {right || <div style={{ width: 44 }} />}
     </div>
   );
 }
@@ -100,8 +100,8 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
       <StatusBar />
       <TopBar onBack={() => go('home')} label="COURSE LIBRARY" />
 
-      <div style={{ padding: '6px 24px 16px' }}>
-        <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, lineHeight: 1 }}>
+      <div style={{ padding: '8px 24px 16px' }}>
+        <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1 }}>
           Course Library.
         </div>
       </div>
@@ -115,7 +115,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
               setFilter(c)
             }}
             style={{
-              padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: filter === c ? 600 : 500,
+              height: 44, padding: '0 16px', borderRadius: 22, fontSize: 13, fontWeight: filter === c ? 600 : 500,
               whiteSpace: 'nowrap', border: `1px solid ${filter === c && c !== 'official' ? FT.forest : FT.hair}`,
               background: filter === c && c !== 'official' ? FT.forest : FT.paper,
               color: filter === c && c !== 'official' ? FT.cream : FT.dim,
@@ -136,13 +136,13 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
               </div>
             ) : (
               recentCourses.map(course => (
-                <div key={course.id} style={{ background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 14, padding: '10px 11px', display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: FT.forest, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, color: FT.cream, flexShrink: 0 }}>
+                <div key={course.id} style={{ background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 20, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+                  <div style={{ width: 46, height: 46, borderRadius: 12, background: FT.forest, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, color: FT.cream, flexShrink: 0, fontFamily: MONO }}>
                     {course.pars.length}H
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 13, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{course.name}</div>
-                    <div style={{ fontSize: 10, color: FT.dim, marginTop: 2 }}>
+                    <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{course.name}</div>
+                    <div style={{ fontSize: 13, color: FT.dim, marginTop: 2 }}>
                       {course.location ?? `Par ${totalPar(course.pars)}`}
                       {course.source === 'official' && (
                         <span style={{ background: FT.orangeAlpha12, color: FT.orange, fontSize: 8, fontWeight: 600, padding: '1px 4px', borderRadius: 3, marginLeft: 4, fontFamily: MONO }}>OFFICIAL</span>
@@ -158,14 +158,14 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
         {filter === 'mine' && (
         <div style={{ padding: '0 20px' }}>
           {courses.length === 0 ? (
-            <EmptyState icon="🌲" title="No courses yet"
+            <EmptyState icon={<IconBadge bg={FT.forest}><IconMapPin color={FT.cream} size={18} /></IconBadge>} title="No courses yet"
               body="Add your first course — give it a name and dial in the par for each hole." />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {courses.map((c) => (
                 <div key={c.id} style={{
                   display: 'flex', alignItems: 'center', gap: 14,
-                  background: FT.paper, borderRadius: 16, padding: '14px 16px',
+                  background: FT.paper, borderRadius: 20, padding: '14px 16px',
                   border: `1px solid ${FT.hair}`,
                 }}>
                   <div style={{
@@ -174,16 +174,16 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
                     fontFamily: SFR, fontWeight: 900, fontSize: 14, color: FT.cream,
                   }}>{c.pars.length}H</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 17, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</div>
-                    <div style={{ fontSize: 12, color: FT.dim, marginTop: 1 }}>Par {totalPar(c.pars)} · {c.pars.length} holes</div>
+                    <div style={{ fontFamily: SFR, fontWeight: 600, fontSize: 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</div>
+                    <div style={{ fontSize: 13, color: FT.dim, marginTop: 1 }}>Par {totalPar(c.pars)} · {c.pars.length} holes</div>
                   </div>
                   <button onClick={() => go('newCourse', { courseId: c.id })} className="flat" style={{
-                    width: 32, height: 32, borderRadius: 10, border: 'none',
+                    width: 44, height: 44, borderRadius: 12, border: 'none',
                     background: FT.barkAlpha06, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: SFR, fontWeight: 800, fontSize: 11, color: FT.dim,
+                    fontFamily: SFR, fontWeight: 600, fontSize: 13, color: FT.dim,
                   }}>Edit</button>
                   <button onClick={() => setConfirmDel(c)} className="flat" aria-label="Delete course" style={{
-                    width: 32, height: 32, borderRadius: 10, border: 'none',
+                    width: 44, height: 44, borderRadius: 12, border: 'none',
                     background: FT.barkAlpha06, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}><IconTrash /></button>
                 </div>
@@ -288,8 +288,8 @@ function NewCourseScreen({ go, params, userId, onToast = () => {} }) {
       <StatusBar />
       <TopBar onBack={() => go(params.returnTo || 'courses')} label={editing ? 'EDIT COURSE' : 'NEW COURSE'} />
 
-      <div style={{ padding: '6px 24px 14px' }}>
-        <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 34, letterSpacing: -1.2, lineHeight: 1 }}>
+      <div style={{ padding: '8px 24px 14px' }}>
+        <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1 }}>
           {editing ? 'Edit course.' : 'New course.'}
         </div>
       </div>

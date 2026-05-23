@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { FT, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
-import { StatusBar, HomeIndicator, IconChevronLeft } from '../components/atoms'
+import { StatusBar, HomeIndicator, IconArrowBack, IconWarning } from '../components/atoms'
 import { useOfficialCourses } from '../hooks/useOfficialCourses'
 import { fetchWeather, weatherEmoji, windCompass } from '../services/weather'
 
@@ -120,7 +120,7 @@ export function CourseDetailScreen({ go, params = {} }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '6px 20px 8px',
+          padding: '20px 20px 0',
           flexShrink: 0,
         }}
       >
@@ -128,8 +128,8 @@ export function CourseDetailScreen({ go, params = {} }) {
           onClick={() => go(returnTo)}
           className="flat"
           style={{
-            width: 36,
-            height: 36,
+            width: 44,
+            height: 44,
             borderRadius: 12,
             background: FT.paper,
             border: `1px solid ${FT.hair}`,
@@ -139,33 +139,34 @@ export function CourseDetailScreen({ go, params = {} }) {
             cursor: 'pointer',
           }}
         >
-          <IconChevronLeft />
+          <IconArrowBack color={FT.ink} size={18} />
         </button>
         <span
           style={{
             fontFamily: MONO,
-            fontSize: 11,
+            fontSize: 10,
             letterSpacing: 2,
             color: FT.dim,
+            textTransform: 'uppercase',
           }}
         >
-          COURSE DETAIL
+          Course Detail
         </span>
-        <div style={{ width: 36 }} />
+        <div style={{ width: 44 }} />
       </div>
 
       {/* Scrollable body */}
       <div className="ft-scroll">
         {/* Title block */}
-        <div style={{ padding: '2px 20px 12px' }}>
+        <div style={{ padding: '8px 20px 12px' }}>
           <h1
             style={{
-              fontSize: 26,
-              fontWeight: 900,
+              fontSize: 36,
+              fontWeight: 700,
               fontFamily: SFR,
-              letterSpacing: -0.8,
+              letterSpacing: -1.2,
               color: FT.ink,
-              lineHeight: 1.1,
+              lineHeight: 1.05,
               margin: 0,
             }}
           >
@@ -187,12 +188,12 @@ export function CourseDetailScreen({ go, params = {} }) {
               style={{
                 background: 'rgba(255,107,31,0.12)',
                 color: FT.orange,
-                fontSize: 9,
-                fontWeight: 700,
+                fontSize: 8,
+                fontWeight: 600,
                 padding: '2px 6px',
-                borderRadius: 5,
+                borderRadius: 4,
                 fontFamily: MONO,
-                letterSpacing: 1,
+                letterSpacing: 0.5,
               }}
             >
               OFFICIAL
@@ -202,12 +203,12 @@ export function CourseDetailScreen({ go, params = {} }) {
                 style={{
                   background: 'rgba(42,31,23,0.06)',
                   color: FT.dim,
-                  fontSize: 9,
+                  fontSize: 8,
                   fontWeight: 600,
                   padding: '2px 6px',
-                  borderRadius: 5,
+                  borderRadius: 4,
                   fontFamily: MONO,
-                  letterSpacing: 1,
+                  letterSpacing: 0.5,
                 }}
               >
                 PDGA #{course.pdga_id}
@@ -220,8 +221,8 @@ export function CourseDetailScreen({ go, params = {} }) {
         {course.lat && course.lng && (
           <div
             style={{
-              margin: '0 16px 14px',
-              borderRadius: 18,
+              margin: '0 20px 14px',
+              borderRadius: 20,
               overflow: 'hidden',
               height: 190,
               border: `1px solid ${FT.hair}`,
@@ -257,7 +258,7 @@ export function CourseDetailScreen({ go, params = {} }) {
 
         {/* Stats row */}
         <div
-          style={{ display: 'flex', gap: 8, padding: '0 16px 14px' }}
+          style={{ display: 'flex', gap: 8, padding: '0 20px 14px' }}
         >
           {/* Holes */}
           <div
@@ -265,29 +266,23 @@ export function CourseDetailScreen({ go, params = {} }) {
               flex: 1,
               background: FT.paper,
               border: `1px solid ${FT.hair}`,
-              borderRadius: 14,
+              borderRadius: 12,
               padding: '10px 12px',
             }}
           >
             <div
               style={{
                 fontFamily: MONO,
-                fontSize: 8,
-                letterSpacing: 1.5,
+                fontSize: 10,
+                letterSpacing: 2,
                 color: FT.dim,
                 marginBottom: 4,
+                textTransform: 'uppercase',
               }}
             >
-              HOLES
+              Holes
             </div>
-            <div
-              style={{
-                fontSize: 22,
-                fontWeight: 900,
-                fontFamily: SFR,
-                color: FT.ink,
-              }}
-            >
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: SFR, color: FT.ink }}>
               {course.holes}
             </div>
           </div>
@@ -298,29 +293,23 @@ export function CourseDetailScreen({ go, params = {} }) {
               flex: 1,
               background: FT.paper,
               border: `1px solid ${FT.hair}`,
-              borderRadius: 14,
+              borderRadius: 12,
               padding: '10px 12px',
             }}
           >
             <div
               style={{
                 fontFamily: MONO,
-                fontSize: 8,
-                letterSpacing: 1.5,
+                fontSize: 10,
+                letterSpacing: 2,
                 color: FT.dim,
                 marginBottom: 4,
+                textTransform: 'uppercase',
               }}
             >
-              PAR
+              Par
             </div>
-            <div
-              style={{
-                fontSize: 22,
-                fontWeight: 900,
-                fontFamily: SFR,
-                color: FT.ink,
-              }}
-            >
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: SFR, color: FT.ink }}>
               {parTotal || '–'}
             </div>
           </div>
@@ -331,111 +320,69 @@ export function CourseDetailScreen({ go, params = {} }) {
               flex: 2,
               background: FT.paper,
               border: `1px solid ${FT.hair}`,
-              borderRadius: 14,
+              borderRadius: 12,
               padding: '10px 12px',
             }}
           >
             <div
               style={{
                 fontFamily: MONO,
-                fontSize: 8,
-                letterSpacing: 1.5,
+                fontSize: 10,
+                letterSpacing: 2,
                 color: FT.dim,
                 marginBottom: 4,
+                textTransform: 'uppercase',
               }}
             >
-              WEATHER
+              Weather
             </div>
             {weatherLoading && (
-              <div style={{ fontSize: 12, color: FT.dim }}>…</div>
+              <div style={{ fontSize: 13, color: FT.dim }}>…</div>
             )}
             {!weatherLoading && weather && (
               <div>
-                <div
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 900,
-                    fontFamily: SFR,
-                    color: FT.ink,
-                    lineHeight: 1,
-                  }}
-                >
+                <div style={{ fontSize: 22, fontWeight: 700, fontFamily: SFR, color: FT.ink, lineHeight: 1 }}>
                   {weatherEmoji(weather.symbolCode)}{' '}
                   {Math.round(weather.temperature)}°
                 </div>
-                <div
-                  style={{ fontSize: 11, color: FT.dim, marginTop: 3 }}
-                >
+                <div style={{ fontSize: 13, color: FT.dim, marginTop: 3 }}>
                   {weather.windSpeed.toFixed(1)} m/s{' '}
                   {windCompass(weather.windDirection)}
                   {weather.windSpeed >= 8 && (
-                    <span
-                      style={{ color: FT.orange, marginLeft: 5 }}
-                    >
-                      ⚠ Windy
-                    </span>
+                    <span style={{ color: FT.orange, marginLeft: 5 }}>⚠ Windy</span>
                   )}
                 </div>
               </div>
             )}
             {!weatherLoading && !weather && (
-              <div style={{ fontSize: 12, color: FT.dim }}>–</div>
+              <div style={{ fontSize: 13, color: FT.dim }}>–</div>
             )}
           </div>
         </div>
 
         {/* Hole-by-hole grid */}
         {holes.length > 0 && (
-          <div style={{ padding: '0 16px 14px' }}>
-            <div
-              style={{
-                fontFamily: MONO,
-                fontSize: 9,
-                letterSpacing: 2,
-                color: FT.dim,
-                marginBottom: 10,
-              }}
-            >
-              HOLE BY HOLE
+          <div style={{ padding: '0 20px 14px' }}>
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginBottom: 10, textTransform: 'uppercase' }}>
+              Hole by Hole
             </div>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(6, 1fr)',
-                gap: 6,
-              }}
-            >
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6 }}>
               {holes.map((h) => (
                 <div
                   key={h.hole_number}
                   style={{
                     background: FT.paper,
                     border: `1px solid ${FT.hair}`,
-                    borderRadius: 12,
+                    borderRadius: 8,
                     padding: '8px 4px',
                     textAlign: 'center',
                   }}
                 >
-                  <div
-                    style={{
-                      fontFamily: MONO,
-                      fontSize: 8,
-                      color: FT.dim,
-                      letterSpacing: 0.5,
-                    }}
-                  >
+                  <div style={{ fontFamily: MONO, fontSize: 8, color: FT.dim, letterSpacing: 0.5 }}>
                     {h.hole_number}
                   </div>
-                  <div
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 900,
-                      fontFamily: SFR,
-                      color: FT.ink,
-                      marginTop: 3,
-                    }}
-                  >
-                    P{h.par}
+                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: SFR, color: FT.ink, marginTop: 2 }}>
+                    {h.par}
                   </div>
                 </div>
               ))}

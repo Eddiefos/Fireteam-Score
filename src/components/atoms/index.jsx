@@ -93,6 +93,39 @@ function IconTrash({ color = FT.dim, size = 16 }) {
 function IconHamburger({ color = FT.cream, size = 14 }) {
   return <svg width={size} height={size} viewBox="0 0 14 14" fill="none"><path d="M3 3h8M3 7h8M3 11h5" stroke={color} strokeWidth="2" strokeLinecap="round"/></svg>;
 }
+function IconArrowForward({ color = 'currentColor', size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 18 18" fill="none"><path d="M4 9H14M14 9L9 4M14 9L9 14" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+function IconArrowBack({ color = 'currentColor', size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 18 18" fill="none"><path d="M14 9H4M4 9L9 4M4 9L9 14" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+function IconSearch({ color = FT.dim, size = 16 }) {
+  return <svg width={size} height={size} viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke={color} strokeWidth="1.6"/><path d="M10 10l3 3" stroke={color} strokeWidth="1.6" strokeLinecap="round"/></svg>;
+}
+function IconTarget({ color = 'currentColor', size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke={color} strokeWidth="1.6"/><circle cx="9" cy="9" r="4" stroke={color} strokeWidth="1.6"/><circle cx="9" cy="9" r="1.5" fill={color}/></svg>;
+}
+function IconPerson({ color = 'currentColor', size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke={color} strokeWidth="1.6"/><path d="M3 16c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke={color} strokeWidth="1.6" strokeLinecap="round"/></svg>;
+}
+function IconHistory({ color = 'currentColor', size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke={color} strokeWidth="1.6"/><path d="M9 5.5V9l2.5 2.5" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+function IconMapPin({ color = 'currentColor', size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 18 18" fill="none"><path d="M9 2C6.24 2 4 4.24 4 7c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5z" stroke={color} strokeWidth="1.6" strokeLinejoin="round"/><circle cx="9" cy="7" r="1.5" fill={color}/></svg>;
+}
+function IconWarning({ color = FT.amber, size = 18 }) {
+  return <svg width={size} height={size} viewBox="0 0 18 18" fill="none"><path d="M9 2L1.5 15.5h15L9 2z" stroke={color} strokeWidth="1.6" strokeLinejoin="round"/><path d="M9 8v3.5" stroke={color} strokeWidth="1.8" strokeLinecap="round"/><circle cx="9" cy="13.5" r="0.8" fill={color}/></svg>;
+}
+// Square badge container for icon atoms (36×36 by default, r-sm = 8px)
+function IconBadge({ bg, size = 36, children }) {
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: 8, background: bg,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+    }}>{children}</div>
+  );
+}
 
 function Pill({ children, dark = false, onClick, style }) {
   return (
@@ -148,5 +181,7 @@ export {
   StatusBar, HomeIndicator, TopoBg, ParChip, Avatar,
   IconChevronLeft, IconChevronRight, IconArrow, IconClose,
   IconPlus, IconCheck, IconTrash, IconHamburger,
+  IconArrowForward, IconArrowBack, IconSearch, IconTarget,
+  IconPerson, IconHistory, IconMapPin, IconWarning, IconBadge,
   Pill, EmptyState, useToast,
 }

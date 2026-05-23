@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FT, SFR, SF, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
-import { StatusBar, HomeIndicator, Avatar } from '../components/atoms'
+import { StatusBar, HomeIndicator, Avatar, IconSearch } from '../components/atoms'
 import { useFriends } from '../hooks/useFriends'
 import { getFriendActivity } from '../services/friends'
 
@@ -128,8 +128,8 @@ function FriendsSubTab({ friends, loading, searchQuery, setSearchQuery, searchRe
   return (
     <>
       {/* Search */}
-      <div style={{ margin: '10px 20px 0', background: 'rgba(42,31,23,0.07)', borderRadius: 14, padding: '9px 13px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 15 }}>🔍</span>
+      <div style={{ margin: '10px 20px 0', background: 'rgba(42,31,23,0.07)', borderRadius: 14, height: 44, padding: '0 13px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <IconSearch color={FT.dim} size={16} />
         <input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -155,7 +155,7 @@ function FriendsSubTab({ friends, loading, searchQuery, setSearchQuery, searchRe
               </div>
               {friendUserIds.has(p.id)
                 ? <div style={{ fontSize: 10, fontFamily: MONO, color: FT.dim, padding: '4px 10px' }}>FRIENDS</div>
-                : <button onClick={() => sendRequest(p.id)} className="flat" style={{ height: 30, padding: '0 13px', borderRadius: 9, border: 'none', background: FT.orange, color: FT.ink, fontFamily: SFR, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>+ Add</button>
+                : <button onClick={() => sendRequest(p.id)} className="flat" style={{ height: 44, padding: '0 16px', borderRadius: 12, border: 'none', background: FT.orange, color: FT.ink, fontFamily: SFR, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>+ Add</button>
               }
             </div>
           ))}
@@ -191,8 +191,8 @@ function FriendsSubTab({ friends, loading, searchQuery, setSearchQuery, searchRe
             >
               <Avatar name={f.displayName} color={f.avatarColor} size={38} fontSize={12} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: SF, fontWeight: 500, fontSize: 14, color: FT.ink }}>{f.displayName}</div>
-                <div style={{ fontSize: 11, color: FT.dim, marginTop: 1 }}>
+                <div style={{ fontFamily: SF, fontWeight: 600, fontSize: 16, color: FT.ink }}>{f.displayName}</div>
+                <div style={{ fontSize: 13, color: FT.dim, marginTop: 1 }}>
                   @{f.username}{f.roundsTogether > 0 ? ` · ${f.roundsTogether} rounds` : ''}
                 </div>
               </div>
@@ -220,7 +220,7 @@ function RequestsSubTab({ pendingRequests, sentRequests, acceptRequest, declineR
     <>
       {pendingRequests.length > 0 && (
         <>
-          <div style={{ padding: '14px 20px 4px', fontFamily: MONO, fontSize: 9, letterSpacing: 2.5, color: FT.dim, textTransform: 'uppercase' }}>Incoming</div>
+          <div style={{ padding: '14px 20px 4px', fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>Incoming</div>
           {pendingRequests.map((req) => (
             <div key={req.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 20px' }}>
               <Avatar name={req.profile.display_name} color={req.profile.avatar_color} size={36} fontSize={11} />
@@ -229,8 +229,8 @@ function RequestsSubTab({ pendingRequests, sentRequests, acceptRequest, declineR
                 <div style={{ fontSize: 11, color: FT.dim }}>@{req.profile.username}</div>
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
-                <button onClick={() => acceptRequest(req.id)} className="flat" style={{ height: 32, padding: '0 12px', borderRadius: 9, border: 'none', background: FT.forest, color: FT.cream, fontFamily: SFR, fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>Accept</button>
-                <button onClick={() => declineRequest(req.id)} className="flat" style={{ height: 32, padding: '0 12px', borderRadius: 9, border: 'none', background: 'rgba(42,31,23,0.08)', color: FT.dim, fontFamily: SFR, fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>✕</button>
+                <button onClick={() => acceptRequest(req.id)} className="flat" style={{ height: 44, padding: '0 14px', borderRadius: 12, border: 'none', background: FT.forest, color: FT.cream, fontFamily: SFR, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>Accept</button>
+                <button onClick={() => declineRequest(req.id)} className="flat" style={{ height: 44, padding: '0 14px', borderRadius: 12, border: 'none', background: 'rgba(42,31,23,0.08)', color: FT.dim, fontFamily: SFR, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>✕</button>
               </div>
             </div>
           ))}
@@ -239,7 +239,7 @@ function RequestsSubTab({ pendingRequests, sentRequests, acceptRequest, declineR
 
       {sentRequests.length > 0 && (
         <>
-          <div style={{ padding: '14px 20px 4px', fontFamily: MONO, fontSize: 9, letterSpacing: 2.5, color: FT.dim, textTransform: 'uppercase' }}>Sent</div>
+          <div style={{ padding: '14px 20px 4px', fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>Sent</div>
           {sentRequests.map((req) => (
             <div key={req.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 20px', opacity: 0.65 }}>
               <Avatar name={req.profile.display_name} color={req.profile.avatar_color} size={36} fontSize={11} />
@@ -247,7 +247,7 @@ function RequestsSubTab({ pendingRequests, sentRequests, acceptRequest, declineR
                 <div style={{ fontFamily: SF, fontWeight: 500, fontSize: 13, color: FT.ink }}>{req.profile.display_name}</div>
                 <div style={{ fontSize: 11, color: FT.dim }}>@{req.profile.username}</div>
               </div>
-              <button onClick={() => cancelRequest(req.id)} className="flat" style={{ height: 32, padding: '0 12px', borderRadius: 9, border: 'none', background: 'rgba(42,31,23,0.08)', color: FT.dim, fontFamily: SFR, fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => cancelRequest(req.id)} className="flat" style={{ height: 44, padding: '0 14px', borderRadius: 12, border: 'none', background: 'rgba(42,31,23,0.08)', color: FT.dim, fontFamily: SFR, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>Cancel</button>
             </div>
           ))}
         </>
@@ -285,7 +285,7 @@ function SquadScreen({ go, userId }) {
   const pendingCount = pendingRequests.length
 
   const chipStyle = (active) => ({
-    padding: '6px 18px', borderRadius: 20, fontSize: 13, fontWeight: 600,
+    height: 44, padding: '0 20px', borderRadius: 22, fontSize: 13, fontWeight: 600,
     border: 'none', cursor: 'pointer', fontFamily: SF,
     background: active ? FT.forest : 'rgba(42,31,23,0.08)',
     color: active ? FT.cream : FT.dim,
@@ -304,7 +304,7 @@ function SquadScreen({ go, userId }) {
       <StatusBar />
 
       <div style={{ padding: '20px 24px 0' }}>
-        <div style={{ fontFamily: SFR, fontWeight: 600, fontSize: 34, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink }}>Friends</div>
+        <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink }}>Friends</div>
       </div>
 
       {/* Top chip tabs */}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FT, SFR, SF, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
-import { StatusBar, HomeIndicator, Avatar, IconChevronLeft, useToast } from '../components/atoms'
+import { StatusBar, HomeIndicator, Avatar, IconArrowBack, useToast } from '../components/atoms'
 import { getFriendActivity, removeFriend } from '../services/friends'
 
 function ScoreChip({ vsPar }) {
@@ -100,18 +100,18 @@ function FriendProfileScreen({ go, params = {} }) {
       <StatusBar />
 
       {/* Back */}
-      <div style={{ padding: '6px 20px 0', display: 'flex', alignItems: 'center' }}>
+      <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'center' }}>
         <button onClick={() => go('friends')} className="flat" style={{
-          width: 34, height: 34, borderRadius: 11, background: FT.paper,
+          width: 44, height: 44, borderRadius: 12, background: FT.paper,
           border: `1px solid ${FT.hair}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}><IconChevronLeft /></button>
+        }}><IconArrowBack color={FT.ink} size={18} /></button>
       </div>
 
       {/* Profile header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '10px 22px 16px' }}>
         <Avatar name={displayName} color={avatarColor} size={52} fontSize={16} />
         <div>
-          <div style={{ fontFamily: SFR, fontWeight: 600, fontSize: 22, color: FT.ink, letterSpacing: -0.5 }}>{displayName}</div>
+          <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 22, color: FT.ink, letterSpacing: -0.5 }}>{displayName}</div>
           <div style={{ fontSize: 13, color: FT.dim, marginTop: 2 }}>@{username}</div>
         </div>
       </div>
@@ -119,19 +119,19 @@ function FriendProfileScreen({ go, params = {} }) {
       {/* Stats row */}
       <div style={{ display: 'flex', gap: 8, padding: '0 20px 16px' }}>
         <div style={{ flex: 1, background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 13, padding: '10px 12px', textAlign: 'center' }}>
-          <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 18, color: FT.ink }}>{roundsTogether ?? 0}</div>
-          <div style={{ fontFamily: MONO, fontSize: 8, letterSpacing: 1.5, color: FT.dim, marginTop: 2, textTransform: 'uppercase' }}>Rounds</div>
+          <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 22, color: FT.ink }}>{roundsTogether ?? 0}</div>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginTop: 2, textTransform: 'uppercase' }}>Rounds</div>
         </div>
         <div style={{ flex: 1, background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 13, padding: '10px 12px', textAlign: 'center' }}>
-          <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 18, color: FT.ink }}>
+          <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 22, color: FT.ink }}>
             {avgVsPar !== null && avgVsPar !== undefined ? (avgVsPar > 0 ? `+${avgVsPar.toFixed(1)}` : avgVsPar.toFixed(1)) : '–'}
           </div>
-          <div style={{ fontFamily: MONO, fontSize: 8, letterSpacing: 1.5, color: FT.dim, marginTop: 2, textTransform: 'uppercase' }}>Avg vs par</div>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginTop: 2, textTransform: 'uppercase' }}>Avg vs par</div>
         </div>
       </div>
 
       {/* Recent activity */}
-      <div style={{ padding: '0 20px 4px', fontFamily: MONO, fontSize: 9, letterSpacing: 2.5, color: FT.dim, textTransform: 'uppercase' }}>
+      <div style={{ padding: '0 20px 4px', fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>
         Recent Rounds
       </div>
 
@@ -146,11 +146,11 @@ function FriendProfileScreen({ go, params = {} }) {
           <div key={round.id} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             margin: '4px 20px', padding: '9px 12px',
-            background: FT.paper, borderRadius: 12, border: `1px solid ${FT.hair}`,
+            background: FT.paper, borderRadius: 20, border: `1px solid ${FT.hair}`,
           }}>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: FT.ink }}>{round.courseName}</div>
-              <div style={{ fontSize: 11, color: FT.dim, marginTop: 2 }}>
+              <div style={{ fontSize: 16, fontWeight: 600, color: FT.ink }}>{round.courseName}</div>
+              <div style={{ fontSize: 13, color: FT.dim, marginTop: 2 }}>
                 {relativeDate(round.startedAt)} · {round.holesPlayed} holes
               </div>
             </div>

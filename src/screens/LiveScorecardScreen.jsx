@@ -3,7 +3,7 @@ import { FT, SF, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import {
   StatusBar, HomeIndicator, TopoBg, ParChip, Avatar,
-  IconHamburger,
+  IconHamburger, IconArrowBack, IconArrowForward,
 } from '../components/atoms'
 import { useRounds } from '../hooks/useRounds'
 import { useScores } from '../hooks/useScores'
@@ -222,7 +222,7 @@ function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinis
       {/* Header strip */}
       <div style={{ padding: '4px 22px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1, flexShrink: 0 }}>
         <button onClick={() => setShowQuit(true)} className="flat" style={{
-          width: 36, height: 36, borderRadius: 12, border: 'none',
+          width: 44, height: 44, borderRadius: 12, border: 'none',
           background: 'rgba(244,239,228,0.1)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}><IconHamburger /></button>
@@ -259,18 +259,18 @@ function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinis
               </div>
             </div>
           </div>
-          {/* Hole pip strip — clickable for fast nav */}
+          {/* Hole pip strip — 44px touch target, 4px visual pip */}
           <div style={{ display: 'flex', gap: 3, marginTop: 8 }}>
             {Array.from({ length: N }).map((_, i) => {
               const allDone = r.players.every((p) => typeof effectiveScores[p.id][i] === 'number')
               const isCurrent = i === hole
               return (
                 <button key={i} onClick={() => setHole(i)} className="flat" style={{
-                  flex: 1, height: 8, padding: 0, border: 'none', cursor: 'pointer',
-                  borderRadius: 2, background: 'transparent',
+                  flex: 1, height: 44, padding: '20px 0', border: 'none', cursor: 'pointer',
+                  background: 'transparent', display: 'flex', alignItems: 'center',
                 }}>
                   <div style={{
-                    height: 4, borderRadius: 2,
+                    flex: 1, height: 4, borderRadius: 2,
                     background: isCurrent ? FT.orange : allDone ? FT.fern : 'rgba(244,239,228,0.18)',
                   }} />
                 </button>
@@ -278,21 +278,21 @@ function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinis
             })}
           </div>
           {/* Hole nav arrows */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, gap: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, gap: 8 }}>
             <button onClick={() => setHole(Math.max(0, hole - 1))} disabled={hole === 0} className="flat" style={{
-              flex: 1, height: 36, borderRadius: 10, border: 'none',
+              flex: 1, height: 44, borderRadius: 12, border: 'none',
               background: hole === 0 ? 'rgba(244,239,228,0.05)' : 'rgba(244,239,228,0.12)',
               color: hole === 0 ? 'rgba(244,239,228,0.3)' : FT.cream,
-              fontFamily: SFR, fontWeight: 800, fontSize: 12, letterSpacing: 0.3,
+              fontFamily: SFR, fontWeight: 700, fontSize: 13, letterSpacing: 0.3,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            }}>← prev</button>
+            }}><IconArrowBack color={hole === 0 ? 'rgba(244,239,228,0.3)' : FT.cream} size={16} /> prev</button>
             <button onClick={() => setHole(Math.min(N - 1, hole + 1))} disabled={hole === N - 1} className="flat" style={{
-              flex: 1, height: 36, borderRadius: 10, border: 'none',
+              flex: 1, height: 44, borderRadius: 12, border: 'none',
               background: hole === N - 1 ? 'rgba(244,239,228,0.05)' : 'rgba(244,239,228,0.12)',
               color: hole === N - 1 ? 'rgba(244,239,228,0.3)' : FT.cream,
-              fontFamily: SFR, fontWeight: 800, fontSize: 12, letterSpacing: 0.3,
+              fontFamily: SFR, fontWeight: 700, fontSize: 13, letterSpacing: 0.3,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            }}>next →</button>
+            }}>next <IconArrowForward color={hole === N - 1 ? 'rgba(244,239,228,0.3)' : FT.cream} size={16} /></button>
           </div>
         </div>
 
@@ -347,7 +347,7 @@ function LiveScorecardImpl({ go, round: r, currentUserId, onSubmitScore, onFinis
                   <Avatar name={p.displayName} color={p.color} size={40} fontSize={13} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                      <span style={{ fontFamily: SFR, fontWeight: 800, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 130 }}>{p.displayName}</span>
+                      <span style={{ fontFamily: SFR, fontWeight: 700, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 130 }}>{p.displayName}</span>
                       {isMe && <span style={{ fontSize: 9, fontWeight: 800, fontFamily: MONO, letterSpacing: 1, color: FT.orange, background: 'rgba(255,107,31,0.12)', padding: '2px 6px', borderRadius: 5 }}>YOU</span>}
                       {through > 0 && <ParChip value={vs} size="sm" />}
                     </div>

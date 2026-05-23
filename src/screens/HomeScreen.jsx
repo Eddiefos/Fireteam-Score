@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { FT, SFR, MONO, PLAYER_COLORS } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
-import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconArrow, EmptyState } from '../components/atoms'
+import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconArrow, IconArrowForward, IconBadge, IconHistory, IconMapPin, EmptyState } from '../components/atoms'
 import { useProfile } from '../hooks/useProfile'
 import { useRounds } from '../hooks/useRounds'
 import { usePlayerRounds } from '../hooks/usePlayerRounds'
@@ -71,11 +71,22 @@ function HomeScreen({ go, userId }) {
         <div style={{ padding: '20px 24px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontWeight: 300, fontSize: 15, color: FT.dim, letterSpacing: 0.1, marginBottom: 2 }}>
-                Good to see you,
-              </div>
-              <div style={{ fontWeight: 600, fontSize: 34, lineHeight: 1.05, letterSpacing: -1.0, color: FT.ink }}>
-                {user || 'friend'} 👋
+              {completed.length > 0 && (
+                <div style={{ fontFamily: MONO, fontWeight: 400, fontSize: 10, letterSpacing: 2, color: 'rgba(42,31,23,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>
+                  {(() => {
+                    const now = new Date()
+                    const thisMonth = completed.filter((r) => {
+                      const d = new Date(r.finished_at)
+                      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+                    }).length
+                    if (thisMonth > 0) return `${thisMonth} round${thisMonth !== 1 ? 's' : ''} this month`
+                    const thisYear = completed.filter((r) => new Date(r.finished_at).getFullYear() === now.getFullYear()).length
+                    return `${thisYear} round${thisYear !== 1 ? 's' : ''} in ${now.getFullYear()}`
+                  })()}
+                </div>
+              )}
+              <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, lineHeight: 1.05, letterSpacing: -1.2, color: FT.ink }}>
+                {user || 'friend'}
               </div>
             </div>
             {fireteam.length > 0 && (
@@ -138,22 +149,22 @@ function HomeScreen({ go, userId }) {
           <button onClick={() => go('start')} className="flat" style={{
             width: '100%', position: 'relative', overflow: 'hidden',
             background: FT.forest, color: FT.cream, border: 'none',
-            borderRadius: 22, padding: '20px 22px', textAlign: 'left',
+            borderRadius: 24, padding: '26px 24px', textAlign: 'left',
             boxShadow: '0 8px 20px rgba(31,61,43,0.26), inset 0 -3px 0 rgba(0,0,0,0.14)',
           }}>
             <TopoBg color="rgba(244,239,228,0.07)" />
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 2.5, opacity: 0.55, marginBottom: 5 }}>TAP TO BEGIN</div>
-                <div style={{ fontWeight: 600, fontSize: 26, lineHeight: 1.05, letterSpacing: -0.6 }}>
-                  Start New Round
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, opacity: 0.55, marginBottom: 6, textTransform: 'uppercase' }}>Tap to begin</div>
+                <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 34, lineHeight: 1.05, letterSpacing: -0.8 }}>
+                  Start New<br />Round
                 </div>
               </div>
               <div style={{
-                width: 48, height: 48, borderRadius: 24, background: FT.orange, flexShrink: 0,
+                width: 56, height: 56, borderRadius: 28, background: FT.orange, flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: '0 4px 0 rgba(0,0,0,0.2)',
-              }}><IconArrow /></div>
+              }}><IconArrow color={FT.ink} size={24} /></div>
             </div>
           </button>
         </div>
@@ -161,20 +172,24 @@ function HomeScreen({ go, userId }) {
         {/* Quick nav tiles */}
         <div style={{ padding: '14px 20px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <button onClick={() => go('stats')} className="flat" style={{
-            background: FT.paper, borderRadius: 18, padding: '14px 16px',
+            background: FT.paper, borderRadius: 20, padding: '16px 16px',
             border: `1px solid ${FT.hair}`, textAlign: 'left',
           }}>
-            <div style={{ fontSize: 20, lineHeight: 1, marginBottom: 8 }}>📋</div>
-            <div style={{ fontWeight: 600, fontSize: 15, color: FT.ink }}>History</div>
-            <div style={{ fontSize: 12, color: FT.dim, marginTop: 2, fontWeight: 400 }}>{completed.length} {completed.length === 1 ? 'round' : 'rounds'}</div>
+            <div style={{ marginBottom: 10 }}>
+              <IconBadge bg={FT.forest}><IconHistory color={FT.cream} size={18} /></IconBadge>
+            </div>
+            <div style={{ fontWeight: 700, fontSize: 17, color: FT.ink }}>History</div>
+            <div style={{ fontSize: 13, color: FT.dim, marginTop: 2, fontWeight: 400 }}>{completed.length} {completed.length === 1 ? 'round' : 'rounds'}</div>
           </button>
           <button onClick={() => go('courses')} className="flat" style={{
-            background: FT.paper, borderRadius: 16, padding: '14px 16px',
+            background: FT.paper, borderRadius: 20, padding: '16px 16px',
             border: `1px solid ${FT.hair}`, textAlign: 'left',
           }}>
-            <div style={{ fontSize: 20, lineHeight: 1, marginBottom: 8 }}>🌲</div>
-            <div style={{ fontWeight: 600, fontSize: 15, color: FT.ink }}>Course Library</div>
-            <div style={{ fontSize: 12, color: FT.dim, marginTop: 2, fontWeight: 400 }}>{myCourseCount} saved</div>
+            <div style={{ marginBottom: 10 }}>
+              <IconBadge bg={FT.orange}><IconMapPin color={FT.ink} size={18} /></IconBadge>
+            </div>
+            <div style={{ fontWeight: 700, fontSize: 17, color: FT.ink }}>Course Library</div>
+            <div style={{ fontSize: 13, color: FT.dim, marginTop: 2, fontWeight: 400 }}>{myCourseCount} saved</div>
           </button>
         </div>
 
@@ -196,17 +211,17 @@ function HomeScreen({ go, userId }) {
                 return (
                   <button key={r.id} onClick={() => go('round', { roundId: r.id })} className="flat" style={{
                     display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left',
-                    background: FT.paper, borderRadius: 14, padding: '12px 14px',
+                    background: FT.paper, borderRadius: 20, padding: '14px 16px',
                     border: `1px solid ${FT.hair}`, width: '100%',
                   }}>
                     <div style={{
-                      width: 40, height: 40, borderRadius: 11, background: FT.forest, flexShrink: 0,
+                      width: 46, height: 46, borderRadius: 12, background: FT.forest, flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontWeight: 600, color: FT.cream, fontSize: 12,
+                      fontFamily: MONO, fontWeight: 600, color: FT.cream, fontSize: 12,
                     }}>{r.holes_played || '?'}H</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 500, fontSize: 14, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: FT.ink }}>{courseName}</div>
-                      <div style={{ fontSize: 11, color: FT.dim, marginTop: 2, fontWeight: 400 }}>
+                      <div style={{ fontWeight: 600, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: FT.ink }}>{courseName}</div>
+                      <div style={{ fontSize: 13, color: FT.dim, marginTop: 2, fontWeight: 400 }}>
                         {formatDate(new Date(r.finished_at).getTime())}
                       </div>
                     </div>

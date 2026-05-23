@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { FT, SFR, SF, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
-import { StatusBar, HomeIndicator, Avatar } from '../components/atoms'
+import { StatusBar, HomeIndicator, Avatar, IconArrowForward } from '../components/atoms'
 import { useFireteam } from '../hooks/useFireteam'
 import { useFriends } from '../hooks/useFriends'
 import { computeHeadToHead, computeFireteamLeaderboard, winnerOf, formatShortDate } from '../lib/gameLogic'
@@ -365,7 +365,7 @@ function FireteamScreen({ go, userId }) {
       <ScreenShell label="Fireteam" bg={FT.cream}>
         <StatusBar />
         <div style={{ padding: '20px 24px 0' }}>
-          <div style={{ fontFamily: SFR, fontWeight: 600, fontSize: 34, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink }}>Fireteam</div>
+          <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink }}>Fireteam</div>
         </div>
         <NoFireteamState
           pendingInvites={pendingInvites}
@@ -385,7 +385,7 @@ function FireteamScreen({ go, userId }) {
       {/* Header */}
       <div style={{ padding: '20px 20px 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexShrink: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 2.5, color: FT.dim, marginBottom: 3 }}>FIRETEAM</div>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginBottom: 3 }}>FIRETEAM</div>
           {editingName ? (
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', paddingRight: 8 }}>
               <input
@@ -403,18 +403,18 @@ function FireteamScreen({ go, userId }) {
                 }}
               />
               <button onClick={handleRename} disabled={renaming || !nameInput.trim()} className="flat" style={{
-                height: 34, padding: '0 12px', borderRadius: 10, border: 'none',
+                height: 44, padding: '0 14px', borderRadius: 12, border: 'none',
                 background: nameInput.trim() ? FT.forest : 'rgba(42,31,23,0.1)',
                 color: FT.cream, fontFamily: SFR, fontWeight: 600, fontSize: 13,
               }}>{renaming ? '…' : 'Save'}</button>
               <button onClick={() => setEditingName(false)} className="flat" style={{
-                height: 34, padding: '0 10px', borderRadius: 10, border: 'none',
+                height: 44, padding: '0 12px', borderRadius: 12, border: 'none',
                 background: 'rgba(42,31,23,0.08)', color: FT.dim, fontFamily: SFR, fontWeight: 600, fontSize: 13,
               }}>✕</button>
             </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ fontFamily: SFR, fontWeight: 600, fontSize: 34, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink }}>
+              <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05, color: FT.ink }}>
                 {fireteam.name}
               </div>
               {isOwner && (
@@ -422,9 +422,9 @@ function FireteamScreen({ go, userId }) {
                   onClick={() => { setNameInput(fireteam.name); setEditingName(true) }}
                   className="flat"
                   style={{
-                    width: 28, height: 28, borderRadius: 8, border: 'none',
+                    width: 44, height: 44, borderRadius: 12, border: 'none',
                     background: 'rgba(42,31,23,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: FT.dim, fontSize: 13, marginBottom: 2,
+                    color: FT.dim, fontSize: 13,
                   }}
                 >✎</button>
               )}
@@ -433,9 +433,9 @@ function FireteamScreen({ go, userId }) {
         </div>
         {!editingName && (
           <button onClick={() => setShowInvite(true)} className="flat" style={{
-            height: 32, padding: '0 14px', borderRadius: 10, border: 'none',
+            height: 44, padding: '0 16px', borderRadius: 12, border: 'none',
             background: FT.forest, color: FT.cream,
-            fontFamily: SFR, fontWeight: 600, fontSize: 12, marginBottom: 4, flexShrink: 0,
+            fontFamily: SFR, fontWeight: 600, fontSize: 13, flexShrink: 0,
           }}>+ Invite</button>
         )}
       </div>
@@ -483,13 +483,13 @@ function FireteamScreen({ go, userId }) {
                   </div>
                   <Avatar name={entry.profile.display_name} color={entry.profile.avatar_color} size={36} fontSize={12} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 500, fontSize: 14, color: FT.ink }}>
+                    <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink }}>
                       {entry.profile.display_name}
                       {entry.profile.id === userId && (
                         <span style={{ marginLeft: 6, fontSize: 10, fontFamily: MONO, color: FT.dim }}>YOU</span>
                       )}
                     </div>
-                    <div style={{ fontSize: 11, color: FT.dim, marginTop: 1 }}>
+                    <div style={{ fontSize: 13, color: FT.dim, marginTop: 1 }}>
                       {entry.roundsPlayed} round{entry.roundsPlayed !== 1 ? 's' : ''}
                       {entry.roundsPlayed > 0 && entry.avgVsPar !== 0 && (
                         <span> · {entry.avgVsPar > 0 ? '+' : ''}{entry.avgVsPar.toFixed(1)} avg</span>
@@ -516,26 +516,25 @@ function FireteamScreen({ go, userId }) {
                 const winner = winnerOf(r)
                 return (
                   <button key={r.id} onClick={() => go('round', { roundId: r.id })} className="flat" style={{
-                    display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                    background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 16,
+                    display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
+                    background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 20,
                     textAlign: 'left', cursor: 'pointer',
                   }}>
                     <div style={{
-                      width: 40, height: 40, borderRadius: 12, background: FT.forest,
+                      width: 46, height: 46, borderRadius: 12, background: FT.forest,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                    }}>
-                      <span style={{ fontSize: 18 }}>🥏</span>
-                    </div>
+                      fontFamily: MONO, fontSize: 11, fontWeight: 600, color: FT.cream,
+                    }}>🥏</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 500, fontSize: 14, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {r.course_name}
                       </div>
-                      <div style={{ fontSize: 11, color: FT.dim, marginTop: 2, fontWeight: 400 }}>
+                      <div style={{ fontSize: 13, color: FT.dim, marginTop: 2, fontWeight: 400 }}>
                         {formatShortDate(new Date(r.started_at).getTime())}
                         {winner && <span> · {winner.displayName} won</span>}
                       </div>
                     </div>
-                    <span style={{ color: FT.dim, fontSize: 16 }}>›</span>
+                    <IconArrowForward color={FT.dim} size={18} />
                   </button>
                 )
               })}
@@ -556,7 +555,7 @@ function FireteamScreen({ go, userId }) {
               }}>
                 <Avatar name={m.display_name} color={m.avatar_color} size={36} fontSize={12} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 500, fontSize: 14, color: FT.ink }}>
+                  <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink }}>
                     {m.display_name}
                     {m.id === userId && (
                       <span style={{ marginLeft: 6, fontSize: 10, fontFamily: MONO, color: FT.dim }}>YOU</span>
@@ -565,16 +564,16 @@ function FireteamScreen({ go, userId }) {
                       <span style={{ marginLeft: 6, fontSize: 10, fontFamily: MONO, color: FT.forest }}>OWNER</span>
                     )}
                   </div>
-                  <div style={{ fontSize: 11, color: FT.dim }}>@{m.username}</div>
+                  <div style={{ fontSize: 13, color: FT.dim }}>@{m.username}</div>
                 </div>
                 {isOwner && m.id !== userId && (
                   <button
                     onClick={() => setKickTarget(m)}
                     className="flat"
                     style={{
-                      height: 28, padding: '0 10px', borderRadius: 8, border: 'none',
+                      height: 44, padding: '0 14px', borderRadius: 12, border: 'none',
                       background: 'rgba(180,40,40,0.08)', color: '#b42828',
-                      fontFamily: SFR, fontWeight: 600, fontSize: 12, cursor: 'pointer',
+                      fontFamily: SFR, fontWeight: 600, fontSize: 13, cursor: 'pointer',
                     }}
                   >Kick</button>
                 )}
@@ -582,20 +581,17 @@ function FireteamScreen({ go, userId }) {
             ))}
           </div>
 
-          {/* Leave button for non-owners */}
-          {!isOwner && (
-            <button
-              onClick={() => setConfirmLeave(true)}
-              className="flat"
-              style={{
-                marginTop: 12, width: '100%', padding: '13px', borderRadius: 14,
-                border: '1.5px solid rgba(180,40,40,0.22)',
-                background: 'rgba(180,40,40,0.05)',
-                color: '#b42828', fontSize: 14, fontWeight: 600,
-                cursor: 'pointer', fontFamily: SF,
-              }}
-            >Leave Fireteam</button>
-          )}
+          <button
+            onClick={() => setConfirmLeave(true)}
+            className="flat"
+            style={{
+              marginTop: 12, width: '100%', padding: '13px', borderRadius: 14,
+              border: '1.5px solid rgba(180,40,40,0.22)',
+              background: 'rgba(180,40,40,0.05)',
+              color: '#b42828', fontSize: 14, fontWeight: 600,
+              cursor: 'pointer', fontFamily: SF,
+            }}
+          >{isOwner && members.length <= 1 ? 'Disband Fireteam' : 'Leave Fireteam'}</button>
         </div>
 
         <div style={{ height: 40 }} />
@@ -622,9 +618,13 @@ function FireteamScreen({ go, userId }) {
 
       <ConfirmModal
         open={confirmLeave}
-        title="Leave fireteam?"
-        body="You'll be removed from the fireteam and lose access to the leaderboard and rivalry stats."
-        confirmLabel={actionLoading ? '…' : 'Leave'}
+        title={isOwner && members.length <= 1 ? 'Disband fireteam?' : 'Leave fireteam?'}
+        body={
+          isOwner && members.length <= 1
+            ? 'This will permanently delete the fireteam. This cannot be undone.'
+            : "You'll be removed from the fireteam and lose access to the leaderboard and rivalry stats."
+        }
+        confirmLabel={actionLoading ? '…' : (isOwner && members.length <= 1 ? 'Disband' : 'Leave')}
         danger
         onConfirm={handleLeave}
         onCancel={() => setConfirmLeave(false)}

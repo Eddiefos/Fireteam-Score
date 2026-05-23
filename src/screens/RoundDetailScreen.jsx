@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { FT, SFR, MONO } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
-import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconChevronLeft, IconTrash, useToast } from '../components/atoms'
+import { StatusBar, HomeIndicator, TopoBg, ParChip, Avatar, IconArrowBack, IconWarning, IconTrash, useToast } from '../components/atoms'
 import { useRounds } from '../hooks/useRounds'
 import { dismissRound } from '../services/rounds'
 import { useScores } from '../hooks/useScores'
@@ -11,16 +11,16 @@ import { playerTotal, playerVsPar, formatDuration, totalPar, initialsOf } from '
 
 function TopBar({ onBack, label, step, right }) {
   return (
-    <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+    <div style={{ padding: '20px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
       {onBack ? (
         <button onClick={onBack} className="flat" style={{
-          width: 36, height: 36, borderRadius: 12, background: FT.paper,
+          width: 44, height: 44, borderRadius: 12, background: FT.paper,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: `1px solid ${FT.hair}`,
-        }}><IconChevronLeft /></button>
-      ) : <div style={{ width: 36 }} />}
-      {label && <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim }}>{label}</div>}
-      {right || <div style={{ width: 36 }} />}
+        }}><IconArrowBack color={FT.ink} size={18} /></button>
+      ) : <div style={{ width: 44 }} />}
+      {label && <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim }}>{label}</div>}
+      {right || <div style={{ width: 44 }} />}
     </div>
   )
 }
@@ -169,11 +169,11 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
 
   const HoleRow = ({ start, end }) => (
     <div style={{ display: 'grid', gridTemplateColumns: `64px repeat(${end - start}, 1fr) 44px`, alignItems: 'center', borderBottom: `1px solid ${FT.hair}`, fontFamily: SFR }}>
-      <div style={{ fontFamily: MONO, fontSize: 9, color: FT.dim, padding: '6px 0 6px 8px', letterSpacing: 1.5 }}>HOLE</div>
+      <div style={{ fontFamily: MONO, fontSize: 10, color: FT.dim, padding: '6px 0 6px 8px', letterSpacing: 2 }}>HOLE</div>
       {Array.from({ length: end - start }).map((_, i) => (
-        <div key={i} style={{ textAlign: 'center', fontWeight: 700, fontSize: 11, color: FT.dim, padding: '6px 0' }}>{start + i + 1}</div>
+        <div key={i} style={{ textAlign: 'center', fontWeight: 700, fontSize: 10, color: FT.dim, padding: '6px 0' }}>{start + i + 1}</div>
       ))}
-      <div style={{ textAlign: 'center', fontWeight: 800, fontSize: 10, color: FT.dim, fontFamily: MONO, letterSpacing: 1 }}>
+      <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 10, color: FT.dim, fontFamily: MONO, letterSpacing: 1 }}>
         {chunks.length === 1 ? 'TOT' : start === 0 ? 'OUT' : start === 9 ? 'IN' : '·'}
       </div>
     </div>
@@ -181,11 +181,11 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
 
   const ParRow = ({ start, end }) => (
     <div style={{ display: 'grid', gridTemplateColumns: `64px repeat(${end - start}, 1fr) 44px`, alignItems: 'center', borderBottom: `1px solid ${FT.hair}`, background: 'rgba(42,31,23,0.04)', fontFamily: SFR }}>
-      <div style={{ fontFamily: MONO, fontSize: 9, color: FT.dim, padding: '6px 0 6px 8px', letterSpacing: 1.5 }}>PAR</div>
+      <div style={{ fontFamily: MONO, fontSize: 10, color: FT.dim, padding: '6px 0 6px 8px', letterSpacing: 2 }}>PAR</div>
       {round.pars.slice(start, end).map((p, i) => (
-        <div key={i} style={{ textAlign: 'center', fontWeight: 800, fontSize: 12, padding: '6px 0', color: FT.ink }}>{p}</div>
+        <div key={i} style={{ textAlign: 'center', fontWeight: 700, fontSize: 12, padding: '6px 0', color: FT.ink }}>{p}</div>
       ))}
-      <div style={{ textAlign: 'center', fontWeight: 900, fontSize: 13, color: FT.ink }}>
+      <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 13, color: FT.ink }}>
         {round.pars.slice(start, end).reduce((a, b) => a + b, 0)}
       </div>
     </div>
@@ -212,12 +212,12 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
                 background: t.bg, color: t.fg,
                 outline: t.box && t.bg === 'transparent' ? `1.5px solid ${FT.ink}` : 'none',
                 outlineOffset: -2,
-                fontWeight: 800, fontSize: 13,
+                fontWeight: 700, fontSize: 13,
               }}>{typeof s === 'number' ? s : '–'}</span>
             </div>
           );
         })}
-        <div style={{ textAlign: 'center', fontWeight: 900, fontSize: 14, color: FT.ink }}>{out}</div>
+        <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 13, color: FT.ink }}>{out}</div>
       </div>
     );
   };
@@ -237,7 +237,7 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
         label={isComplete ? 'FINAL' : 'IN PROGRESS'}
         right={
           <button onClick={() => setConfirmDel(true)} className="flat" style={{
-            width: 36, height: 36, borderRadius: 12, background: FT.paper, border: `1px solid ${FT.hair}`,
+            width: 44, height: 44, borderRadius: 12, background: FT.paper, border: `1px solid ${FT.hair}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}><IconTrash /></button>
         } />
@@ -246,17 +246,17 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
         {/* Orphaned round notice */}
         {isOrphaned && (
           <div style={{ margin: '0 16px 8px', padding: '10px 14px', borderRadius: 12, background: 'rgba(42,31,23,0.07)', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 15 }}>⚠️</span>
+            <IconWarning size={18} />
             <span style={{ fontFamily: SFR, fontSize: 13, color: FT.dim }}>The course for this round was deleted. You can still view scores or delete the round.</span>
           </div>
         )}
 
         {/* Hero result */}
         <div style={{ padding: '4px 22px 16px' }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>
             {isComplete ? 'Final · ' : 'In progress · '}{round.courseName ?? 'Deleted course'}
           </div>
-          <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 38, letterSpacing: -1.4, lineHeight: 1, marginTop: 6 }}>
+          <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1, marginTop: 6 }}>
             {!isComplete ? "Still going." :
              winnerTie ? 'A tie at the top.' :
              `${winner.displayName} takes it.`}
@@ -281,13 +281,13 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
                     borderRadius: 14,
                     color: isWinner ? FT.ink : FT.cream,
                   }}>
-                    <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 22, width: 22, textAlign: 'center', letterSpacing: -1 }}>
+                    <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 22, width: 22, textAlign: 'center', letterSpacing: -1 }}>
                       {p.place}
                     </div>
                     <Avatar name={p.displayName} color={p.color} size={34} fontSize={12}
                       border={isWinner ? `2px solid ${FT.ink}` : 'none'} />
-                    <div style={{ flex: 1, fontFamily: SFR, fontWeight: 800, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.displayName}</div>
-                    <div style={{ fontFamily: SFR, fontWeight: 900, fontSize: 22, letterSpacing: -0.5 }}>{p.total}</div>
+                    <div style={{ flex: 1, fontFamily: SFR, fontWeight: 600, fontSize: 16, letterSpacing: -0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.displayName}</div>
+                    <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 22, letterSpacing: -0.5 }}>{p.total}</div>
                     {!isOrphaned && <ParChip value={p.vs} size="md" tone={isWinner ? 'par' : undefined} />}
                   </div>
                 );
@@ -298,10 +298,10 @@ function RoundDetailImpl({ go, params, round, onDelete }) {
 
         {/* Scorecard table — hidden for orphaned rounds (no par data) */}
         <div style={{ padding: '14px 16px 0', display: isOrphaned ? 'none' : undefined }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase', marginBottom: 8 }}>Scorecard</div>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase', marginBottom: 8 }}>Scorecard</div>
           {chunks.map((c, ci) => (
             <div key={ci} style={{ marginBottom: 6 }}>
-              <div style={{ background: FT.paper, borderRadius: 14, border: `1px solid ${FT.hair}`, overflow: 'hidden' }}>
+              <div style={{ background: FT.paper, borderRadius: 20, border: `1px solid ${FT.hair}`, overflow: 'hidden' }}>
                 <HoleRow start={c.start} end={c.end} />
                 <ParRow start={c.start} end={c.end} />
                 {round.players.map((p) => (

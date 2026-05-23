@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react'
-import { FT, SFR, MONO, PLAYER_COLORS } from '../constants/colors'
+import { FT, SFR, SF, MONO, PLAYER_COLORS } from '../constants/colors'
 import { ScreenShell } from '../components/layout/ScreenShell'
 import {
   StatusBar, HomeIndicator, TopoBg,
-  IconChevronLeft, IconCheck, IconPlus, EmptyState, Avatar,
+  IconArrowBack, IconArrowForward, IconCheck, IconPlus, EmptyState, Avatar,
 } from '../components/atoms'
 import { useCourses } from '../hooks/useCourses'
 import { useOfficialCourses } from '../hooks/useOfficialCourses'
@@ -122,23 +122,23 @@ function StartRoundScreen({ go, userId, params = {} }) {
     <ScreenShell label="Start Round">
       <StatusBar />
 
-      <div style={{ padding: '6px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      <div style={{ padding: '20px 24px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <button onClick={() => go('home')} className="flat" aria-label="Back" style={{
-          width: 36, height: 36, borderRadius: 12, background: FT.paper,
+          width: 44, height: 44, borderRadius: 12, background: FT.paper,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: `1px solid ${FT.hair}`,
         }}>
-          <IconChevronLeft />
+          <IconArrowBack color={FT.ink} size={18} />
         </button>
-        <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: 2, color: FT.dim }}>START ROUND</div>
-        <div style={{ width: 36 }} />
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>Start Round</div>
+        <div style={{ width: 44 }} />
       </div>
 
       <div className="ft-scroll">
         {/* ─── PICK MODE: type selector tiles ─── */}
         {mode === 'pick' && (
-          <div style={{ padding: '6px 24px 16px' }}>
-            <div style={{ fontWeight: 600, fontSize: 32, letterSpacing: -1.0, lineHeight: 1.05, marginBottom: 20 }}>
+          <div style={{ padding: '0 20px 16px' }}>
+            <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05, marginBottom: 20 }}>
               Pick your<br/>course.
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -147,16 +147,18 @@ function StartRoundScreen({ go, userId, params = {} }) {
                 onClick={() => go('officialCourses')}
                 className="flat"
                 style={{
-                  background: FT.forest, borderRadius: 20, padding: '18px 18px',
+                  background: FT.forest, borderRadius: 24, padding: '18px 18px',
                   position: 'relative', overflow: 'hidden', cursor: 'pointer',
                   border: 'none', textAlign: 'left', color: FT.cream, width: '100%',
                 }}
               >
                 <TopoBg color={FT.creamAlpha06} />
-                <div style={{ fontFamily: MONO, fontSize: 8, letterSpacing: 2, opacity: 0.55, textTransform: 'uppercase', marginBottom: 4, position: 'relative', zIndex: 1 }}>Browse</div>
-                <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: -0.4, paddingRight: 40, position: 'relative', zIndex: 1 }}>Official Courses</div>
-                <div style={{ fontSize: 12, opacity: 0.6, marginTop: 3, paddingRight: 40, position: 'relative', zIndex: 1 }}>Norwegian courses with par data</div>
-                <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: 16, background: FT.orange, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: FT.ink, fontWeight: 700, zIndex: 1 }}>→</div>
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, opacity: 0.55, textTransform: 'uppercase', marginBottom: 4, position: 'relative', zIndex: 1 }}>Browse</div>
+                <div style={{ fontFamily: SF, fontSize: 22, fontWeight: 700, letterSpacing: -0.4, paddingRight: 44, position: 'relative', zIndex: 1 }}>Official Courses</div>
+                <div style={{ fontSize: 13, opacity: 0.6, marginTop: 3, paddingRight: 44, position: 'relative', zIndex: 1 }}>Norwegian courses with par data</div>
+                <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 18, background: FT.orange, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
+                  <IconArrowForward color={FT.ink} size={18} />
+                </div>
               </button>
 
               {/* My Courses tile */}
@@ -164,15 +166,17 @@ function StartRoundScreen({ go, userId, params = {} }) {
                 onClick={() => setMode('mine')}
                 className="flat"
                 style={{
-                  background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 20, padding: '18px 18px',
+                  background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 24, padding: '18px 18px',
                   position: 'relative', overflow: 'hidden', cursor: 'pointer',
                   textAlign: 'left', color: FT.ink, width: '100%',
                 }}
               >
-                <div style={{ fontFamily: MONO, fontSize: 8, letterSpacing: 2, opacity: 0.55, textTransform: 'uppercase', marginBottom: 4 }}>Your saved</div>
-                <div style={{ fontSize: 20, fontWeight: 600, letterSpacing: -0.4, paddingRight: 40 }}>My Courses</div>
-                <div style={{ fontSize: 12, opacity: 0.5, marginTop: 3, paddingRight: 40 }}>Custom courses you&#39;ve created</div>
-                <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: 16, background: FT.barkAlpha08, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: FT.dim, fontWeight: 700 }}>→</div>
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, opacity: 0.55, textTransform: 'uppercase', marginBottom: 4 }}>Your saved</div>
+                <div style={{ fontFamily: SF, fontSize: 22, fontWeight: 700, letterSpacing: -0.4, paddingRight: 44 }}>My Courses</div>
+                <div style={{ fontSize: 13, opacity: 0.5, marginTop: 3, paddingRight: 44 }}>Custom courses you've created</div>
+                <div style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 18, background: FT.barkAlpha08, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <IconArrowForward color={FT.dim} size={18} />
+                </div>
               </button>
             </div>
           </div>
@@ -181,11 +185,11 @@ function StartRoundScreen({ go, userId, params = {} }) {
         {/* ─── MINE MODE: personal course list ─── */}
         {mode === 'mine' && (
           <>
-            <div style={{ padding: '6px 24px 16px' }}>
-              <button onClick={() => setMode('pick')} className="flat" style={{ background: 'none', border: 'none', color: FT.orange, fontSize: 13, fontWeight: 500, cursor: 'pointer', padding: 0, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
-                ← Back
+            <div style={{ padding: '0 20px 16px' }}>
+              <button onClick={() => setMode('pick')} className="flat" style={{ background: 'none', border: 'none', color: FT.orange, fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 0, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6, fontFamily: SF }}>
+                <IconArrowBack color={FT.orange} size={16} /> Back
               </button>
-              <div style={{ fontWeight: 600, fontSize: 32, letterSpacing: -1.0, lineHeight: 1.05 }}>
+              <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05 }}>
                 My<br/>Courses.
               </div>
             </div>
@@ -208,7 +212,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
                   const sel = c.id === selectedCourseId
                   return (
                     <button key={c.id} onClick={() => setSelectedCourseId(c.id)} className="flat" style={{
-                      padding: '14px 16px', borderRadius: 18,
+                      padding: '14px 16px', borderRadius: 20,
                       background: sel ? FT.forest : FT.paper,
                       color: sel ? FT.cream : FT.ink,
                       border: sel ? `2px solid ${FT.forest}` : `1px solid ${FT.hair}`,
@@ -225,7 +229,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
                       }}>{c.pars.length}H</div>
                       <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
                         <div style={{ fontWeight: 600, fontSize: 16, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</div>
-                        <div style={{ fontSize: 12, opacity: 0.65, marginTop: 2, fontWeight: 400 }}>Par {totalPar(c.pars)}</div>
+                        <div style={{ fontSize: 13, opacity: 0.65, marginTop: 2, fontWeight: 400 }}>Par {totalPar(c.pars)}</div>
                       </div>
                       <div style={{
                         width: 22, height: 22, borderRadius: 11, position: 'relative', zIndex: 1, flexShrink: 0,
@@ -253,12 +257,12 @@ function StartRoundScreen({ go, userId, params = {} }) {
 
         {/* ─── READY MODE: pre-selected official course ─── */}
         {mode === 'ready' && preselectedCourse && (
-          <div style={{ padding: '6px 24px 16px' }}>
-            <div style={{ fontWeight: 600, fontSize: 32, letterSpacing: -1.0, lineHeight: 1.05, marginBottom: 16 }}>
+          <div style={{ padding: '0 20px 16px' }}>
+            <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05, marginBottom: 16 }}>
               Ready to<br/>play.
             </div>
             <div style={{
-              background: FT.paper, border: `2px solid ${FT.forest}`, borderRadius: 18,
+              background: FT.paper, border: `2px solid ${FT.forest}`, borderRadius: 20,
               padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14,
               position: 'relative', overflow: 'hidden',
             }}>
@@ -270,12 +274,12 @@ function StartRoundScreen({ go, userId, params = {} }) {
               }}>{preselectedCourse.holes}H</div>
               <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 16, letterSpacing: -0.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: FT.ink }}>{preselectedCourse.name}</div>
-                <div style={{ fontSize: 12, color: FT.dim, marginTop: 2 }}>{preselectedCourse.location}</div>
+                <div style={{ fontSize: 13, color: FT.dim, marginTop: 2 }}>{preselectedCourse.location}</div>
               </div>
               <button
                 onClick={() => go(returnTo ?? 'start')}
                 className="flat"
-                style={{ fontSize: 11, color: FT.orange, background: 'none', border: 'none', cursor: 'pointer', position: 'relative', zIndex: 1, flexShrink: 0 }}
+                style={{ height: 44, padding: '0 12px', fontSize: 13, fontWeight: 500, color: FT.orange, fontFamily: SF, background: 'none', border: 'none', cursor: 'pointer', position: 'relative', zIndex: 1, flexShrink: 0 }}
               >
                 Change
               </button>
@@ -309,22 +313,22 @@ function StartRoundScreen({ go, userId, params = {} }) {
 
             {!friendsLoading && friends.length > 0 && (
               <>
-                <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: 2, color: FT.dim, marginBottom: 6 }}>FRIENDS</div>
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginBottom: 6, textTransform: 'uppercase' }}>Friends</div>
                 {friends.map((f) => {
                   const added = addedIds.has(f.userId)
                   return (
                     <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0' }}>
-                      <Avatar name={f.displayName} color={f.avatarColor} size={34} fontSize={11} />
+                      <Avatar name={f.displayName} color={f.avatarColor} size={36} fontSize={12} />
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 500, fontSize: 14, color: FT.ink }}>{f.displayName}</div>
-                        <div style={{ fontSize: 11, color: FT.dim, fontWeight: 400 }}>@{f.username}</div>
+                        <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink }}>{f.displayName}</div>
+                        <div style={{ fontSize: 13, color: FT.dim, fontWeight: 400 }}>@{f.username}</div>
                       </div>
                       <button
                         onClick={() => added ? removePlayer(`friend-${f.userId}`) : addFriend(f)}
                         className="flat"
                         aria-label={added ? `Remove ${f.displayName}` : `Add ${f.displayName}`}
                         style={{
-                          width: 30, height: 30, borderRadius: 9, border: 'none',
+                          width: 44, height: 44, borderRadius: 12, border: 'none',
                           background: added ? FT.forestAlpha10 : FT.orangeAlpha12,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: added ? 14 : 18, color: added ? FT.forest : FT.orange, fontWeight: 700,

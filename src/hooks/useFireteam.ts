@@ -12,6 +12,7 @@ import {
   renameFireteam as renameFireteamService,
   kickMember as kickMemberService,
   leaveFireteam as leaveFireteamService,
+  deleteFireteam as deleteFireteamService,
 } from '../services/fireteams'
 
 export function useFireteam(userId: string | undefined) {
@@ -33,7 +34,7 @@ export function useFireteam(userId: string | undefined) {
     if (ft) {
       const [mems, ftRounds] = await Promise.all([
         getFireteamMembers(ft.id),
-        getFireteamRoundsWithData(ft.id),
+        getFireteamRoundsWithData(ft.id, userId),
       ])
       setMembers(mems)
       setRounds(ftRounds)
@@ -87,11 +88,15 @@ export function useFireteam(userId: string | undefined) {
   }, [])
 
   const leaveFireteam = useCallback(async (fireteamId: string, uid: string) => {
-    await leaveFireteamService(fireteamId, uid)
+    if (members.length <= 1) {
+      await deleteFireteamService(fireteamId)
+    } else {
+      await leaveFireteamService(fireteamId, uid)
+    }
     setFireteam(null)
     setMembers([])
     setRounds([])
-  }, [])
+  }, [members])
 
   return {
     fireteam,
