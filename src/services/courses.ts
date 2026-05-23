@@ -3,29 +3,20 @@ import type { Course, CourseHole, CourseSubmission } from '../types'
 import { del } from 'idb-keyval'
 
 export async function getCourses(userId: string, onlyMine = false): Promise<Course[]> {
-  let query = supabase.from('courses').select('*')
+  let query = supabase.from('courses').select('*, course_holes(hole_number, par, distance_m)')
   if (onlyMine) query = query.eq('created_by', userId)
   const { data: courses, error } = await query
 
   if (error) throw new Error(error.message)
 
-  const withPars = await Promise.all(
-    (courses as any[]).map(async (c) => {
-      const { data: holes } = await supabase
-        .from('course_holes')
-        .select('hole_number, par, distance_m')
-        .eq('course_id', c.id)
-        .order('hole_number')
-
-      const pars = holes
-        ? (holes as CourseHole[]).map((h) => h.par)
-        : Array(c.holes).fill(3)
-
-      return { ...c, pars } as Course
-    }),
-  )
-
-  return withPars
+  return (courses as any[]).map((c) => {
+    const holes: CourseHole[] = (c.course_holes ?? []).sort(
+      (a: CourseHole, b: CourseHole) => a.hole_number - b.hole_number,
+    )
+    const pars = holes.length > 0 ? holes.map((h) => h.par) : Array(c.holes).fill(3)
+    const { course_holes: _, ...rest } = c
+    return { ...rest, pars } as Course
+  })
 }
 
 export async function createCourse(data: {
@@ -142,6 +133,10 @@ export async function approveSubmission(
   adminId: string,
   sub: CourseSubmission,
 ): Promise<void> {
+  const par_total = sub.holes_detail?.length
+    ? sub.holes_detail.reduce((sum, h) => sum + h.par, 0)
+    : null
+
   const { data: courseRow, error: courseErr } = await supabase
     .from('courses')
     .insert({
@@ -150,6 +145,7 @@ export async function approveSubmission(
       lat: sub.lat,
       lng: sub.lng,
       holes: sub.holes,
+      par_total,
       source: 'official',
       is_public: true,
       created_by: null,

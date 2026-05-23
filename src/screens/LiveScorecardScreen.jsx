@@ -54,7 +54,7 @@ function LiveScorecardScreen({ go, userId }) {
 
   useEffect(() => {
     if (!roundsLoading && !activeRound && !isFinishingRef.current) go('home')
-  }, [roundsLoading, activeRound])
+  }, [roundsLoading, activeRound, go])
 
   const anyLoading = roundsLoading || playersLoading || coursesLoading
   const course = courses.find((c) => c.id === activeRound?.course_id)

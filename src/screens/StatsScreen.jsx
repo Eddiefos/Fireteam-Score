@@ -14,7 +14,7 @@ function StatsScreen({ go, userId }) {
 
   const loading = profileLoading || roundsLoading
 
-  const user = profile?.display_name ?? ''
+  const displayName = profile?.display_name ?? ''
 
   const completed = useMemo(() =>
     [...rounds].filter((r) => r.finished_at).sort((a, b) =>
@@ -23,16 +23,16 @@ function StatsScreen({ go, userId }) {
   [rounds])
 
   const stats = useMemo(() => {
-    if (!profile) return null
-    return computePlayerStats(rounds, user)
-  }, [rounds, profile, user])
+    if (!userId) return null
+    return computePlayerStats(rounds, userId)
+  }, [rounds, userId])
 
   const myRounds = useMemo(() => {
-    if (!user) return []
+    if (!userId) return []
     return completed
-      .filter((r) => r.players?.some((p) => p.displayName === user))
+      .filter((r) => r.players?.some((p) => p.userId === userId))
       .map((r) => {
-        const me = r.players.find((p) => p.displayName === user)
+        const me = r.players.find((p) => p.userId === userId)
         const myScore = playerTotal(r, me.id)
         const myVs = playerVsPar(r, me.id)
         let strictlyBest = true
@@ -42,7 +42,7 @@ function StatsScreen({ go, userId }) {
         }
         return { round: r, vs: myVs, win: strictlyBest }
       })
-  }, [completed, user])
+  }, [completed, userId])
 
   const filtered = useMemo(() => {
     if (filter === 'all') return myRounds
@@ -50,7 +50,7 @@ function StatsScreen({ go, userId }) {
     return myRounds.filter((m) => !m.win)
   }, [myRounds, filter])
 
-  const noUser = !user
+  const noUser = !userId
   const noRounds = completed.length === 0
 
   if (loading) {
@@ -81,7 +81,7 @@ function StatsScreen({ go, userId }) {
         <div style={{ padding: '4px 22px 12px' }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, textTransform: 'uppercase' }}>Your stats</div>
           <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1, marginTop: 4 }}>
-            {noUser ? 'Set your name.' : `The book on ${user.split(' ')[0]}.`}
+            {noUser ? 'Set your name.' : `The book on ${displayName.split(' ')[0]}.`}
           </div>
         </div>
 
