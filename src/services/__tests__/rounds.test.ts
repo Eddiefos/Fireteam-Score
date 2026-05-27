@@ -7,12 +7,22 @@ vi.mock('../supabase', () => ({
 import { supabase } from '../supabase'
 import { startRound, finishRound, abandonRound, updateHolesPlayed } from '../rounds'
 
-beforeEach(() => vi.clearAllMocks())
+beforeEach(() => vi.resetAllMocks())
+
+function makeActiveRoundChain(data: unknown = null) {
+  return {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    maybeSingle: vi.fn().mockResolvedValue({ data, error: null }),
+  }
+}
 
 describe('startRound', () => {
   it('inserts a round then inserts round_players and returns the round id', async () => {
     const mockRound = { id: 'r1', course_id: 'c1', status: 'active', started_at: '2026-01-01', finished_at: null, holes_played: 0, created_by: 'u1' }
-    const roundChain = {
+    const roundInsertChain = {
       insert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: mockRound, error: null }),
@@ -21,14 +31,15 @@ describe('startRound', () => {
       insert: vi.fn().mockResolvedValue({ error: null }),
     }
     vi.mocked(supabase.from)
-      .mockReturnValueOnce(roundChain as any)  // rounds insert
-      .mockReturnValueOnce(playerChain as any) // round_players insert
+      .mockReturnValueOnce(makeActiveRoundChain() as any) // getActiveRound — no existing round
+      .mockReturnValueOnce(roundInsertChain as any)       // rounds insert
+      .mockReturnValueOnce(playerChain as any)            // round_players insert
 
     const result = await startRound('c1', 'u1', [
       { userId: 'u1', displayName: 'Edvard', initials: 'EF', color: '#FF6B1F', isGuest: false },
     ])
 
-    expect(roundChain.insert).toHaveBeenCalledWith(expect.objectContaining({ course_id: 'c1', created_by: 'u1' }))
+    expect(roundInsertChain.insert).toHaveBeenCalledWith(expect.objectContaining({ course_id: 'c1', created_by: 'u1' }))
     expect(playerChain.insert).toHaveBeenCalledWith(
       expect.arrayContaining([
         expect.objectContaining({ round_id: 'r1', display_name: 'Edvard', is_guest: false }),
@@ -39,7 +50,7 @@ describe('startRound', () => {
 
   it('throws when round_players insert fails', async () => {
     const mockRound = { id: 'r1', course_id: 'c1', status: 'active', started_at: '2026-01-01', finished_at: null, holes_played: 0, created_by: 'u1' }
-    const roundChain = {
+    const roundInsertChain = {
       insert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: mockRound, error: null }),
@@ -48,12 +59,39 @@ describe('startRound', () => {
       insert: vi.fn().mockResolvedValue({ error: { message: 'insert failed' } }),
     }
     vi.mocked(supabase.from)
-      .mockReturnValueOnce(roundChain as any)
+      .mockReturnValueOnce(makeActiveRoundChain() as any) // getActiveRound — no existing round
+      .mockReturnValueOnce(roundInsertChain as any)
       .mockReturnValueOnce(playerChain as any)
 
     await expect(startRound('c1', 'u1', [
       { userId: 'u1', displayName: 'Edvard', initials: 'EF', color: '#FF6B1F', isGuest: false },
     ])).rejects.toThrow('insert failed')
+  })
+
+  it('abandons existing active round before creating a new one', async () => {
+    const existingRound = { id: 'r0', course_id: 'c0', status: 'active', started_at: '2026-01-01', holes_played: 0, created_by: 'u1' }
+    const mockRound = { id: 'r1', course_id: 'c1', status: 'active', started_at: '2026-01-02', finished_at: null, holes_played: 0, created_by: 'u1' }
+    const abandonChain = {
+      update: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ error: null }),
+    }
+    const roundInsertChain = {
+      insert: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: mockRound, error: null }),
+    }
+    vi.mocked(supabase.from)
+      .mockReturnValueOnce(makeActiveRoundChain(existingRound) as any) // getActiveRound — returns existing
+      .mockReturnValueOnce(abandonChain as any)                        // abandonRound update
+      .mockReturnValueOnce(roundInsertChain as any)                    // rounds insert
+      .mockReturnValueOnce({ insert: vi.fn().mockResolvedValue({ error: null }) } as any) // round_players
+
+    const result = await startRound('c1', 'u1', [
+      { userId: 'u1', displayName: 'Edvard', initials: 'EF', color: '#FF6B1F', isGuest: false },
+    ])
+
+    expect(abandonChain.update).toHaveBeenCalledWith({ status: 'abandoned' })
+    expect(result.id).toBe('r1')
   })
 })
 

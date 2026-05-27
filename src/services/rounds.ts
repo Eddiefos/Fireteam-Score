@@ -7,6 +7,11 @@ export async function startRound(
   players: NewRoundPlayer[],
   fireteamId?: string,
 ): Promise<{ id: string }> {
+  const existing = await getActiveRound(userId)
+  if (existing) {
+    await abandonRound(existing.id)
+  }
+
   const { data, error } = await supabase
     .from('rounds')
     .insert({
@@ -71,7 +76,7 @@ export async function dismissRound(roundId: string, userId: string): Promise<voi
   if (error) throw new Error(error.message)
 }
 
-export async function getActiveRound(_userId: string): Promise<{
+export async function getActiveRound(userId: string): Promise<{
   id: string
   course_id: string
   started_at: string
@@ -82,6 +87,7 @@ export async function getActiveRound(_userId: string): Promise<{
     .from('rounds')
     .select('id, course_id, started_at, holes_played, created_by, status')
     .eq('status', 'active')
+    .eq('created_by', userId)
     .order('started_at', { ascending: false })
     .limit(1)
     .maybeSingle()
