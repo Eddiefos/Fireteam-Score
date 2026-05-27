@@ -39,7 +39,7 @@ describe('useRecentCourses', () => {
 
   it('returns a RecentCourse for each unique course_id played', async () => {
     vi.mocked(roundsService.getPlayerRoundsWithData).mockResolvedValue([
-      makeRound({ id: 'r1', course_id: 'c1', course_name: 'Alpha', started_at: '2026-05-25T10:00:00Z' }),
+      makeRound({ id: 'r1', course_id: 'c1', course_name: 'Alpha', started_at: '2026-05-25T10:00:00Z', finished_at: '2026-05-25T11:00:00Z' }),
       makeRound({ id: 'r2', course_id: 'c2', course_name: 'Beta', started_at: '2026-05-22T10:00:00Z' }),
     ])
 
@@ -51,14 +51,14 @@ describe('useRecentCourses', () => {
       courseId: 'c1',
       courseName: 'Alpha',
       pars: [3, 3, 3],
-      lastPlayedAt: '2026-05-25T10:00:00Z',
+      lastPlayedAt: '2026-05-25T11:00:00Z',
     })
   })
 
   it('deduplicates: keeps the most recent play when a course appears multiple times', async () => {
     vi.mocked(roundsService.getPlayerRoundsWithData).mockResolvedValue([
       // rounds are newest-first (service guarantees this)
-      makeRound({ id: 'r3', course_id: 'c1', started_at: '2026-05-25T10:00:00Z' }),
+      makeRound({ id: 'r3', course_id: 'c1', started_at: '2026-05-25T10:00:00Z', finished_at: '2026-05-25T11:00:00Z' }),
       makeRound({ id: 'r1', course_id: 'c1', started_at: '2026-05-10T10:00:00Z' }),
       makeRound({ id: 'r2', course_id: 'c2', course_name: 'Beta', started_at: '2026-05-20T10:00:00Z' }),
     ])
@@ -69,7 +69,7 @@ describe('useRecentCourses', () => {
     expect(result.current.recentCourses).toHaveLength(2)
     // c1 appears with the most recent play date
     expect(result.current.recentCourses[0].courseId).toBe('c1')
-    expect(result.current.recentCourses[0].lastPlayedAt).toBe('2026-05-25T10:00:00Z')
+    expect(result.current.recentCourses[0].lastPlayedAt).toBe('2026-05-25T11:00:00Z')
   })
 
   it('caps results at 5 courses', async () => {

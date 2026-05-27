@@ -8,7 +8,7 @@ export function useRecentCourses(userId: string | undefined) {
   const recentCourses = useMemo<RecentCourse[]>(() => {
     const seen = new Set<string>()
     const result: RecentCourse[] = []
-    // rounds are already sorted newest-first by the service
+    // getPlayerRoundsWithData orders by started_at DESC — first occurrence per course_id is most recent
     for (const round of rounds) {
       if (!seen.has(round.course_id)) {
         seen.add(round.course_id)
@@ -16,7 +16,7 @@ export function useRecentCourses(userId: string | undefined) {
           courseId: round.course_id,
           courseName: round.course_name,
           pars: round.pars,
-          lastPlayedAt: round.started_at,
+          lastPlayedAt: round.finished_at ?? round.started_at,
         })
       }
       if (result.length === 5) break
