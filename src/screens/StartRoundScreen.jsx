@@ -7,6 +7,8 @@ import {
 } from '../components/atoms'
 import { useCourses } from '../hooks/useCourses'
 import { useOfficialCourses } from '../hooks/useOfficialCourses'
+import { useRecentCourses } from '../hooks/useRecentCourses'
+import { formatLastPlayed } from '../lib/formatDate'
 import { useRounds } from '../hooks/useRounds'
 import { useProfile } from '../hooks/useProfile'
 import { useFriends } from '../hooks/useFriends'
@@ -22,6 +24,7 @@ function StartRoundScreen({ go, userId, params = {} }) {
   const { friends, loading: friendsLoading } = useFriends(userId)
   const { fireteam } = useFireteam(userId)
   const { courses: officialCourses } = useOfficialCourses()
+  const { recentCourses } = useRecentCourses(userId)
 
   const [mode, setMode] = useState(() => courseId ? 'ready' : 'pick')
   const [selectedCourseId, setSelectedCourseId] = useState(null)
@@ -85,6 +88,9 @@ function StartRoundScreen({ go, userId, params = {} }) {
   const preselectedCourse = courseId ? officialCourses.find(c => c.id === courseId) ?? null : null
   const selectedCourse = mode === 'ready'
     ? preselectedCourse
+      ?? courses.find(c => c.id === selectedCourseId)
+      ?? officialCourses.find(c => c.id === selectedCourseId)
+      ?? null
     : courses.find((c) => c.id === selectedCourseId)
   const canStart = !!selectedCourse && !starting && !!myPlayer
 
@@ -138,9 +144,36 @@ function StartRoundScreen({ go, userId, params = {} }) {
         {/* ─── PICK MODE: type selector tiles ─── */}
         {mode === 'pick' && (
           <div style={{ padding: '0 20px 16px' }}>
-            <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05, marginBottom: 20 }}>
+            <div style={{ fontFamily: SFR, fontWeight: 700, fontSize: 36, letterSpacing: -1.2, lineHeight: 1.05, marginBottom: recentCourses.length > 0 ? 14 : 20 }}>
               Pick your<br/>course.
             </div>
+
+            {recentCourses.length > 0 && (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: 2, color: FT.dim, marginBottom: 8 }}>RECENTLY PLAYED</div>
+                <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+                  {recentCourses.slice(0, 5).map(rc => (
+                    <button
+                      key={rc.courseId}
+                      onClick={() => { setSelectedCourseId(rc.courseId); setMode('ready') }}
+                      className="flat"
+                      style={{
+                        flexShrink: 0, height: 36, padding: '0 14px',
+                        borderRadius: 22, border: `1px solid ${FT.hair}`,
+                        background: FT.paper, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: 5,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <span style={{ fontSize: 13, fontWeight: 600, color: FT.ink }}>{rc.courseName}</span>
+                      <span style={{ fontSize: 11, color: FT.dim }}>·</span>
+                      <span style={{ fontSize: 11, color: FT.dim }}>{formatLastPlayed(rc.lastPlayedAt)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {/* Official tile */}
               <button
