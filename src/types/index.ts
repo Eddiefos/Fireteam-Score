@@ -179,3 +179,10 @@ export interface CourseSubmission {
   reviewed_at: string | null;
   created_at: string;
 }
+
+export type RecentCourse = {
+  courseId: string
+  courseName: string
+  pars: number[]
+  lastPlayedAt: string  // ISO timestamp of most recent finished round
+}
