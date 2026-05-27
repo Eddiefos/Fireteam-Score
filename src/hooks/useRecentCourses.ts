@@ -19,7 +19,6 @@ export function useRecentCourses(userId: string | undefined) {
           lastPlayedAt: round.finished_at ?? round.started_at,
         })
       }
-      if (result.length === 5) break
     }
     return result
   }, [rounds])

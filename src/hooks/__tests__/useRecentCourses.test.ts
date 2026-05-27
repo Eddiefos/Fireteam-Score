@@ -72,7 +72,7 @@ describe('useRecentCourses', () => {
     expect(result.current.recentCourses[0].lastPlayedAt).toBe('2026-05-25T11:00:00Z')
   })
 
-  it('caps results at 5 courses', async () => {
+  it('returns all unique courses with no cap', async () => {
     vi.mocked(roundsService.getPlayerRoundsWithData).mockResolvedValue(
       ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].map((cid, i) =>
         makeRound({ id: `r${i}`, course_id: cid, course_name: `Course ${cid}` })
@@ -82,7 +82,7 @@ describe('useRecentCourses', () => {
     const { result } = renderHook(() => useRecentCourses('u1'))
     await act(async () => {})
 
-    expect(result.current.recentCourses).toHaveLength(5)
+    expect(result.current.recentCourses).toHaveLength(6)
   })
 
   it('passes the userId to getPlayerRoundsWithData', async () => {

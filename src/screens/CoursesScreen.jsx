@@ -74,6 +74,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
   const chipLabels = { recent: 'Recent', official: 'Official', mine: 'My Courses' }
 
   const { recentCourses, loading: recentLoading } = useRecentCourses(userId)
+  const [showAllRecent, setShowAllRecent] = useState(false)
 
   const remove = async (id) => {
     try {
@@ -142,31 +143,55 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
                 title="No rounds played yet"
                 body="Finish a round and your recent courses will appear here."
               />
-            ) : (
-              recentCourses.map(rc => (
-                <div key={rc.courseId} style={{
-                  background: FT.paper, border: `1px solid ${FT.hair}`,
-                  borderRadius: 20, padding: '14px 16px',
-                  display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6,
-                }}>
-                  <div style={{
-                    width: 46, height: 46, borderRadius: 14, background: FT.forest,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: SFR, fontWeight: 900, fontSize: 14, color: FT.cream, flexShrink: 0,
-                  }}>
-                    {rc.pars.length}H
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {rc.courseName}
+            ) : (() => {
+              const displayed = showAllRecent ? recentCourses : recentCourses.slice(0, 5)
+              const hiddenCount = recentCourses.length - 5
+              return (
+                <>
+                  {displayed.map(rc => (
+                    <div key={rc.courseId} style={{
+                      background: FT.paper, border: `1px solid ${FT.hair}`,
+                      borderRadius: 20, padding: '14px 16px',
+                      display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6,
+                    }}>
+                      <div style={{
+                        width: 46, height: 46, borderRadius: 14, background: FT.forest,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: SFR, fontWeight: 900, fontSize: 14, color: FT.cream, flexShrink: 0,
+                      }}>
+                        {rc.pars.length}H
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {rc.courseName}
+                        </div>
+                        <div style={{ fontSize: 13, color: FT.dim, marginTop: 2 }}>
+                          Par {totalPar(rc.pars)} · {formatLastPlayed(rc.lastPlayedAt)}
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ fontSize: 13, color: FT.dim, marginTop: 2 }}>
-                      Par {totalPar(rc.pars)} · {formatLastPlayed(rc.lastPlayedAt)}
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+                  ))}
+                  {!showAllRecent && hiddenCount > 0 && (
+                    <button onClick={() => setShowAllRecent(true)} className="flat" style={{
+                      width: '100%', height: 44, borderRadius: 12, border: `1px solid ${FT.hair}`,
+                      background: FT.paper, color: FT.dim,
+                      fontSize: 13, fontWeight: 600, marginTop: 2,
+                    }}>
+                      Show {hiddenCount} more
+                    </button>
+                  )}
+                  {showAllRecent && recentCourses.length > 5 && (
+                    <button onClick={() => setShowAllRecent(false)} className="flat" style={{
+                      width: '100%', height: 44, borderRadius: 12, border: `1px solid ${FT.hair}`,
+                      background: FT.paper, color: FT.dim,
+                      fontSize: 13, fontWeight: 600, marginTop: 2,
+                    }}>
+                      Show less
+                    </button>
+                  )}
+                </>
+              )
+            })()}
           </div>
         )}
 
