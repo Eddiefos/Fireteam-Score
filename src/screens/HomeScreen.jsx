@@ -178,7 +178,7 @@ function HomeScreen({ go, userId }) {
             <div style={{ marginBottom: 10 }}>
               <IconBadge bg={FT.forest}><IconHistory color={FT.cream} size={18} /></IconBadge>
             </div>
-            <div style={{ fontWeight: 700, fontSize: 17, color: FT.ink }}>History</div>
+            <div style={{ fontWeight: 700, fontSize: 17, color: FT.ink }}>Stats</div>
             <div style={{ fontSize: 13, color: FT.dim, marginTop: 2, fontWeight: 400 }}>{completed.length} {completed.length === 1 ? 'round' : 'rounds'}</div>
           </button>
           <button onClick={() => go('courses')} className="flat" style={{
