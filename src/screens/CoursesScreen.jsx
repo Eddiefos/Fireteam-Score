@@ -150,9 +150,9 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
                   display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6,
                 }}>
                   <div style={{
-                    width: 46, height: 46, borderRadius: 12, background: FT.forest,
+                    width: 46, height: 46, borderRadius: 14, background: FT.forest,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 11, fontWeight: 600, color: FT.cream, flexShrink: 0, fontFamily: MONO,
+                    fontFamily: SFR, fontWeight: 900, fontSize: 14, color: FT.cream, flexShrink: 0,
                   }}>
                     {rc.pars.length}H
                   </div>
