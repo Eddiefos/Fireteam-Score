@@ -35,8 +35,12 @@ describe('formatLastPlayed', () => {
     expect(formatLastPlayed(date.toISOString(), NOW)).toBe('15 Mar')
   })
 
+  it('returns "Today" for a future timestamp (clock skew)', () => {
+    const future = new Date(2026, 4, 28, 10, 0, 0)
+    expect(formatLastPlayed(future.toISOString(), NOW)).toBe('Today')
+  })
+
   it('uses current time as default when now is omitted', () => {
-    // Just verifies it runs without error — the result depends on real clock
     expect(() => formatLastPlayed(new Date().toISOString())).not.toThrow()
   })
 })

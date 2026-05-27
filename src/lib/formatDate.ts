@@ -11,7 +11,7 @@ export function formatLastPlayed(isoDate: string, now: Date = new Date()): strin
     (todayStart.getTime() - dateStart.getTime()) / (1000 * 60 * 60 * 24)
   )
 
-  if (diffDays === 0) return 'Today'
+  if (diffDays <= 0) return 'Today'
   if (diffDays === 1) return 'Yesterday'
   if (diffDays < 7)  return `${diffDays} days ago`
 
