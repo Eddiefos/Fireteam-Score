@@ -1,49 +1,47 @@
-# Handoff — 2026-05-27
+# Handoff: Recent Courses, Start Round Chips, Active Round Fix
+**Date:** 2026-05-27  
+**Branch:** `main` (committed directly)  
+**Tests:** 95/106 passing · 11 pre-existing failures (unrelated baseline)
+
+---
 
 ## What was built
 
-### 1. Recent Courses tab in CoursesScreen
-- New `useRecentCourses` hook (`src/hooks/useRecentCourses.ts`) — derives unique recently-played courses from `usePlayerRounds`, deduped by `course_id`, sorted newest-first via `finished_at ?? started_at`.
-- New `RecentCourse` type in `src/types/index.ts`.
-- New `formatLastPlayed` utility (`src/lib/formatDate.ts`) — converts ISO timestamps to human labels: "Today", "Yesterday", "3 days ago", "20 May". Handles clock-skew (future dates → "Today").
-- CoursesScreen "Recent" tab now shows real data: top 5 courses with a "Show X more / Show less" toggle.
-- Tests: `src/lib/__tests__/formatDate.test.ts` (8 tests), `src/hooks/__tests__/useRecentCourses.test.ts` (5 tests).
+Added real round history to the "Recent" tab in CoursesScreen, surfaced recently played courses as quick-pick chips on the Start Round screen, fixed a bug that allowed duplicate active rounds per user, and renamed the HomeScreen "History" tile to "Stats".
 
-### 2. Recently played chips on Start Round screen
-- `StartRoundScreen.jsx` shows a horizontal scroll row of chips above the course tiles when the user has recent history.
-- Chip format: "CourseName · 3 days ago" (single-line, B2 design from visual companion session).
-- Tapping a chip sets `selectedCourseId` and advances to the ready-to-start state.
-- Shows top 5 chips. No separate screen needed.
-- `selectedCourse` lookup expanded to cover both user courses and official courses so pre-selection from chips works correctly.
+---
 
-### 3. Guard against multiple active rounds
-- `getActiveRound` (`src/services/rounds.ts`) was ignoring its `userId` param — now correctly filters `created_by = userId`.
+## Key changes
+
+### Types (`src/types/index.ts`)
+- `RecentCourse` — `{ courseId, courseName, pars, lastPlayedAt }`
+
+### Utilities (`src/lib/formatDate.ts`)
+- `formatLastPlayed(isoDate, now?)` — converts ISO timestamps to human labels: "Today", "Yesterday", "3 days ago", "20 May". Guards against clock-skew (future dates → "Today").
+
+### Hook (`src/hooks/useRecentCourses.ts`)
+- Derives unique recently-played courses from `usePlayerRounds`, deduped by `course_id`, sorted newest-first via `finished_at ?? started_at`. No cap — display limit handled in UI.
+
+### Services (`src/services/rounds.ts`)
+- `getActiveRound` was ignoring its `userId` param entirely — now filters by `created_by = userId`.
 - `startRound` auto-abandons any existing active round before creating a new one.
-- `rounds.test.ts` updated: switched `clearAllMocks` → `resetAllMocks` to prevent `mockReturnValueOnce` queue leakage, added `getActiveRoundChain` helper, added auto-abandon test.
-- All 6 rounds tests pass. Pre-existing 11 failures in other test files are unrelated (baseline from before this work).
 
-### 4. HomeScreen "History" → "Stats" rename
-- The quick-nav tile on HomeScreen was labeled "History" but navigated to the `stats` screen/tab, causing a naming mismatch.
-- Renamed the tile label to "Stats" to match the bottom tab and `StatsScreen`.
+### Screens (modified)
+| File | Change |
+|---|---|
+| `src/screens/CoursesScreen.jsx` | "Recent" tab now shows real data from `useRecentCourses`. Top 5 shown by default with a "Show X more / Show less" toggle. |
+| `src/screens/StartRoundScreen.jsx` | Horizontal scroll row of "Name · timestamp" chips in pick mode. Tapping a chip sets `selectedCourseId` and jumps to ready state. `selectedCourse` lookup expanded to cover both user and official courses. |
+| `src/screens/HomeScreen.jsx` | Quick-nav tile renamed "History" → "Stats" to match the bottom tab. |
 
----
-
-## Deferred / follow-up ideas
-
-### History vs Stats split (intentionally deferred)
-The user noticed the "History" → Stats mismatch and asked whether to rename or split. Decision: rename for now.
-
-**Context for future revisit:** StatsScreen currently serves two purposes — aggregate performance metrics (win %, avg vs par, birdies) AND a chronological round list. These could be split into:
-- **Stats** — purely the numbers/performance view
-- **History** — a dedicated round log, potentially showing rounds across the whole fireteam, filterable by course or date range
-
-This split would make sense if/when the round list grows complex enough to warrant its own IA (e.g. fireteam-wide history, course-specific filters). Not worth building until there's a clear need.
-
-### One-time DB cleanup
-Users who played before the multiple-active-rounds fix may have stale `active` rounds in the DB. A one-time migration to mark old orphaned active rounds as `abandoned` would clean this up. Low priority — only affects rounds created before this fix.
+### Tests
+- `src/lib/__tests__/formatDate.test.ts` — 8 tests for `formatLastPlayed`
+- `src/hooks/__tests__/useRecentCourses.test.ts` — 5 tests (dedup, no cap, userId forwarding)
+- `src/services/__tests__/rounds.test.ts` — updated to use `resetAllMocks()` (prevents `mockReturnValueOnce` queue leakage between tests); added `getActiveRoundChain` helper and auto-abandon test. 6/6 passing.
 
 ---
 
-## Test baseline
-- Pre-existing failures (not introduced by this work): 11 tests in `gameLogic.test.ts`, `courses.test.ts`, `useOfficialCourses.test.ts`. The handoff doc from 2026-05-23 stated 1 failure — this was inaccurate.
-- All new code has full test coverage.
+## What's NOT done / follow-up
+
+- **History vs Stats split**: StatsScreen currently handles both aggregate metrics (win %, avg vs par, birdies) and a chronological round list. These could eventually be split into a dedicated "History" screen (round log, fireteam-wide, filterable) and a "Stats" screen (numbers only). Deferred until fireteam features make a separate history view clearly worthwhile.
+- **One-time DB cleanup**: Users with rounds created before the active-round fix may have stale `active` rows in the DB. A one-time migration (`UPDATE rounds SET status = 'abandoned' WHERE status = 'active' AND finished_at IS NULL AND started_at < <fix date>`) would clean this up. Low priority.
+- **Test baseline**: 11 pre-existing failures in `gameLogic.test.ts`, `courses.test.ts`, `useOfficialCourses.test.ts`. The 2026-05-23 handoff doc stated 1 failure — that was inaccurate.
