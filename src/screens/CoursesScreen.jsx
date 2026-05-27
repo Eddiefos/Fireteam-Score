@@ -6,7 +6,9 @@ import {
   IconArrowBack, IconTrash, IconPlus, IconMapPin, IconBadge, EmptyState,
 } from '../components/atoms'
 import { useCourses } from '../hooks/useCourses'
+import { useRecentCourses } from '../hooks/useRecentCourses'
 import { totalPar } from '../lib/gameLogic'
+import { formatLastPlayed } from '../lib/formatDate'
 
 // ────────────────────────────────────────────────────────────────────────
 //  Tiny modal (for confirms)
@@ -71,7 +73,7 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
   const chips = ['recent', 'official', 'mine']
   const chipLabels = { recent: 'Recent', official: 'Official', mine: 'My Courses' }
 
-  const recentCourses = courses.slice(0, 5)
+  const { recentCourses, loading: recentLoading } = useRecentCourses(userId)
 
   const remove = async (id) => {
     try {
@@ -130,23 +132,36 @@ function CoursesScreen({ go, userId, onToast = () => {} }) {
       <div className="ft-scroll">
         {filter === 'recent' && (
           <div style={{ padding: '0 10px' }}>
-            {recentCourses.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '32px 20px', color: FT.dim, fontSize: 13, lineHeight: 1.6 }}>
-                Add a course to see it here.
+            {recentLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: FT.orange, opacity: 0.8 }} />
               </div>
+            ) : recentCourses.length === 0 ? (
+              <EmptyState
+                icon={<IconBadge bg={FT.forest}><IconMapPin color={FT.cream} size={18} /></IconBadge>}
+                title="No rounds played yet"
+                body="Finish a round and your recent courses will appear here."
+              />
             ) : (
-              recentCourses.map(course => (
-                <div key={course.id} style={{ background: FT.paper, border: `1px solid ${FT.hair}`, borderRadius: 20, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: 12, background: FT.forest, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, color: FT.cream, flexShrink: 0, fontFamily: MONO }}>
-                    {course.pars.length}H
+              recentCourses.map(rc => (
+                <div key={rc.courseId} style={{
+                  background: FT.paper, border: `1px solid ${FT.hair}`,
+                  borderRadius: 20, padding: '14px 16px',
+                  display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6,
+                }}>
+                  <div style={{
+                    width: 46, height: 46, borderRadius: 12, background: FT.forest,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 11, fontWeight: 600, color: FT.cream, flexShrink: 0, fontFamily: MONO,
+                  }}>
+                    {rc.pars.length}H
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{course.name}</div>
+                    <div style={{ fontWeight: 600, fontSize: 16, color: FT.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {rc.courseName}
+                    </div>
                     <div style={{ fontSize: 13, color: FT.dim, marginTop: 2 }}>
-                      {course.location ?? `Par ${totalPar(course.pars)}`}
-                      {course.source === 'official' && (
-                        <span style={{ background: FT.orangeAlpha12, color: FT.orange, fontSize: 8, fontWeight: 600, padding: '1px 4px', borderRadius: 3, marginLeft: 4, fontFamily: MONO }}>OFFICIAL</span>
-                      )}
+                      Par {totalPar(rc.pars)} · {formatLastPlayed(rc.lastPlayedAt)}
                     </div>
                   </div>
                 </div>
